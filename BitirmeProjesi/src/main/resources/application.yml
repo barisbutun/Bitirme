@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/BitirmeProjesi
+    username: barishafize
+    password: bitirmeProjesi
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # 'create', 'create-drop', 'validate', 'update' gibi de?erler alabilir.
+      show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+  docker:
+    compose:
+      enabled: true
+      files: docker-compose.yaml
+      services:
+        - postgres
+        - redis
+
+
+datasource:
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    idle-timeout: 30000
+    connection-timeout: 20000
+    pool-name: HikariPool
+
+server:
+  port: 8082
