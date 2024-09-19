@@ -1,8 +1,8 @@
-package mapper;
+package org.example.bitirmeprojesi.mapper;
 
 
-import dto.UserDto;
-import entity.User;
+import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.entity.User;
 import org.mapstruct.*;
 
 import java.util.List;

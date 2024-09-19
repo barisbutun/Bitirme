@@ -1,10 +1,10 @@
-package controller;
+package org.example.bitirmeprojesi.controller;
 
 
-import dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.service.UserService;
 import org.springframework.web.bind.annotation.*;
-import service.UserService;
 
 import java.util.List;
 
@@ -26,19 +26,11 @@ public class UserController {
     @GetMapping("/v1")
     public List<UserDto> findAll() {
         return userService.findAll();
-    }
-
-    @PutMapping("/v1/{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody UserDto userDto){
-
-
-        return userService.update(userDto);
-    }
+    }@PutMapping("/v1/{id}")
+    public UserDto update(@PathVariable("id") Long id, @RequestBody UserDto userDto){return userService.update(userDto);}
     @DeleteMapping("/v1/{id}")
     public void delete(@PathVariable("id") Long id){
         userService.delete(id);
     }
-
-
 
 }

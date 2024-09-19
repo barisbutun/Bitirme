@@ -1,20 +1,19 @@
-package dto;
+package org.example.bitirmeprojesi.dto;
 
-import enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
 
-/**
- * DTO for {@link entity.User}
- */
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class UserDto implements Serializable {
 
+    @JsonIgnore
     private Long id;
 
     private String name;

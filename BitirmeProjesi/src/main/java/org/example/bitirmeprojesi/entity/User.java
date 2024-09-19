@@ -1,8 +1,8 @@
-package entity;
+package org.example.bitirmeprojesi.entity;
 
-import enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
 
@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Table(name = "users")
 @Getter
 @Setter
+@ToString
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

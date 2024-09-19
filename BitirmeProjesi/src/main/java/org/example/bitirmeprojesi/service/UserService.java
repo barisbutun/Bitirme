@@ -1,12 +1,12 @@
-package service;
+package org.example.bitirmeprojesi.service;
 
 
-import dto.UserDto;
-import entity.User;
 import lombok.RequiredArgsConstructor;
-import mapper.UserMapper;
+import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.entity.User;
+import org.example.bitirmeprojesi.mapper.UserMapper;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import repository.UserRepository;
 
 import java.util.List;
 

@@ -1,0 +1,25 @@
+package org.example.bitirmeprojesi.mapper;
+
+import org.example.bitirmeprojesi.dto.ProductDto;
+import org.example.bitirmeprojesi.entity.Product;
+import org.mapstruct.*;
+
+import java.util.List;
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface ProductMapper {
+
+    ProductDto toDto(Product product);
+
+    Product toEntity(ProductDto productDto);
+
+    List<ProductDto> toDtoList(List<Product> productList);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void Update(ProductDto productDto, @MappingTarget Product product);
+
+
+
+
+}
