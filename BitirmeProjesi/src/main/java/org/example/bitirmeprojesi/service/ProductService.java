@@ -18,10 +18,19 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public Long create(ProductDto productDto) {
-
-        Product product = productMapper.toEntity(productDto);
+       /* Product product=new Product();
+        product.setId(productDto.getId());
+        product.setDescription(productDto.getDescription());
+        product.setName(productDto.getName());
+        product.setCategory(productDto.getCategory());
+        product.setPrice(productDto.getPrice());
+        product.setStockState(productDto.isStockState());
+        productRepository.save(product);
+        */
+        Product product=productMapper.toEntity(productDto);
         productRepository.save(product);
         return product.getId();
+
     }
 
     public ProductDto findById(long id) {

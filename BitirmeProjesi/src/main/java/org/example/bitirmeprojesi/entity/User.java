@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 @Entity
 @AllArgsConstructor
@@ -24,6 +25,7 @@ public class User implements Serializable {
     @ToString.Exclude
     private boolean registered=false;
 
+    @Column(name="password")
     private String password;
 
     @Column(name = "email")

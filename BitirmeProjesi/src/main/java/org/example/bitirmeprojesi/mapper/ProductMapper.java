@@ -10,11 +10,11 @@ import java.util.List;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
 
-    ProductDto toDto(Product product);
+    ProductDto toDto(final Product product);
 
-    Product toEntity(ProductDto productDto);
+    Product toEntity(final ProductDto productDto);
 
-    List<ProductDto> toDtoList(List<Product> productList);
+    List<ProductDto> toDtoList(final List<Product> productList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void Update(ProductDto productDto, @MappingTarget Product product);

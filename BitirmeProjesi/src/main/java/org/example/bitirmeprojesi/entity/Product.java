@@ -2,23 +2,20 @@ package org.example.bitirmeprojesi.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "products")
-@Getter
-@Setter
-public class Product {
+@Data
+public class Product implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "description")
@@ -27,6 +24,7 @@ public class Product {
     @Column(name = "name")
     private String name;
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "category")
     private String category;
 

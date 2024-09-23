@@ -2,8 +2,10 @@ package org.example.bitirmeprojesi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
+import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,13 +20,14 @@ public class ProductController {
 
 
     @PostMapping("/v1")
-    public ResponseEntity<Long> create(@RequestBody ProductDto productDto) {
-        Long productId = productService.create(productDto);
-        return ResponseEntity.ok(productId);
+    public ResponseEntity<Long> create(@RequestBody @Validated final  ProductDto productDto) {
+         long product= productService.create(productDto);
+
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<ProductDto> findById(@PathVariable Long id) {
+    public ResponseEntity<ProductDto> findById(@PathVariable final  Long id) {
         ProductDto product = productService.findById(id);
         return ResponseEntity.ok(product);
     }
@@ -38,7 +41,7 @@ public class ProductController {
 
     // Update a product by id
     @PutMapping("/v1/{id}")
-    public ResponseEntity<ProductDto> update(@PathVariable Long id, @RequestBody ProductDto productDto) {
+    public ResponseEntity<ProductDto> update(@PathVariable final Long id, @RequestBody final  ProductDto productDto) {
 
         ProductDto updatedProduct = productService.update(productDto, id);
         return ResponseEntity.ok(updatedProduct);
@@ -46,7 +49,7 @@ public class ProductController {
 
     // Delete a product by id
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable final Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build(); // 204 No Content döner
     }
