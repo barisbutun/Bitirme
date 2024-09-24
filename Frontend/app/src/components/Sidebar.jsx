@@ -5,6 +5,8 @@ import {
   HomeOutlined,
   ShoppingCartOutlined,
   LoginOutlined,
+  AppstoreOutlined,
+  TruckOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom"; // Link to for routing
@@ -29,11 +31,21 @@ const items = [
   },
   {
     key: "4",
-    icon: <ShoppingCartOutlined />, // Sepetim ikonu
-    label: <Link to="/cart">Sepetim</Link>, // Sepetim sayfasına yönlendirme
+    icon: <AppstoreOutlined />, // Ürünler ikonu
+    label: <Link to="/Products">Ürünler</Link>, // Ürünler sayfasına yönlendirme
   },
   {
     key: "5",
+    icon: <ShoppingCartOutlined />, // Sepetim ikonu
+    label: <Link to="/ShoppingCard">Sepetim</Link>, // Sepetim sayfasına yönlendirme
+  },
+  {
+    key: "6",
+    icon: <TruckOutlined />, // Teslimatikonu
+    label: <Link to="/Delivery">Alışveriş Bilgileri</Link>, // Alışveriş bilgileri sayfasına yönlendirme
+  },
+  {
+    key: "7",
     icon: <SettingOutlined />, // Ayarlar ikonu
     label: <Link to="/settings">Ayarlar</Link>, // Ayarlar sayfasına yönlendirme
   },
