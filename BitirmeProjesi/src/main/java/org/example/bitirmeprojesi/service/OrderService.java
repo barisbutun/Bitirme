@@ -2,7 +2,7 @@ package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrderDto;
-import org.example.bitirmeprojesi.entity.Order;
+import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,26 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
 
-    public Long create(OrderDto orderDto){
-        Order order=orderMapper.toEntity(orderDto);
-        return orderRepository.save(order).getId();
+    public OrderDto create(OrderDto orderDto){
+        Orders orders =orderMapper.toEntity(orderDto);
+        orderRepository.save(orders);
+        return orderMapper.toDto(orders);
     }
 
     public OrderDto findById(Long id){
-        Order order=orderRepository.findById(id).orElseThrow(()->new RuntimeException("Order not found"));
-        return orderMapper.toDto(order);
+        Orders orders =orderRepository.findById(id).get();
+        return orderMapper.toDto(orders);
     }
 
     public List<OrderDto> findAll(){
-        List<Order> orderList=orderRepository.findAll();
-        return orderMapper.toDtoList(orderList);
+        List<Orders> ordersList =orderRepository.findAll();
+        return orderMapper.toDtoList(ordersList);
     }
     public OrderDto update(OrderDto orderDto,long id){
-        orderRepository.findById(id).orElseThrow(()->new RuntimeException("Order not found()->"));
-        Order order=orderMapper.toEntity(orderDto);
-        orderRepository.save(order);
-        return orderMapper.toDto(order);
+        Orders orders =orderRepository.findById(id).get();
+        orderMapper.update(orderDto, orders);
+        orderRepository.save(orders);
+        return orderMapper.toDto(orders);
     }
 
     public void  delete (long id){

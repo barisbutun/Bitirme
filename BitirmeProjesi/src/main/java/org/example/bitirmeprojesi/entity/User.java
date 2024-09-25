@@ -3,9 +3,11 @@ package org.example.bitirmeprojesi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.bitirmeprojesi.enums.Role;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -16,8 +18,13 @@ import java.math.BigInteger;
 @ToString
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "name")
     private String name;
@@ -28,12 +35,15 @@ public class User implements Serializable {
     @Column(name="password")
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email",unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @ToString.Exclude
     private Role role = Role.USER;
+
+    @OneToMany(mappedBy = "user")
+    private List<OrderItem> orderItems;
 
 
 }

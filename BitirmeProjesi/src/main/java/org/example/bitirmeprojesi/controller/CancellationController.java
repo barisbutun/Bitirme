@@ -16,13 +16,15 @@ public class CancellationController {
     private final CancellationService cancellationService;
 
     @PostMapping("/v1")
-    public ResponseEntity<Long> create(@RequestBody CancellationDto cancellationDto){
+    public ResponseEntity<CancellationDto> create(@RequestBody CancellationDto cancellationDto) {
         return ResponseEntity.ok(cancellationService.create(cancellationDto));
     }
     @GetMapping("/v1/{id}")
     public ResponseEntity<CancellationDto> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(cancellationService.findById(id));
     }
+
+
     @GetMapping("/v1")
     public ResponseEntity<List<CancellationDto>> findAll() {
         return ResponseEntity.ok(cancellationService.findAll());

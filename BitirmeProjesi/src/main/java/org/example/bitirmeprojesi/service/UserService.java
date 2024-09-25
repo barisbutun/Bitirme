@@ -9,6 +9,7 @@ import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +18,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public long create(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         userRepository.save(user);
-        return user.getId();
+        return userMapper.toDto(user);
     }
 
-    public UserDto findById(long id) {
+    public UserDto findById(UUID id) {
         User user = userRepository.findById(id).get();
         return userMapper.toDto(user);
     }
@@ -32,14 +33,16 @@ public class UserService {
 
         return userMapper.toDtoList(userRepository.findAll());
     }
-    public UserDto update(UserDto userDto){
-        User user=userRepository.findById(userDto.getId()).get();
+
+    public UserDto update(UserDto userDto, UUID id) {
+        User user = userRepository.findById(id).get();
         userMapper.Update(userDto,user);
         userRepository.save(user);
 
         return userMapper.toDto(user);
     }
-    public void delete(long id){
+
+    public void delete(UUID id) {
         userRepository.deleteById(id);
     }
 }

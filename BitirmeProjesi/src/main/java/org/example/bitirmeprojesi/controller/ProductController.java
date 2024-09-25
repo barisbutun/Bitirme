@@ -2,12 +2,10 @@ package org.example.bitirmeprojesi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
-import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.List;
 
@@ -20,10 +18,10 @@ public class ProductController {
 
 
     @PostMapping("/v1")
-    public ResponseEntity<Long> create(@RequestBody @Validated final  ProductDto productDto) {
-         long product= productService.create(productDto);
+    public ResponseEntity<ProductDto> create(@RequestBody @Validated final  ProductDto productDto) {
+          productService.create(productDto);
 
-        return ResponseEntity.ok(product);
+        return ResponseEntity.ok(productDto);
     }
 
     @GetMapping("/v1/{id}")
@@ -39,7 +37,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // Update a product by id
+
     @PutMapping("/v1/{id}")
     public ResponseEntity<ProductDto> update(@PathVariable final Long id, @RequestBody final  ProductDto productDto) {
 
@@ -47,7 +45,6 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
-    // Delete a product by id
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         productService.delete(id);

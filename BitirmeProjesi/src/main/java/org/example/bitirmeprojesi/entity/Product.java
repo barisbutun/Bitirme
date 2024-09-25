@@ -34,5 +34,8 @@ public class Product implements Serializable {
     @Column(name = "stock_state")
     private boolean stockState;
 
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
+
 
 }

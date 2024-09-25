@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
 
@@ -10,7 +11,7 @@ import java.io.Serializable;
 import java.sql.Time;
 
 /**
- * DTO for {@link org.example.bitirmeprojesi.entity.Order}
+ * DTO for {@link Orders}
  */
 
 @Getter

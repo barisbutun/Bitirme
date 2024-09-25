@@ -17,23 +17,16 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    public Long create(ProductDto productDto) {
-       /* Product product=new Product();
-        product.setId(productDto.getId());
-        product.setDescription(productDto.getDescription());
-        product.setName(productDto.getName());
-        product.setCategory(productDto.getCategory());
-        product.setPrice(productDto.getPrice());
-        product.setStockState(productDto.isStockState());
-        productRepository.save(product);
-        */
+    public ProductDto create(ProductDto productDto) {
+
         Product product=productMapper.toEntity(productDto);
         productRepository.save(product);
-        return product.getId();
+        return productMapper.toDto(product);
 
     }
 
     public ProductDto findById(long id) {
+
         Product product = productRepository.findById(id).get();
         return productMapper.toDto(product);
     }
@@ -43,8 +36,9 @@ public class ProductService {
     }
 
     public ProductDto update(ProductDto productDto,long id){
+
         Product product=productRepository.findById(id).get();
-        productMapper.Update(productDto,product);
+        productMapper.update(productDto,product);
         productRepository.save(product);
         return productMapper.toDto(product);
     }

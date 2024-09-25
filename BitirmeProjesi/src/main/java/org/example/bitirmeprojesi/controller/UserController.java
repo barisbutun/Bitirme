@@ -4,33 +4,57 @@ package org.example.bitirmeprojesi.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("api/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping("/v1")
-    public Long create(@RequestBody UserDto userDto){
-        return userService.create(userDto);
+    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
+         userService.create(userDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
+
     @GetMapping("/v1/{id}")
-    public UserDto findById(@PathVariable("id") Long id) {
-        return userService.findById(id);
+    public ResponseEntity<UserDto> findById(@PathVariable("id") UUID id) {
+        UserDto userDto = userService.findById(id);
+        if (userDto != null) {
+            return ResponseEntity.ok(userDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
+
     @GetMapping("/v1")
-    public List<UserDto> findAll() {
-        return userService.findAll();
-    }@PutMapping("/v1/{id}")
-    public UserDto update(@PathVariable("id") Long id, @RequestBody UserDto userDto){return userService.update(userDto);}
-    @DeleteMapping("/v1/{id}")
-    public void delete(@PathVariable("id") Long id){
-        userService.delete(id);
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> userDtos = userService.findAll();
+        return ResponseEntity.ok(userDtos);
     }
+
+    @PutMapping("/v1/{id}")
+    public ResponseEntity<UserDto> update(@PathVariable("id") UUID id, @RequestBody UserDto userDto) {
+        UserDto updatedUserDto = userService.update(userDto, id);
+        if (updatedUserDto != null) {
+            return ResponseEntity.ok(updatedUserDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @DeleteMapping("/v1/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

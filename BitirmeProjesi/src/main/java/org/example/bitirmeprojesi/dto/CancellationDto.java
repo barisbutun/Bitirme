@@ -2,7 +2,6 @@ package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.hibernate.annotations.NaturalIdCache;
 
 import java.io.Serializable;
 

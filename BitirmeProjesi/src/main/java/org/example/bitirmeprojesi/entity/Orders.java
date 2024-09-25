@@ -7,6 +7,7 @@ import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.sql.Time;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +15,7 @@ import java.sql.Time;
 @Setter
 @Entity
 @Table(name = "orders")
-public class Order implements Serializable {
+public class Orders implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -37,6 +38,9 @@ public class Order implements Serializable {
 
     @Column(name = "payment_state")
     private PaymentState paymentState;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems;
 
 
 
