@@ -6,7 +6,8 @@ import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
-import java.sql.Time;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -28,7 +29,7 @@ public class Orders implements Serializable {
     private String name;
 
     @Column(name = "sale_date")
-    private Time saleDate;
+    private LocalDateTime saleDate;
 
     @Column(name = "sum_price")
     private Integer sumPrice;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,5 +27,5 @@ public class DeliveryDto implements Serializable {
     @JsonProperty("delivery_state")
     boolean deliveryState;
     @JsonProperty("delivery_date")
-    Date deliveryDate;
+    LocalDateTime deliveryDate;
 }

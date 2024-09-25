@@ -2,7 +2,7 @@ package org.example.bitirmeprojesi.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.OrderDto;
+import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +18,23 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/v1")
-    public ResponseEntity<OrderDto> create(OrderDto orderDto){
-        return ResponseEntity.ok(orderService.create(orderDto));
+    public ResponseEntity<OrdersDto> create(OrdersDto ordersDto){
+        return ResponseEntity.ok(orderService.create(ordersDto));
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<OrderDto> findById(Long id){
+    public ResponseEntity<OrdersDto> findById(Long id){
         return ResponseEntity.ok(orderService.findById(id));
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<List<OrderDto>> findAll(){
+    public ResponseEntity<List<OrdersDto>> findAll(){
         return ResponseEntity.ok(orderService.findAll());
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<OrderDto> update(OrderDto orderDto,long id){
-        return ResponseEntity.ok(orderService.update(orderDto,id));
+    public ResponseEntity<OrdersDto> update(OrdersDto ordersDto, long id){
+        return ResponseEntity.ok(orderService.update(ordersDto,id));
     }
 
     @DeleteMapping("/v1/{id}")

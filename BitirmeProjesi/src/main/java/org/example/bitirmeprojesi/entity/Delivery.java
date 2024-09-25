@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,7 +19,12 @@ import java.util.UUID;
 public class Delivery {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "follow_number")
@@ -30,6 +37,6 @@ public class Delivery {
     private boolean deliveryState;
 
     @Column(name = "delivery_date")
-    private Date deliveryDate;
+    private LocalDateTime deliveryDate;
 
 }

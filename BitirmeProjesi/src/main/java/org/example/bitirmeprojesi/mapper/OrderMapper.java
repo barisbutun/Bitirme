@@ -1,6 +1,6 @@
 package org.example.bitirmeprojesi.mapper;
 
-import org.example.bitirmeprojesi.dto.OrderDto;
+import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.mapstruct.*;
 
@@ -12,12 +12,12 @@ import java.util.List;
 public interface OrderMapper {
 
    // @Mapping(target = "id", ignore = true)
-    Orders toEntity(final OrderDto orderDto);
+    Orders toEntity(final OrdersDto ordersDto);
 
-    OrderDto toDto(final Orders orders);
+    OrdersDto toDto(final Orders orders);
 
-    List<OrderDto> toDtoList(final List<Orders> ordersList);
+    List<OrdersDto> toDtoList(final List<Orders> ordersList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void  update(final OrderDto orderDto, @MappingTarget final Orders orders);
+    void  update(final OrdersDto ordersDto, @MappingTarget final Orders orders);
 }

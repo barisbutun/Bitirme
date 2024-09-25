@@ -8,7 +8,7 @@ import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
-import java.sql.Time;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link Orders}
@@ -18,7 +18,7 @@ import java.sql.Time;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class OrderDto implements Serializable {
+public class OrdersDto implements Serializable {
     @JsonIgnore
     Long id;
 
@@ -29,7 +29,7 @@ public class OrderDto implements Serializable {
     String name;
 
     @JsonProperty("sale_date")
-    Time saleDate;
+    LocalDateTime saleDate;
 
     @JsonProperty("sum_price")
     Integer sumPrice;
