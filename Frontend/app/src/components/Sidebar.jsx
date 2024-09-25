@@ -22,7 +22,7 @@ const items = [
   {
     key: "2",
     icon: <UserOutlined />, // Profilim ikonu
-    label: <Link to="/profile">Profilim</Link>, // Profilim sayfasına yönlendirme
+    label: <Link to="/Profile">Profilim</Link>, // Profilim sayfasına yönlendirme
   },
   {
     key: "3",
@@ -66,7 +66,7 @@ const Sidebar = () => (
     <Menu
       theme="dark"
       mode="inline"
-      defaultSelectedKeys={["4"]}
+      defaultSelectedKeys={["7"]}
       items={items}
     />
   </Sider>

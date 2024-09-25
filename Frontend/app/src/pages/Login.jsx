@@ -1,15 +1,43 @@
-import React from "react";
-import { Form, Input, Button, Checkbox } from "antd"; // Ant Design'dan Form bileşenlerini import edin
-import { UserOutlined, LockOutlined } from "@ant-design/icons"; // Ant Design ikonu
-import "antd/dist/reset.css"; // Ant Design stillerini import edin
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Checkbox } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import "antd/dist/reset.css";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values); // Form submit başarılı olduğunda yapılacak işlem
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
+
+  // JSON dosyasından kullanıcı verilerini çekme
+  useEffect(() => {
+    fetch("/users.json")
+      .then((response) => response.json())
+      .then((data) => setUsers(data))
+      .catch((error) => console.error("error fetching user data:", error));
+  }, []);
+
+  // Giriş işlemi
+  const handleLogin = () => {
+    const user = users.find(
+      (user) => user.username === username && user.password === password
+    );
+    if (user) {
+      navigate("/Homepage"); // Kullanıcı bilgileri doğruysa yönlendirme
+    } else {
+      alert("Geçersiz kullanıcı adı ve şifre");
+    }
   };
 
+  // Form submit başarılı olduğunda tetiklenen fonksiyon
+  const onFinish = () => {
+    handleLogin(); // Form submit işlemi tetiklendiğinde login işlemi yapılır
+  };
+
+  // Form submit başarısız olduğunda tetiklenen fonksiyon
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo); // Form submit başarısız olduğunda yapılacak işlem
+    console.log("Failed:", errorInfo);
   };
 
   return (
@@ -24,21 +52,25 @@ const LoginForm = () => {
           name="username"
           rules={[
             { required: true, message: "Lütfen kullanıcı adınızı girin!" },
-          ]} // Validation için kurallar
+          ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />} // Kullanıcı adı ikonu
             placeholder="Kullanıcı Adı"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </Form.Item>
 
         <Form.Item
           name="password"
-          rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]} // Validation için kurallar
+          rules={[{ required: true, message: "Lütfen şifrenizi girin!" }]}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />} // Şifre ikonu
             placeholder="Şifre"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Item>
 

@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Akıllı Telefon",
+      "image": "./images/smartphone.jpeg",
+      "price": 5999.99,
+      "description": "64 GB, 6.1 inç ekran, 12 MP kamera",
+      "stock": "Stokta Var"
+    },
+    {
+      "name": "Dizüstü Bilgisayar",
+      "image": "./images/pc.jpeg",
+      "price": 9999.99,
+      "description": "Intel i7, 16 GB RAM, 512 GB SSD",
+      "stock": "Az Kaldı"
+    },
+    {
+      "name": "Kablosuz Kulaklık",
+      "image": "./images/jbl.jpeg",
+      "price": 799.99,
+      "description": "Bluetooth 5.0, 24 saat batarya ömrü",
+      "stock": "Stokta Yok"
+    },
+    {
+      "name": "Akıllı Saat",
+      "image": "./images/smartwatch.jpeg",
+      "price": 1999.99,
+      "description": "Kalp ritmi ölçer, GPS, Su geçirmez",
+      "stock": "Stokta Var"
+    },
+    {
+      "name": "4K Televizyon",
+      "image": "./images/Tv.jpeg",
+      "price": 5499.99,
+      "description": "50 inç, 4K çözünürlük, Smart TV",
+      "stock": "Stokta Var"
+    }
+  ]
+  
