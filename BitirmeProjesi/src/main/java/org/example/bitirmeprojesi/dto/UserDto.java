@@ -34,4 +34,8 @@ public class UserDto implements Serializable {
 
     @JsonProperty("role")
     private Role role;
+
+    @JsonProperty("phone")
+    private String phone;
+
 }

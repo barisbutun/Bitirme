@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.util.List;
@@ -32,10 +33,11 @@ public class Product implements Serializable {
     private double price;
 
     @Column(name = "stock_state")
-    private boolean stockState;
+    private StockState stockState;
 
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
+
 
 
 }

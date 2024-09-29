@@ -6,8 +6,11 @@ import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.mapper.ProductMapper;
 import org.example.bitirmeprojesi.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @Service
@@ -31,8 +34,10 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    public List<ProductDto> findAll() {
-        return productMapper.toDtoList(productRepository.findAll());
+    public List<ProductDto> findAll(int page, int size) {
+        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        Page<Product> productPage = productRepository.findAll((org.springframework.data.domain.Pageable) pageable);
+        return productMapper.toDtoList(productPage.getContent());
     }
 
     public ProductDto update(ProductDto productDto,long id){
@@ -41,6 +46,13 @@ public class ProductService {
         productMapper.update(productDto,product);
         productRepository.save(product);
         return productMapper.toDto(product);
+    }
+
+    public List<ProductDto> filterbyProduct(String name,
+                                            String category,
+                                            Double minPrice,
+                                            Double maxPrice){
+        return productMapper.toDtoList(productRepository.findByFilters(name,category,minPrice,maxPrice));
     }
 
     public void delete(long id){

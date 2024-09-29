@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.bitirmeprojesi.enums.Role;
@@ -41,6 +42,10 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     @ToString.Exclude
     private Role role = Role.USER;
+
+    @Column (name = "phone",unique = true,nullable = true)
+    private String phone;
+
 
     @OneToMany(mappedBy = "user")
     private List<OrderItem> orderItems;

@@ -2,9 +2,11 @@ package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrdersDto;
+import org.example.bitirmeprojesi.entity.OrderItem;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderRepository;
+import org.example.bitirmeprojesi.validator.ProductValidation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final ProductValidation productValidation;
 
     public OrdersDto create(OrdersDto ordersDto){
         Orders orders =orderMapper.toEntity(ordersDto);

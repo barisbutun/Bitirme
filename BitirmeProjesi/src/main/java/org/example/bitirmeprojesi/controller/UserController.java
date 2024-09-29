@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,15 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/v1/{id}")
+    public ResponseEntity<UserPatchDto> patch(@PathVariable("id") UUID id, @RequestBody UserPatchDto userPatchDto) {
+        UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, id);
+        if (updatedUserDto != null) {
+            return ResponseEntity.ok(updatedUserDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
 

@@ -32,8 +32,9 @@ public class ProductController {
 
 
     @GetMapping("/v1")
-    public ResponseEntity<List<ProductDto>> getAll() {
-        List<ProductDto> products = productService.findAll();
+    public ResponseEntity<List<ProductDto>> getAll(@RequestParam(required = false,defaultValue = "0" ) int page,
+                                                  @RequestParam(required = false,defaultValue = "10") int size) {
+        List<ProductDto> products = productService.findAll(page,size);
         return ResponseEntity.ok(products);
     }
 
@@ -43,6 +44,14 @@ public class ProductController {
 
         ProductDto updatedProduct = productService.update(productDto, id);
         return ResponseEntity.ok(updatedProduct);
+    }
+    @GetMapping("/v1/filter")
+    public ResponseEntity<List<ProductDto>> filter(@RequestParam(required = false) String name,
+                                                   @RequestParam(required = false) String category,
+                                                   @RequestParam(required = false) Double minPrice,
+                                                   @RequestParam(required = false) Double maxPrice) {
+        List<ProductDto> products = productService.filterbyProduct(name, category, minPrice, maxPrice);
+        return ResponseEntity.ok(products);
     }
 
     @DeleteMapping("/v1/{id}")

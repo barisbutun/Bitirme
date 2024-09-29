@@ -2,6 +2,7 @@ package org.example.bitirmeprojesi.mapper;
 
 
 import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.entity.User;
 import org.mapstruct.*;
 
@@ -19,6 +20,10 @@ public interface UserMapper {
     List<UserDto> toDtoList(final List<User> userList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void Update(final UserDto userDto,@MappingTarget final User user);
+    void update(final UserDto userDto,@MappingTarget final User user);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void update(final UserPatchDto userPatchDto, @MappingTarget final User user);
+
+    UserPatchDto toDtoUpdate(final User user);
 }
