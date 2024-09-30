@@ -1,4 +1,14 @@
 .site-layout-header {
-    padding: 0;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
+  .header-search {
+    width: 600px;
+  }
+  
+  .header-filter-button {
+    margin-left: 20px;
+  }

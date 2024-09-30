@@ -27,7 +27,11 @@ const items = [
   {
     key: "3",
     icon: <LoginOutlined />, // Giriş ikonu
-    label: <Link to="/Login">Giriş</Link>, // Giriş sayfasına yönlendirme
+    label: "Giriş/Kayıt", // Giriş sayfasına yönlendirme
+    children: [
+      { key: "31", label: <Link to="/SignUp">Kayıt Ol</Link> },
+      { key: "32", label: <Link to="/Login">Giriş</Link> },
+    ],
   },
   {
     key: "4",
