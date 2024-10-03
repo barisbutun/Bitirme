@@ -38,4 +38,8 @@ public class UserDto implements Serializable {
     @JsonProperty("phone")
     private String phone;
 
+    @JsonProperty("address")
+    private String address;
+
+
 }

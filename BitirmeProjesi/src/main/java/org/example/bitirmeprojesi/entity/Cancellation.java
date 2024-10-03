@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name="cancellation")
+@Table(name = "cancellation")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -21,10 +21,10 @@ public class Cancellation implements Serializable {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
 
-    @Column(name="cancel_state")
+    @Column(name = "cancel_state")
     private boolean cancelState;
 
 

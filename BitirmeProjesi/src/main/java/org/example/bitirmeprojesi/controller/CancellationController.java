@@ -19,6 +19,7 @@ public class CancellationController {
     public ResponseEntity<CancellationDto> create(@RequestBody CancellationDto cancellationDto) {
         return ResponseEntity.ok(cancellationService.create(cancellationDto));
     }
+
     @GetMapping("/v1/{id}")
     public ResponseEntity<CancellationDto> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(cancellationService.findById(id));
@@ -29,12 +30,14 @@ public class CancellationController {
     public ResponseEntity<List<CancellationDto>> findAll() {
         return ResponseEntity.ok(cancellationService.findAll());
     }
+
     @PutMapping("/v1/{id}")
-    public ResponseEntity<CancellationDto> update(@PathVariable("id") Long id, @RequestBody CancellationDto cancellationDto){
-        return ResponseEntity.ok(cancellationService.update(cancellationDto,id));
+    public ResponseEntity<CancellationDto> update(@PathVariable("id") Long id, @RequestBody CancellationDto cancellationDto) {
+        return ResponseEntity.ok(cancellationService.update(cancellationDto, id));
     }
+
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         cancellationService.delete(id);
         return ResponseEntity.noContent().build();
     }

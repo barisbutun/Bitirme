@@ -18,33 +18,34 @@ public class ProductController {
 
 
     @PostMapping("/v1")
-    public ResponseEntity<ProductDto> create(@RequestBody @Validated final  ProductDto productDto) {
-          productService.create(productDto);
+    public ResponseEntity<ProductDto> create(@RequestBody @Validated final ProductDto productDto) {
+        productService.create(productDto);
 
         return ResponseEntity.ok(productDto);
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<ProductDto> findById(@PathVariable final  Long id) {
+    public ResponseEntity<ProductDto> findById(@PathVariable final Long id) {
         ProductDto product = productService.findById(id);
         return ResponseEntity.ok(product);
     }
 
 
-    @GetMapping("/v1")
-    public ResponseEntity<List<ProductDto>> getAll(@RequestParam(required = false,defaultValue = "0" ) int page,
-                                                  @RequestParam(required = false,defaultValue = "10") int size) {
-        List<ProductDto> products = productService.findAll(page,size);
+    @GetMapping("/v1/home")
+    public ResponseEntity<List<ProductDto>> getAll(@RequestParam(required = false, defaultValue = "0") int page,
+                                                   @RequestParam(required = false, defaultValue = "10") int size) {
+        List<ProductDto> products = productService.findAll(page, size);
         return ResponseEntity.ok(products);
     }
 
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<ProductDto> update(@PathVariable final Long id, @RequestBody final  ProductDto productDto) {
+    public ResponseEntity<ProductDto> update(@PathVariable final Long id, @RequestBody final ProductDto productDto) {
 
         ProductDto updatedProduct = productService.update(productDto, id);
         return ResponseEntity.ok(updatedProduct);
     }
+
     @GetMapping("/v1/filter")
     public ResponseEntity<List<ProductDto>> filter(@RequestParam(required = false) String name,
                                                    @RequestParam(required = false) String category,

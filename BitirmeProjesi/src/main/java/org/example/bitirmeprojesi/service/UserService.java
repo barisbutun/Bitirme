@@ -10,7 +10,6 @@ import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -38,11 +37,12 @@ public class UserService {
 
     public UserDto update(UserDto userDto, UUID id) {
         User user = userRepository.findById(id).get();
-        userMapper.update(userDto,user);
+        userMapper.update(userDto, user);
         userRepository.save(user);
 
         return userMapper.toDto(user);
     }
+
     public UserPatchDto updateUserPartially(UserPatchDto userPatchDto, UUID id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         userMapper.update(userPatchDto, user);
@@ -50,6 +50,7 @@ public class UserService {
         return userMapper.toDtoUpdate(user);
 
     }
+
     public void delete(UUID id) {
         userRepository.deleteById(id);
     }

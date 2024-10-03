@@ -5,6 +5,7 @@ import org.example.bitirmeprojesi.entity.Product;
 import org.mapstruct.*;
 
 import java.util.List;
+
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -18,8 +19,6 @@ public interface ProductMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(ProductDto productDto, @MappingTarget Product product);
-
-
 
 
 }

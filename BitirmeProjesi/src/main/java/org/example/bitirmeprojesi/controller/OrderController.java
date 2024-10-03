@@ -2,6 +2,7 @@ package org.example.bitirmeprojesi.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -18,28 +19,35 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/v1")
-    public ResponseEntity<OrdersDto> create(OrdersDto ordersDto){
-        return ResponseEntity.ok(orderService.create(ordersDto));
+    public ResponseEntity<OrdersDto> create(String userId,OrdersDto ordersDto) {
+        return ResponseEntity.ok(orderService.create(userId,ordersDto));
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<OrdersDto> findById(Long id){
+    public ResponseEntity<OrdersDto> findById(Long id) {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<List<OrdersDto>> findAll(){
+    public ResponseEntity<List<OrdersDto>> findAll() {
         return ResponseEntity.ok(orderService.findAll());
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<OrdersDto> update(OrdersDto ordersDto, long id){
-        return ResponseEntity.ok(orderService.update(ordersDto,id));
+    public ResponseEntity<OrdersDto> update(OrdersDto ordersDto, long id) {
+        return ResponseEntity.ok(orderService.update(ordersDto, id));
+    }
+
+    @GetMapping("/v1/orderItems/{id}")
+    public ResponseEntity<OrderGetOrderItemsDto> getOrderItemsById(Long id) {
+        return ResponseEntity.ok(orderService.getOrderItemsById(id));
     }
 
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(long id){
+    public ResponseEntity<Void> delete(long id) {
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }

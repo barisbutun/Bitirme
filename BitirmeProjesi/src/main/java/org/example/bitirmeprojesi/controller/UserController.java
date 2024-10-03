@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping("/v1")
     public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
-         userService.create(userDto);
+        userService.create(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
@@ -56,6 +56,7 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
     @PatchMapping("/v1/{id}")
     public ResponseEntity<UserPatchDto> patch(@PathVariable("id") UUID id, @RequestBody UserPatchDto userPatchDto) {
         UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, id);

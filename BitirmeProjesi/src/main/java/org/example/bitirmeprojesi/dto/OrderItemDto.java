@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serializable;
@@ -16,8 +17,12 @@ import java.io.Serializable;
 public class OrderItemDto implements Serializable {
     @JsonIgnore
     Long id;
+    @JsonProperty("product_id")
     ProductDto productDto;
+    @JsonProperty("order_id")
     OrdersDto ordersDto;
+    @JsonProperty("quantity")
     Integer quantity;
+    @JsonProperty("user_id")
     UserDto user;
 }

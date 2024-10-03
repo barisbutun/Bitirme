@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 
-
 @Service
 @RequiredArgsConstructor
 public class CancellationService {
@@ -24,24 +23,24 @@ public class CancellationService {
         return cancellationMapper.toDto(cancellation);
     }
 
-    public CancellationDto findById(Long id){
-        Cancellation cancellation=cancellationRepository.findById(id).get();
+    public CancellationDto findById(Long id) {
+        Cancellation cancellation = cancellationRepository.findById(id).get();
         return cancellationMapper.toDto(cancellation);
     }
 
-    public List<CancellationDto> findAll(){
-        List<Cancellation> cancellation=cancellationRepository.findAll();
+    public List<CancellationDto> findAll() {
+        List<Cancellation> cancellation = cancellationRepository.findAll();
         return cancellationMapper.toDtoList(cancellation);
     }
 
-    public CancellationDto update(CancellationDto cancellationDto,long id){
+    public CancellationDto update(CancellationDto cancellationDto, long id) {
         cancellationRepository.findById(id).get();
-        Cancellation cancellation=cancellationMapper.toEntity(cancellationDto);
+        Cancellation cancellation = cancellationMapper.toEntity(cancellationDto);
         cancellationRepository.save(cancellation);
         return cancellationMapper.toDto(cancellation);
     }
 
-    public void  delete (long id){
+    public void delete(long id) {
         cancellationRepository.deleteById(id);
     }
 

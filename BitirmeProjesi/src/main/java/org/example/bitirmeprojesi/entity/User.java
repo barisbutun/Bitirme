@@ -3,8 +3,10 @@ package org.example.bitirmeprojesi.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.bitirmeprojesi.enums.Role;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,24 +33,26 @@ public class User implements Serializable {
     private String name;
 
     @ToString.Exclude
-    private boolean registered=false;
+    private boolean registered = false;
 
-    @Column(name="password")
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "email",unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @ToString.Exclude
     private Role role = Role.USER;
 
-    @Column (name = "phone",unique = true,nullable = true)
+    @Column(name = "phone", unique = true, nullable = true)
     private String phone;
 
+    @Column(name = "address")
+    private String address;
 
-    @OneToMany(mappedBy = "user")
-    private List<OrderItem> orderItems;
-
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Orders> orders;
 
 }

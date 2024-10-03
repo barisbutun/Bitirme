@@ -1,8 +1,11 @@
 package org.example.bitirmeprojesi.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
@@ -35,9 +38,9 @@ public class Product implements Serializable {
     @Column(name = "stock_state")
     private StockState stockState;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
-
 
 
 }

@@ -17,9 +17,9 @@ public class AnalyzeReportService {
     private final AnalyzeReportMapper analyzeReportMapper;
 
     public AnalyzeReportDto create(AnalyzeReportDto analyzeReportDto) {
-        AnalyzeReport analyzeReport=analyzeReportMapper.toEntity(analyzeReportDto);
+        AnalyzeReport analyzeReport = analyzeReportMapper.toEntity(analyzeReportDto);
         analyzeReportRepository.save(analyzeReport);
-    return analyzeReportMapper.toDto(analyzeReport);
+        return analyzeReportMapper.toDto(analyzeReport);
     }
 
     public AnalyzeReportDto findById(long id) {

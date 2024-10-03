@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface CancellationRepository extends JpaRepository<Cancellation,Long> {
+public interface CancellationRepository extends JpaRepository<Cancellation, Long> {
 }

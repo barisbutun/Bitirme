@@ -18,18 +18,16 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "order_id")
     private Orders order;
 
-    @Column(name = "quantity",nullable = false)
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
 
 }

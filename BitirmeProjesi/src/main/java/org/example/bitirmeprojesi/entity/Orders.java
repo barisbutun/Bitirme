@@ -1,12 +1,13 @@
 package org.example.bitirmeprojesi.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,24 +26,26 @@ public class Orders implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "sale_date")
     private LocalDateTime saleDate;
 
     @Column(name = "sum_price")
-    private Integer sumPrice;
+    private double sumPrice;
 
     @ToString.Exclude
-    private StockState stockState=StockState.AVAILABLE;
+    private StockState stockState = StockState.AVAILABLE;
 
     @Column(name = "payment_state")
     private PaymentState paymentState;
 
-    @OneToMany(mappedBy = "order")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
-
-
-
 }

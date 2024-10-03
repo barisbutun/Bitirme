@@ -20,7 +20,7 @@ public interface UserMapper {
     List<UserDto> toDtoList(final List<User> userList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(final UserDto userDto,@MappingTarget final User user);
+    void update(final UserDto userDto, @MappingTarget final User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(final UserPatchDto userPatchDto, @MappingTarget final User user);

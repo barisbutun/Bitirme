@@ -22,6 +22,4 @@ public interface CancellationMapper {
     void update(CancellationDto cancellationDto, @MappingTarget Cancellation cancellation);
 
 
-
-
 }
