@@ -1,3 +1,17 @@
 .ProductCard{
-    min-height: 100vh;
+  min-height: 30vh;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  
 }
+
+.ProductCard:hover{
+  background-color:  rgb(201, 196, 196);
+  transform: scale(1.05); /* Kartın üzerine gelindiğinde büyütür */
+ }
+
+ .InceleButon{
+  margin-left:5px;
+ }

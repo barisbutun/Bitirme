@@ -4,74 +4,58 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../css/ShoppingCard.css"; // CSS dosyasını import ediyoruz
+import { useNavigate } from "react-router-dom";
 
 const ShoppingCard = () => {
   const columns = [
     {
-      title: "Müşteri ID", // Customer(id)
-      dataIndex: "customerId",
-      key: "customerId",
+      title: "Ürün Resmi", // Product Image
+      dataIndex: "image", // image alanını kullanıyoruz
+      key: "image",
+      render: (image) => <img className="image" src={image} alt="Ürün Resmi" />, // Resmi gösteriyoruz
+    },
+
+    {
+      title: "Ürün Adı", // Product Name
+      dataIndex: "name", // name alanını kullanıyoruz
+      key: "name",
     },
     {
-      title: "Ürün Listesi", // List(Product(id))
-      dataIndex: "productList",
-      key: "productList",
-      render: (products) =>
-        Array.isArray(products) && products.length > 0
-          ? products.join(", ") //  Eğer dizi ise ürünleri virgül ile ayırarak göster
-          : "Ürün yok", //ürün listesi boş ise
-    },
-    // {
-    //   title: "Açıklama", // description
-    //   dataIndex: "description",
-    //   key: "description",
-    // },
-    {
-      title: "Satış Tarihi", // sale_date
-      dataIndex: "saleDate",
-      key: "saleDate",
+      title: "Açıklama", // Description
+      dataIndex: "description", // description alanı mevcutsa bunu kullanabilirsiniz
+      key: "description",
+      render: (text) => text || "Açıklama yok", // Eğer açıklama yoksa "Açıklama yok" yazdır
     },
     {
-      title: "Toplam Fiyat", // sum_price
-      dataIndex: "sumPrice",
-      key: "sumPrice",
+      title: "Fiyat", // Price
+      dataIndex: "price", // price alanını kullanıyoruz
+      key: "price",
+      render: (price) => `${price.toFixed(2)} TL`, // Fiyatı TL cinsinden gösteriyoruz
     },
     {
-      title: "Sipariş Durumu", // order_state
-      dataIndex: "orderState",
-      key: "orderState",
-    },
-    {
-      title: "Ödeme Durumu", // payment_state
-      dataIndex: "paymentState",
-      key: "paymentState",
-    },
-    {
-      title: "Ödeme Yöntemi", // payment_method
-      dataIndex: "paymentMethod",
-      key: "paymentMethod",
-    },
-    {
-      title: "",
-      key: "action",
-      render: (record) => (
-        <Button type="primary" onClick={() => handlePayment(record)}>
-          Ödeme Yap
-        </Button>
-      ),
+      title: "Stok Durumu", // Stock Status
+      dataIndex: "stock", // stock alanını kullanıyoruz
+      key: "stock",
     },
   ];
 
   const [data, setData] = useState([]);
-  useEffect(() => {
-    fetch("/Shopping.json")
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("vei çekme hatası:", error));
-  }, []);
+  // useEffect(() => {
+  //   fetch("/Shopping.json")
+  //     .then((response) => response.json())
+  //     .then((data) => setData(data))
+  //     .catch((error) => console.error("vei çekme hatası:", error));
+  // }, []);
 
-  const handlePayment = (record) => {
-    console.log("ödeme işlemi başlatıldı:${record.customerId");
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cartData) {
+      setData(cartData);
+    }
+  }, []);
+  const navigate = useNavigate();
+  const handleOrder = (record) => {
+    navigate("/Orders");
   };
   return (
     <Layout>
@@ -81,6 +65,8 @@ const ShoppingCard = () => {
         <Table
           className="shopping-card-table"
           columns={columns}
+          dataSource={data}
+          rowKey={(record) => record.id}
           expandable={{
             expandedRowRender: (record) => (
               <Table
@@ -104,8 +90,19 @@ const ShoppingCard = () => {
             ),
             rowExpandable: (record) => record.name !== "Not Expandable",
           }}
-          dataSource={data}
+          footer={() => (
+            <div>
+              <Button
+                className="SiparisButon"
+                type="primary"
+                onClick={() => handleOrder()}
+              >
+                Sipariş Et
+              </Button>
+            </div>
+          )}
         />
+
         <Footer />
       </Layout>
     </Layout>

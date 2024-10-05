@@ -3,7 +3,7 @@ import { Pagination } from "antd";
 import "../css/Pagination.css";
 const App = () => (
   <Pagination
-    className="paginaation"
+    className="pagination"
     total={85}
     showSizeChanger
     showQuickJumper

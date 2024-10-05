@@ -4,14 +4,14 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Content from "../components/Content";
 import Footer from "../components/Footer";
-import "../css/Delivery.css";
+import "../css/Orders.css";
 
-const Delivery = () => {
-  // teslimat bilgileri
+const Orders = () => {
+  // sipariş bilgileri
   return (
     <Layout>
       <Sidebar />
-      <Layout className="Delivery-layout">
+      <Layout className="Orders-layout">
         <Header />
         <Content />
         <Footer />
@@ -20,4 +20,4 @@ const Delivery = () => {
   );
 };
 
-export default Delivery;
+export default Orders;

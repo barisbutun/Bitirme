@@ -1,331 +1,243 @@
 import React, { useState } from "react";
 import {
-  AutoComplete,
   Button,
-  Cascader,
   Checkbox,
   Col,
   Form,
   Input,
-  InputNumber,
   Row,
   Select,
+  Typography,
 } from "antd";
+import "../css/SignUp.css"; // CSS dosyasını içe aktarma
+
 const { Option } = Select;
-const residences = [
-  {
-    value: "zhejiang",
-    label: "Zhejiang",
-    children: [
-      {
-        value: "hangzhou",
-        label: "Hangzhou",
-        children: [
-          {
-            value: "xihu",
-            label: "West Lake",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    value: "jiangsu",
-    label: "Jiangsu",
-    children: [
-      {
-        value: "nanjing",
-        label: "Nanjing",
-        children: [
-          {
-            value: "zhonghuamen",
-            label: "Zhong Hua Men",
-          },
-        ],
-      },
-    ],
-  },
-];
+
 const formItemLayout = {
   labelCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 8,
-    },
+    xs: { span: 24 },
+    sm: { span: 8 },
   },
   wrapperCol: {
-    xs: {
-      span: 24,
-    },
-    sm: {
-      span: 16,
-    },
+    xs: { span: 24 },
+    sm: { span: 16 },
   },
 };
+
 const tailFormItemLayout = {
   wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0,
-    },
-    sm: {
-      span: 16,
-      offset: 8,
-    },
+    xs: { span: 24, offset: 0 },
+    sm: { span: 16, offset: 8 },
   },
 };
-const App = () => {
+
+const SignUp = () => {
   const [form] = Form.useForm();
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
-  };
-  const prefixSelector = (
-    <Form.Item name="prefix" noStyle>
-      <Select
-        style={{
-          width: 70,
-        }}
-      >
-        <Option value="86">+86</Option>
-        <Option value="87">+87</Option>
-      </Select>
-    </Form.Item>
-  );
-  const suffixSelector = (
-    <Form.Item name="suffix" noStyle>
-      <Select
-        style={{
-          width: 70,
-        }}
-      >
-        <Option value="USD">$</Option>
-        <Option value="CNY">¥</Option>
-      </Select>
-    </Form.Item>
-  );
-  const [autoCompleteResult, setAutoCompleteResult] = useState([]);
-  const onWebsiteChange = (value) => {
-    if (!value) {
-      setAutoCompleteResult([]);
-    } else {
-      setAutoCompleteResult(
-        [".com", ".org", ".net"].map((domain) => `${value}${domain}`)
-      );
+  const [captcha, setCaptcha] = useState(generateCaptcha());
+  const [userCaptcha, setUserCaptcha] = useState("");
+  const [username, setUsername] = useState("");
+  const [useremail, setUseremail] = useState("");
+  const [userpassword, setUserpassword] = useState("");
+  const [useraddress, setUseraddress] = useState("");
+  const [userphone, setUserphone] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newUser = {
+      name: username,
+      email: useremail,
+      password: userpassword,
+      address: useraddress,
+      phone: userphone,
+    };
+    try {
+      const response = await fetch("   ", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
+      });
+
+      if (response.ok) {
+        const savedUser = await response.json();
+        console.log(" Kayıt başarılı:", savedUser);
+      } else {
+        console.error("Kişi kaydedilemedi");
+      }
+    } catch (error) {
+      console.error("Hata oluştu:", error);
     }
   };
-  const websiteOptions = autoCompleteResult.map((website) => ({
-    label: website,
-    value: website,
-  }));
+  //captcha oluşturma fonksiyonu
+  function generateCaptcha() {
+    let chars =
+      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let captchaLength = 6;
+    let captchaCode = "";
+    for (let i = 0; i < captchaLength; i++) {
+      let randomIndex = Math.floor(Math.random() * chars.length);
+      captchaCode += chars[randomIndex];
+    }
+    return captchaCode;
+  }
+
+  //captcha yenileme fonksiyonu
+  const refreshCaptcha = () => {
+    setCaptcha(generateCaptcha());
+  };
+
+  const onFinish = (values) => {
+    if (userCaptcha === captcha) {
+      console.log("Başarılı doğrulama!");
+      console.log("Formdan alınan değerler: ", values);
+    } else {
+      console.log("Captcha doğrulaması başarısız!");
+    }
+  };
+
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select style={{ width: 70 }}>
+        <Option value="90">+90</Option>
+      </Select>
+    </Form.Item>
+  );
+
   return (
     <Form
       {...formItemLayout}
       form={form}
       name="register"
       onFinish={onFinish}
-      initialValues={{
-        residence: ["zhejiang", "hangzhou", "xihu"],
-        prefix: "86",
-      }}
-      style={{
-        maxWidth: 600,
-      }}
+      initialValues={{ prefix: "90" }}
+      className="form-container"
       scrollToFirstError
     >
       <Form.Item
-        name="email"
-        label="E-mail"
+        name="name"
+        label="İsim"
         rules={[
           {
-            type: "email",
-            message: "The input is not valid E-mail!",
-          },
-          {
             required: true,
-            message: "Please input your E-mail!",
+            message: "Lütfen isminizi giriniz.",
+            whitespace: true,
           },
         ]}
+        className="form-label"
       >
-        <Input />
+        <Input
+          className="form-input"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="email"
+        label="E-posta"
+        rules={[
+          { type: "email", message: "Geçerli bir e-posta değil!" },
+          { required: true, message: "Lütfen e-posta adresinizi giriniz!" },
+        ]}
+      >
+        <Input
+          className="form-input"
+          value={useremail}
+          onChange={(e) => setUseremail(e.target.value)}
+        />
       </Form.Item>
 
       <Form.Item
         name="password"
-        label="Password"
-        rules={[
-          {
-            required: true,
-            message: "Please input your password!",
-          },
-        ]}
+        label="Şifre"
+        rules={[{ required: true, message: "Lütfen şifrenizi giriniz!" }]}
         hasFeedback
       >
-        <Input.Password />
+        <Input.Password
+          className="form-input"
+          value={userpassword}
+          onChange={(e) => setUserpassword(e.target.value)}
+        />
       </Form.Item>
 
       <Form.Item
         name="confirm"
-        label="Confirm Password"
+        label="Şifreyi Onayla"
         dependencies={["password"]}
         hasFeedback
         rules={[
           {
             required: true,
-            message: "Please confirm your password!",
+            message: "Lütfen şifrenizi onaylayınız!",
           },
           ({ getFieldValue }) => ({
             validator(_, value) {
               if (!value || getFieldValue("password") === value) {
                 return Promise.resolve();
               }
-              return Promise.reject(
-                new Error("The new password that you entered do not match!")
-              );
+              return Promise.reject(new Error("Şifreler eşleşmiyor!"));
             },
           }),
         ]}
       >
-        <Input.Password />
+        <Input.Password className="form-input" />
       </Form.Item>
 
       <Form.Item
-        name="nickname"
-        label="Nickname"
-        tooltip="What do you want others to call you?"
-        rules={[
-          {
-            required: true,
-            message: "Please input your nickname!",
-            whitespace: true,
-          },
-        ]}
+        name="Adress"
+        label="Adres"
+        rules={[{ required: true, message: "Lütfen adresinizi giriniz." }]}
       >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="residence"
-        label="Habitual Residence"
-        rules={[
-          {
-            type: "array",
-            required: true,
-            message: "Please select your habitual residence!",
-          },
-        ]}
-      >
-        <Cascader options={residences} />
+        <Input
+          className="form-input"
+          value={useraddress}
+          onChange={(e) => setUseraddress(e.target.value)}
+        />
       </Form.Item>
 
       <Form.Item
         name="phone"
-        label="Phone Number"
+        label="Telefon Numarası"
         rules={[
-          {
-            required: true,
-            message: "Please input your phone number!",
-          },
+          { required: true, message: "Lütfen telefon numaranızı giriniz!" },
         ]}
       >
         <Input
           addonBefore={prefixSelector}
-          style={{
-            width: "100%",
-          }}
+          className="form-input"
+          value={userphone}
+          onChange={(e) => setUserphone(e.target.value)}
         />
       </Form.Item>
 
       <Form.Item
-        name="donation"
-        label="Donation"
-        rules={[
-          {
-            required: true,
-            message: "Please input donation amount!",
-          },
-        ]}
+        label="Güvenlik Kodu"
+        extra="Bir insan olduğunuzdan emin olmalıyız."
       >
-        <InputNumber
-          addonAfter={suffixSelector}
-          style={{
-            width: "100%",
-          }}
-        />
-      </Form.Item>
-
-      <Form.Item
-        name="website"
-        label="Website"
-        rules={[
-          {
-            required: true,
-            message: "Please input website!",
-          },
-        ]}
-      >
-        <AutoComplete
-          options={websiteOptions}
-          onChange={onWebsiteChange}
-          placeholder="website"
-        >
-          <Input />
-        </AutoComplete>
-      </Form.Item>
-
-      <Form.Item
-        name="intro"
-        label="Intro"
-        rules={[
-          {
-            required: true,
-            message: "Please input Intro",
-          },
-        ]}
-      >
-        <Input.TextArea showCount maxLength={100} />
-      </Form.Item>
-
-      <Form.Item
-        name="gender"
-        label="Gender"
-        rules={[
-          {
-            required: true,
-            message: "Please select gender!",
-          },
-        ]}
-      >
-        <Select placeholder="select your gender">
-          <Option value="male">Male</Option>
-          <Option value="female">Female</Option>
-          <Option value="other">Other</Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item
-        label="Captcha"
-        extra="We must make sure that your are a human."
-      >
-        <Row gutter={8}>
+        <Row gutter={8} className="captcha-container">
           <Col span={12}>
             <Form.Item
               name="captcha"
               noStyle
               rules={[
-                {
-                  required: true,
-                  message: "Please input the captcha you got!",
-                },
+                { required: true, message: "Lütfen güvenlik kodunu giriniz!" },
               ]}
             >
-              <Input />
+              <Input
+                className="captcha-input"
+                value={userCaptcha}
+                onChange={(e) => setUserCaptcha(e.target.value)}
+              />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Button>Get captcha</Button>
+
+          <Col span={30}>
+            <Typography.Text strong>{captcha}</Typography.Text>
           </Col>
+          <Button className="captcha-button" onClick={refreshCaptcha}>
+            Captcha Al
+          </Button>
         </Row>
       </Form.Item>
 
@@ -337,21 +249,23 @@ const App = () => {
             validator: (_, value) =>
               value
                 ? Promise.resolve()
-                : Promise.reject(new Error("Should accept agreement")),
+                : Promise.reject(new Error("Sözleşmeyi kabul etmelisiniz")),
           },
         ]}
         {...tailFormItemLayout}
       >
         <Checkbox>
-          I have read the <a href="">agreement</a>
+          Sözleşmeyi okudum <a href="">kabul ediyorum</a>
         </Checkbox>
       </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
-        <Button type="primary" htmlType="submit">
-          Register
+
+      <Form.Item {...tailFormItemLayout} className="submit-button">
+        <Button type="primary" htmlType="submit" onClick={handleSubmit}>
+          Kayıt Ol
         </Button>
       </Form.Item>
     </Form>
   );
 };
-export default App;
+
+export default SignUp;

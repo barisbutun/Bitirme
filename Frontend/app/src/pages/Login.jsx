@@ -7,26 +7,48 @@ import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   // JSON dosyasından kullanıcı verilerini çekme
-  useEffect(() => {
-    fetch("/users.json")
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .catch((error) => console.error("error fetching user data:", error));
-  }, []);
+  // useEffect(() => {
+  //   fetch("/users.json")
+  //     .then((response) => response.json())
+  //     .then((data) => setUsers(data))
+  //     .catch((error) => console.error("error fetching user data:", error));
+  // }, []);
 
   // Giriş işlemi
-  const handleLogin = () => {
-    const user = users.find(
-      (user) => user.username === username && user.password === password
-    );
-    if (user) {
-      navigate("/Homepage"); // Kullanıcı bilgileri doğruysa yönlendirme
-    } else {
-      alert("Geçersiz kullanıcı adı ve şifre");
+  // const handleLogin = () => {
+  //   const user = users.find(
+  //     (user) => user.username === username && user.password === password
+  //   );
+  //   if (user) {
+  //     navigate("/Homepage"); // Kullanıcı bilgileri doğruysa yönlendirme
+  //   } else {
+  //     alert("Geçersiz kullanıcı adı ve şifre");
+  //   }
+  // };
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        navigate("/Homepage");
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("Oturum açma sayfasında bir hata oluştu");
     }
   };
 
@@ -79,7 +101,7 @@ const LoginForm = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" onClick={handleLogin} htmlType="submit" block>
             Giriş Yap
           </Button>
         </Form.Item>

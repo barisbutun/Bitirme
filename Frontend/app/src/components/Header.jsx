@@ -8,15 +8,10 @@ const { Search } = Input;
 
 const HeaderComponent = ({ onFilterChange }) => {
   const [isDrawerVisible, setDrawerVisible] = useState(false);
-  const [filteredCategory, setFilteredCategory] = useState(null);
+
   // Arama fonksiyonu
   const onSearch = (value) => {
     console.log("Arama sorgusu:", value);
-  };
-
-  const handleApplyFilter = (category) => {
-    setFilteredCategory(category);
-    onFilterChange(category); // Seçilen kategoriyi üst bileşene gönder
   };
 
   // Drawer açma fonksiyonu
@@ -62,7 +57,7 @@ const HeaderComponent = ({ onFilterChange }) => {
         onClose={closeDrawer}
         visible={isDrawerVisible}
       >
-        <FilterComponent onApplyFilter={handleApplyFilter} />
+        <FilterComponent onApplyFilter={onFilterChange} />
       </Drawer>
     </Header>
   );

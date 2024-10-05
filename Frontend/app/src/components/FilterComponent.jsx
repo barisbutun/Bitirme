@@ -13,7 +13,7 @@ const FilterComponent = ({ onApplyFilter }) => {
   };
 
   const handleApplyFilter = () => {
-    onApplyFilter(selectedCategory); // Filtreyi uygula
+    onApplyFilter(selectedCategory);
   };
 
   return (

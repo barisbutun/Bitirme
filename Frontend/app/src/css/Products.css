@@ -1,4 +1,23 @@
 .product-layout {
-    min-height: 100vh;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* Üst: header, Orta: içerik, Alt: footer */
+  grid-template-columns: 1fr; /* Tek sütun */
+  }
+
+  .product-layout > Header {
+    grid-row: 1; /* Header üstte */
+  }
+
+  .product-layout > .content {
+    grid-row: 2; /* Ürün kartları burada gösterilecek */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 10px;
+    padding: 20px; /* Header ile içerik arasında boşluk */
+  }
+  
+  .product-layout > Footer {
+    grid-row: 3; /* Footer en altta */
   }
   
