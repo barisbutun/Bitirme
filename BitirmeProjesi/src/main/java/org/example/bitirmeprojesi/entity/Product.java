@@ -3,9 +3,7 @@ package org.example.bitirmeprojesi.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
@@ -15,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "products")
-@Data
+@Getter
+@Setter
 public class Product implements Serializable {
 
     @Id
@@ -39,8 +38,11 @@ public class Product implements Serializable {
     private StockState stockState;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product",cascade= CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ShoppingCartItem> shoppingCartItem;
 
 }
