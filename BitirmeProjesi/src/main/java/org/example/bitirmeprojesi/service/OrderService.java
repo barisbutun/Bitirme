@@ -54,7 +54,7 @@ public class OrderService {
                 })
                 .collect(Collectors.toList());
         orderItemRepository.saveAll(orderItems);
-
+        orderValidator.sumPriceCalculating(orders);
         shoppingCartItemRepository.deleteAllByUserId(uuidUserId);
         return orderMapper.toDto(orders);
     }

@@ -34,7 +34,7 @@ public class OrderController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<OrdersDto> update(OrdersDto ordersDto, long id) {
+    public ResponseEntity<OrdersDto> update(@RequestBody OrdersDto ordersDto, long id) {
         return ResponseEntity.ok(orderService.update(ordersDto, id));
     }
 

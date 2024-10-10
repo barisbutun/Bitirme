@@ -3,7 +3,10 @@ package org.example.bitirmeprojesi.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
@@ -27,9 +30,9 @@ public class Product implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "category")
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "price")
     private double price;
