@@ -6,11 +6,20 @@ import Footer from "../components/Footer";
 import "../css/Products.css";
 import ProductCard from "../components/ProductCard";
 import FilterComponent from "../components/FilterComponent";
+// import { fetchProducts } from "../services/ProductService/ProductService";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredCategory, setFilteredCategory] = useState(null);
+
+  // useEffect(() => {
+  //   const getProducts = async () => {
+  //     const data = await fetchProducts();
+  //     setProducts(data);
+  //   };
+  //   getProducts();
+  // }, []);
 
   useEffect(() => {
     fetch("/products.json")
@@ -61,12 +70,12 @@ const Products = () => {
       setFilteredProducts(products); // Kategori seçilmezse tüm ürünler gösterilir
     }
   };
-
+  const [collapsed, setCollapsed] = useState(false);
   return (
     <Layout>
-      <Sidebar />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="product-layout">
-        <Header>
+        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
           <FilterComponent onApplyFilter={handleApplyFilter} />
         </Header>
         <div className="content">

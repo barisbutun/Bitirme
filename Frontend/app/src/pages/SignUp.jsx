@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Typography,
-} from "antd";
+import { Button, Checkbox, Form, Input, Select } from "antd";
 import "../css/SignUp.css"; // CSS dosyasını içe aktarma
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -33,15 +25,16 @@ const tailFormItemLayout = {
 
 const SignUp = () => {
   const [form] = Form.useForm();
-  const [captcha, setCaptcha] = useState(generateCaptcha());
-  const [userCaptcha, setUserCaptcha] = useState("");
+
   const [username, setUsername] = useState("");
   const [useremail, setUseremail] = useState("");
   const [userpassword, setUserpassword] = useState("");
   const [useraddress, setUseraddress] = useState("");
   const [userphone, setUserphone] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const registerUser = async (e) => {
     e.preventDefault();
     const newUser = {
       name: username,
@@ -58,41 +51,15 @@ const SignUp = () => {
         },
         body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
       });
-
+      const savedUser = await response.json();
       if (response.ok) {
-        const savedUser = await response.json();
-        console.log(" Kayıt başarılı:", savedUser);
+        setMessage(" Kayıt başarılı:", savedUser);
+        navigate("/Login");
       } else {
-        console.error("Kişi kaydedilemedi");
+        setMessage("Kayıt başarısız: {$data.message}");
       }
     } catch (error) {
-      console.error("Hata oluştu:", error);
-    }
-  };
-  //captcha oluşturma fonksiyonu
-  function generateCaptcha() {
-    let chars =
-      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let captchaLength = 6;
-    let captchaCode = "";
-    for (let i = 0; i < captchaLength; i++) {
-      let randomIndex = Math.floor(Math.random() * chars.length);
-      captchaCode += chars[randomIndex];
-    }
-    return captchaCode;
-  }
-
-  //captcha yenileme fonksiyonu
-  const refreshCaptcha = () => {
-    setCaptcha(generateCaptcha());
-  };
-
-  const onFinish = (values) => {
-    if (userCaptcha === captcha) {
-      console.log("Başarılı doğrulama!");
-      console.log("Formdan alınan değerler: ", values);
-    } else {
-      console.log("Captcha doğrulaması başarısız!");
+      setMessage("Kayıt sırasında hata oluştu:");
     }
   };
 
@@ -109,7 +76,6 @@ const SignUp = () => {
       {...formItemLayout}
       form={form}
       name="register"
-      onFinish={onFinish}
       initialValues={{ prefix: "90" }}
       className="form-container"
       scrollToFirstError
@@ -212,36 +178,6 @@ const SignUp = () => {
       </Form.Item>
 
       <Form.Item
-        label="Güvenlik Kodu"
-        extra="Bir insan olduğunuzdan emin olmalıyız."
-      >
-        <Row gutter={8} className="captcha-container">
-          <Col span={12}>
-            <Form.Item
-              name="captcha"
-              noStyle
-              rules={[
-                { required: true, message: "Lütfen güvenlik kodunu giriniz!" },
-              ]}
-            >
-              <Input
-                className="captcha-input"
-                value={userCaptcha}
-                onChange={(e) => setUserCaptcha(e.target.value)}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={30}>
-            <Typography.Text strong>{captcha}</Typography.Text>
-          </Col>
-          <Button className="captcha-button" onClick={refreshCaptcha}>
-            Captcha Al
-          </Button>
-        </Row>
-      </Form.Item>
-
-      <Form.Item
         name="agreement"
         valuePropName="checked"
         rules={[
@@ -260,7 +196,12 @@ const SignUp = () => {
       </Form.Item>
 
       <Form.Item {...tailFormItemLayout} className="submit-button">
-        <Button type="primary" htmlType="submit" onClick={handleSubmit}>
+        <Button
+          className="KayitButon"
+          type="primary"
+          htmlType="submit"
+          onClick={registerUser}
+        >
           Kayıt Ol
         </Button>
       </Form.Item>

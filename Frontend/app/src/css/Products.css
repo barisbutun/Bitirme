@@ -12,9 +12,10 @@
   .product-layout > .content {
     grid-row: 2; /* Ürün kartları burada gösterilecek */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+    gap:10px;
     padding: 20px; /* Header ile içerik arasında boşluk */
+ 
   }
   
   .product-layout > Footer {

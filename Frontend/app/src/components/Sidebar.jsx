@@ -55,15 +55,16 @@ const items = [
   },
 ];
 
-const Sidebar = () => (
+const Sidebar = ({ collapsed, setCollapsed }) => (
   <Sider
+    collapsible
+    collapsed={collapsed}
+    trigger={null}
+    // onCollapse={(value) => setCollapsed(value)}
     breakpoint="lg"
     collapsedWidth="0"
     onBreakpoint={(broken) => {
       console.log(broken);
-    }}
-    onCollapse={(collapsed, type) => {
-      console.log(collapsed, type);
     }}
   >
     <div className="demo-logo-vertical" />

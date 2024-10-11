@@ -57,11 +57,14 @@ const ShoppingCard = () => {
   const handleOrder = (record) => {
     navigate("/Orders");
   };
+
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <Layout>
-      <Sidebar />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="shopping-card-layout">
-        <Header />
+        <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Table
           className="shopping-card-table"
           columns={columns}
@@ -97,7 +100,7 @@ const ShoppingCard = () => {
                 type="primary"
                 onClick={() => handleOrder()}
               >
-                Sipariş Et
+                Sepeti Onayla
               </Button>
             </div>
           )}

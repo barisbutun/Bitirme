@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -7,12 +7,13 @@ import Footer from "../components/Footer";
 import "../css/Orders.css";
 
 const Orders = () => {
+  const [collapsed, setCollapsed] = useState(false);
   // sipariş bilgileri
   return (
     <Layout>
-      <Sidebar />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="Orders-layout">
-        <Header />
+        <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Content />
         <Footer />
       </Layout>

@@ -28,7 +28,9 @@ function ProductCard({ name, image, price, stock, description }) {
   return (
     <Card className="ProductCard">
       <h3>{name}</h3>
-      <img src={image} />
+      <div className="image-container">
+        <img className="image" src={image} />
+      </div>
       <p>Fiyat:{price}</p>
       <p>Açıklama:{description}</p>
       <p>Stok Durumu:{stock}</p>

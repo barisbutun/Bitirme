@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -7,11 +7,13 @@ import Footer from "../components/Footer";
 import "../css/Homepage.css";
 
 const Homepage = () => {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <Layout>
-      <Sidebar />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="site-layout">
-        <Header />
+        <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Content />
         <Footer />
       </Layout>

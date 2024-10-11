@@ -6,9 +6,20 @@
   }
   
   .header-search {
+    margin-left:20%;
     width: 600px;
   }
   
   .header-filter-button {
     margin-left: 20px;
+  }
+  .headerbuttons{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .toggle-button {
+    font-size: 0px; /* İkonun boyutunu ayarlayabilirsiniz */
+    text-align: center;
+    padding: 10px 0; /* Boşluğu ayarlayın */
   }

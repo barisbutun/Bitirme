@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox, Col, Row, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
+import "../css/Login.css";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [users, setUsers] = useState([]);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [captcha, setCaptcha] = useState(generateCaptcha());
+  const [userCaptcha, setUserCaptcha] = useState("");
 
   // JSON dosyasından kullanıcı verilerini çekme
+  // const [users, setUsers] = useState("");
   // useEffect(() => {
   //   fetch("/users.json")
   //     .then((response) => response.json())
@@ -19,7 +22,7 @@ const LoginForm = () => {
   //     .catch((error) => console.error("error fetching user data:", error));
   // }, []);
 
-  // Giriş işlemi
+  // // Giriş işlemi
   // const handleLogin = () => {
   //   const user = users.find(
   //     (user) => user.username === username && user.password === password
@@ -31,30 +34,67 @@ const LoginForm = () => {
   //   }
   // };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
     try {
-      const response = await fetch("", {
+      const response = await fetch(" ", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          username,
+          password,
+        }),
       });
+
       const data = await response.json();
+
       if (response.ok) {
+        setMessage("Giriş başarılı!");
         navigate("/Homepage");
+        // Eğer JWT token dönerse, localStorage'a kaydedebiliriz
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        // Giriş başarılı olduğunda kullanıcıyı başka bir sayfaya yönlendirebilirsiniz
+        // Örneğin: window.location.href = "/dashboard";
       } else {
-        setError(data.message);
+        setMessage(`Giriş başarısız: ${data.message}`);
       }
     } catch (error) {
-      console.error("Login failed:", error);
-      setError("Oturum açma sayfasında bir hata oluştu");
+      setMessage("Giriş sırasında bir hata oluştu.");
     }
   };
 
-  // Form submit başarılı olduğunda tetiklenen fonksiyon
-  const onFinish = () => {
-    handleLogin(); // Form submit işlemi tetiklendiğinde login işlemi yapılır
+  //captcha oluşturma fonksiyonu
+  function generateCaptcha() {
+    let chars =
+      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let captchaLength = 6;
+    let captchaCode = "";
+    for (let i = 0; i < captchaLength; i++) {
+      let randomIndex = Math.floor(Math.random() * chars.length);
+      captchaCode += chars[randomIndex];
+    }
+    return captchaCode;
+  }
+
+  //captcha yenileme fonksiyonu
+  const refreshCaptcha = () => {
+    setCaptcha(generateCaptcha());
+  };
+
+  const onFinish = (values) => {
+    if (userCaptcha === captcha) {
+      console.log("Başarılı doğrulama!");
+      console.log("Formdan alınan değerler: ", values);
+      handleLogin();
+    } else {
+      console.log("Captcha doğrulaması başarısız!");
+    }
   };
 
   // Form submit başarısız olduğunda tetiklenen fonksiyon
@@ -63,9 +103,9 @@ const LoginForm = () => {
   };
 
   return (
-    <div style={{ width: "300px", margin: "100px auto" }}>
+    <div className="login ">
       <Form
-        name="login_form"
+        name="login-form"
         initialValues={{ remember: true }} // Varsayılan değerler
         onFinish={onFinish} // Form submit başarılı olduğunda tetiklenir
         onFinishFailed={onFinishFailed} // Form submit başarısız olduğunda tetiklenir
@@ -94,6 +134,39 @@ const LoginForm = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </Form.Item>
+
+        <Form.Item
+          label="Güvenlik Kodu"
+          extra="Bir insan olduğunuzdan emin olmalıyız."
+        >
+          <Row gutter={8} className="captcha-container">
+            <Col span={12}>
+              <Form.Item
+                name="captcha"
+                noStyle
+                rules={[
+                  {
+                    required: true,
+                    message: "Lütfen güvenlik kodunu giriniz!",
+                  },
+                ]}
+              >
+                <Input
+                  className="captcha-input"
+                  value={userCaptcha}
+                  onChange={(e) => setUserCaptcha(e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={30}>
+              <Typography.Text strong>{captcha}</Typography.Text>
+            </Col>
+            <Button className="captcha-button" onClick={refreshCaptcha}>
+              Captcha Al
+            </Button>
+          </Row>
         </Form.Item>
 
         <Form.Item name="remember" valuePropName="checked">
