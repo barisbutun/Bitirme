@@ -19,8 +19,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/v1")
-    public ResponseEntity<OrdersDto> create(String userId,OrdersDto ordersDto) {
-        return ResponseEntity.ok(orderService.create(userId,ordersDto));
+    public ResponseEntity<OrdersDto> create(String userId, OrdersDto ordersDto) {
+        return ResponseEntity.ok(orderService.create(userId, ordersDto));
     }
 
     @GetMapping("/v1/{id}")

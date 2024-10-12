@@ -1,7 +1,7 @@
 package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -9,6 +9,10 @@ import java.io.Serializable;
  * DTO for {@link org.example.bitirmeprojesi.entity.ShoppingCartItem}
  */
 @Value
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+@Getter
+@Setter
 public class ShoppingCartItemDto implements Serializable {
       @JsonProperty(access = JsonProperty.Access.READ_ONLY)
       long id;

@@ -38,26 +38,39 @@ public class OrderService {
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(uuidUserId);
 
         if (shoppingCartItems.isEmpty()) {
-
             throw new NoSuchElementException("Sepetinizde ürün bulunmamaktadır!");
         }
 
         Orders orders = orderMapper.toEntity(ordersDto);
-        orders = orderRepository.save(orders);
+        orders = orderRepository.save(orders);  // İlk kaydetme, ID oluşturma
 
         Orders finalOrders = orders;
+
         List<OrderItem> orderItems = shoppingCartItems.stream()
                 .map(shoppingCartItem -> {
                     OrderItem orderItem = orderItemMapper.toOrderItem(shoppingCartItem);
-                    orderItem.setOrder(finalOrders); // Her OrderItem'a siparişi ekliyoruz.
+                    orderItem.setOrder(finalOrders);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
-        orderItemRepository.saveAll(orderItems);
+
+        // Ürün isimlerini virgülle birleştirerek Orders name alanına ekliyoruz.
+        String productNames = orderItems.stream()
+                .map(orderItem -> orderItem.getProduct().getName())
+                .collect(Collectors.joining(", "));
+
+        finalOrders.setName(productNames);
         orderValidator.sumPriceCalculating(orders);
+        orderRepository.save(finalOrders);  // Name alanı güncelleniyor.
+
+        orderItemRepository.saveAll(orderItems);
+
         shoppingCartItemRepository.deleteAllByUserId(uuidUserId);
+
         return orderMapper.toDto(orders);
     }
+
+
 
 
     public OrdersDto findById(Long id) {

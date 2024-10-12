@@ -27,12 +27,12 @@ public class ProductDto implements Serializable {
     @JsonProperty("name")
     String name;
 
-    @JsonProperty("category")
-    String category;
-
     @JsonProperty("price")
     double price;
 
     @JsonProperty("stock_state")
     StockState stockState;
+
+    @JsonProperty("category_id")
+    CategoryDto categoryDto;
 }

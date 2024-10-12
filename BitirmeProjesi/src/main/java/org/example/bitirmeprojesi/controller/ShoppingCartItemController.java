@@ -20,15 +20,17 @@ public class ShoppingCartItemController {
     private ResponseEntity<ShoppingCartItemDto> create(@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
         return ResponseEntity.ok().body(shoppingCartItemService.create(shoppingCartItemDto));
     }
+
     @DeleteMapping("/v1/{id}")
     private ResponseEntity<Void> delete(long id) {
         shoppingCartItemService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @DeleteMapping("/v1/user/{userId}")
     private ResponseEntity<Void> deleteAllByUserId(UUID userId) {
         shoppingCartItemService.deleteAllByUserId(userId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

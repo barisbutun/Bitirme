@@ -33,7 +33,7 @@ public class ProductController {
 
     @GetMapping("/v1/home")
     public ResponseEntity<List<ProductDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,
-                                                   @RequestParam(required = false, defaultValue = "10") int size) {
+                                                    @RequestParam(required = false, defaultValue = "10") int size) {
         List<ProductDto> products = productService.findAll(page, size);
         return ResponseEntity.ok(products);
     }

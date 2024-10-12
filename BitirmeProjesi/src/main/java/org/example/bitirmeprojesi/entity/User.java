@@ -6,9 +6,12 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.example.bitirmeprojesi.enums.Role;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +22,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -31,6 +34,9 @@ public class User implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name="user_name",unique = true)
+    private String userName;
 
     @ToString.Exclude
     private boolean registered = false;
@@ -56,5 +62,13 @@ public class User implements Serializable {
     private List<Orders> orders;
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
 
+    @Override
+    public String getUsername() {
+        return this.userName;
+    }
 }
