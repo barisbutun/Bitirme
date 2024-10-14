@@ -8,6 +8,7 @@ import Delivery from "./pages/Delivery";
 import ShoppingCard from "./pages/ShoppingCard";
 import SignUp from "./pages/SignUp";
 import Orders from "./pages/Orders";
+import ProductDetails from "./pages/ProductDetails";
 function App() {
   return (
     <Router>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/Delivery" element={<Delivery />} />
         <Route path="/ShoppingCard" element={<ShoppingCard />} />
         <Route path="/Orders" element={<Orders />} />
+        <Route path="/ProductDetails/:id" element={<ProductDetails />} />
       </Routes>
     </Router>
   );

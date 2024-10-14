@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Layout, Table } from "antd";
+import { Button, Layout, Table, notification } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../css/ShoppingCard.css"; // CSS dosyasını import ediyoruz
 import { useNavigate } from "react-router-dom";
 
-const ShoppingCard = () => {
+const ShoppingCard = ({ product }) => {
   const columns = [
     {
       title: "Ürün Resmi", // Product Image
@@ -37,6 +37,15 @@ const ShoppingCard = () => {
       dataIndex: "stock", // stock alanını kullanıyoruz
       key: "stock",
     },
+    {
+      title: "İşlem",
+      key: "action",
+      render: (text, record) => (
+        <Button type="primary" onClick={() => removeFromCart(record.id)}>
+          Sepetten Çıkar
+        </Button>
+      ),
+    },
   ];
 
   const [data, setData] = useState([]);
@@ -59,6 +68,22 @@ const ShoppingCard = () => {
   };
 
   const [collapsed, setCollapsed] = useState(false);
+  //sepetten silme işlemi
+
+  const removeFromCart = (productId) => {
+    const updatedCart = data.filter((item) => item.id !== productId);
+    setData(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    const product = data.find((item) => item.id === productId);
+    notification.success({
+      message: "Sepetten Çıkarıldı",
+      description: `${
+        product ? product.name : "Ürün"
+      } başarıyla sepette çıkarıldı!`,
+      placement: "topRight",
+    });
+  };
 
   return (
     <Layout>

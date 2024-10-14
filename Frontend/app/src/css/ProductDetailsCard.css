@@ -1,0 +1,27 @@
+/* ProductDetailsCard.css */
+.product-details-card {
+  padding: 20px;
+}
+
+.product-details-row {
+  margin-top: 10px;
+}
+
+.product-details-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.product-details-price {
+  font-size: 18px;
+  color: #1890ff;
+}
+
+.product-details-description {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.product-details-button {
+  margin-top: 20px;
+}

@@ -28,3 +28,9 @@
   height: 100%;
   object-fit: cover; 
  }
+
+ .cardtext{
+   font-family:sans-serif; 
+   font-size:  15px;
+  color:black;
+ }

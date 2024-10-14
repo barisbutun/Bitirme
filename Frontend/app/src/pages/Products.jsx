@@ -82,7 +82,8 @@ const Products = () => {
           {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <ProductCard
-                key={product.name}
+                key={product.id}
+                id={product.id}
                 name={product.name}
                 image={product.image}
                 price={product.price}

@@ -1,18 +1,42 @@
 import React, { useState } from "react";
-import { Card, Button, notification } from "antd";
+import { Card, Button, notification, Image } from "antd";
+import { CardText, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/ProductCard.css";
-function ProductCard({ name, image, price, stock, description }) {
+function ProductCard({
+  id,
+  name,
+  image,
+  price,
+  stock,
+  description,
+  image1,
+  image2,
+  image3,
+}) {
   const navigate = useNavigate();
   const handleCardClick = () => {
-    navigate("/ProductDetails");
+    const url = `/ProductDetails/${id}`;
+    console.log("Navigating to:", url); // URL'yi kontrol etmek için log
+    navigate(url);
+    // navigate(`/ProductDetails/${id}`);
   };
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const addToCart = () => {
-    const product = { name, image, price, stock, description };
+    const product = {
+      id,
+      name,
+      image,
+      price,
+      stock,
+      description,
+      image1,
+      image2,
+      image3,
+    };
     const currentcart = JSON.parse(localStorage.getItem("cart")) || [];
 
     const newCart = [...currentcart, product];
@@ -27,13 +51,16 @@ function ProductCard({ name, image, price, stock, description }) {
 
   return (
     <Card className="ProductCard">
-      <h3>{name}</h3>
+      <CardTitle tag="h3">{name}</CardTitle>
+
       <div className="image-container">
-        <img className="image" src={image} />
+        <Image className="image" src={image} />
       </div>
-      <p>Fiyat:{price}</p>
-      <p>Açıklama:{description}</p>
-      <p>Stok Durumu:{stock}</p>
+
+      <CardText className="cardtext">Fiyat:{price}</CardText>
+      <CardText className="cardtext">Açıklama:{description}</CardText>
+      <CardText className="cardtext">Stok Durumu:{stock}</CardText>
+
       <Button className="SepetButon" onClick={addToCart}>
         Sepete Ekle
       </Button>
