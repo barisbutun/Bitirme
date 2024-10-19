@@ -13,7 +13,23 @@ spring:
       properties:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com # Google Developer Console'dan aldığınız client ID
+            client-secret: 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  # Google Developer Console'dan aldığınız client secret
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8082/oauth2/code/google
+            scope:
+              - profile
+              - email
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
 
   docker:
     compose:

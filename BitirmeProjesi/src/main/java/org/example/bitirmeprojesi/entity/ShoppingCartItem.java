@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class ShoppingCartItem {
     private long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="product_id")
     private Product product;
 
@@ -27,6 +29,7 @@ public class ShoppingCartItem {
 
     @ManyToOne
     @JoinColumn(name="user_id")
+    @JsonBackReference
     private User user;
 
 }

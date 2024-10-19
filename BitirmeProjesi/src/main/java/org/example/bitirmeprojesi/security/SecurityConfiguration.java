@@ -1,39 +1,102 @@
 package org.example.bitirmeprojesi.security;
 
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.enums.Role;
+import org.example.bitirmeprojesi.util.RSAkeyProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import static org.apache.catalina.webresources.TomcatURLStreamHandlerFactory.disable;
-
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfiguration {
 
-   @Bean
-    public PasswordEncoder passwordEncoder(){
-       return new BCryptPasswordEncoder();
-   }
+    private final RSAkeyProperties keys;
 
-   @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-       http
-               .csrf(csrf -> csrf.disable())
-               .authorizeHttpRequests(auth->{
-                   auth.requestMatchers("api/product/**").permitAll();
-                   auth.requestMatchers("api/order/**").permitAll();
-                   auth.requestMatchers("api/category/**").permitAll();
-                   auth.requestMatchers("api/order/").permitAll();
-                   auth.requestMatchers("api/orderItems/**").permitAll();
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/order/**").permitAll();
+                    auth.requestMatchers("api/order/v1/orderItems/").permitAll();
+                    auth.requestMatchers("/api/product/v1/**").permitAll();
+                    auth.requestMatchers("/api/categories/v1/**").permitAll();
+                    auth.requestMatchers("/api/users/v1/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name());
+                    auth.requestMatchers("/api/shoppingCartItem/v1/**").permitAll();
+
+                    auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.anyRequest().authenticated();
+                })
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorize")
+                        )
+                        .tokenEndpoint(token -> token
+                                .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
+                        )
+
+                        .defaultSuccessUrl("/homePage", true)
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+        return http.build();
+    }
 
 
-               }).build();
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> oAuth2AccessTokenResponseClient() {
+        return new DefaultAuthorizationCodeTokenResponseClient();
+    }
 
-       return http.build();
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder() {
+        JWK jwk = new RSAKey.Builder(keys.getPublicKey()).privateKey(keys.getPrivateKey()).build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtConverter;
     }
 
     @Bean
@@ -47,7 +110,4 @@ public class SecurityConfiguration {
             }
         };
     }
-
-
-
 }

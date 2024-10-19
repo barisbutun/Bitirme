@@ -2,6 +2,7 @@ package org.example.bitirmeprojesi.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.dto.RegisterDto;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.service.UserService;
@@ -20,12 +21,23 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/v1")
-    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
-        userService.create(userDto);
+    public ResponseEntity<UserDto> register(@RequestBody RegisterDto registerDto) {
+        UserDto userDto = userService.register(registerDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
-    @GetMapping("/v1/{id}")
+    @PostMapping("/v1/login")
+    public ResponseEntity<Void> login(@RequestBody String userName, @RequestBody String password) {
+        userService.login(userName, password);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/v1")
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> userDtos = userService.findAll();
+        return ResponseEntity.ok(userDtos);
+    }
+    @GetMapping("/v1/register")
     public ResponseEntity<UserDto> findById(@PathVariable("id") UUID id) {
         UserDto userDto = userService.findById(id);
         if (userDto != null) {
@@ -33,12 +45,6 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-    }
-
-    @GetMapping("/v1")
-    public ResponseEntity<List<UserDto>> findAll() {
-        List<UserDto> userDtos = userService.findAll();
-        return ResponseEntity.ok(userDtos);
     }
 
     @PutMapping("/v1/{id}")

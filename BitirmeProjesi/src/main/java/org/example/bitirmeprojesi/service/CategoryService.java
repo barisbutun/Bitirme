@@ -19,7 +19,7 @@ public class CategoryService {
 
     public CategoryDto create(CategoryDto categoryDto) {
         Category category = categoryMapper.toEntity(categoryDto);
-        category = categoryRepository.save(category);
+         categoryRepository.save(category);
         return categoryMapper.toDto(category);
     }
     public CategoryDto findById(long id) {
