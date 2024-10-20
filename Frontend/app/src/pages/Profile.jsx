@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
+import ProfileSettings from "../components/ProfileSettings";
 import { Layout, Avatar, Card, Descriptions, Tabs } from "antd";
 import "../css/Profile.css";
 
@@ -18,7 +20,7 @@ const Profile = () => {
         <Card>
           <Avatar src="" />
           <Descriptions title="User Profile" bordered>
-            <Descriptions.Item label="Username"></Descriptions.Item>
+            <Descriptions.Item label="Name"></Descriptions.Item>
             <Descriptions.Item label="Email"></Descriptions.Item>
             <Descriptions.Item label="Phone"></Descriptions.Item>
             <Descriptions.Item label="Adress"></Descriptions.Item>
@@ -29,7 +31,11 @@ const Profile = () => {
             </TabPane>
 
             <TabPane tab="Settings" key="2">
-              {/* kullanıcı ayarları gösterilecek */}
+              <ProfileSettings />
+            </TabPane>
+
+            <TabPane tab="Favorites" key="3">
+              <Link to="/Favorites"></Link>
             </TabPane>
           </Tabs>
         </Card>

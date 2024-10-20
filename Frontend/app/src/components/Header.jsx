@@ -9,6 +9,7 @@ import {
   ShoppingCartOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 const { Header } = Layout;
 const { Search } = Input;
@@ -72,6 +73,11 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
         <Button icon={<ShoppingCartOutlined />}>
           <Link to="/ShoppingCard">Sepetim</Link>
         </Button>
+
+        <Button className="header-favorite" icon={<HeartOutlined />}>
+          <Link to="/Favorites">Favorilerim</Link>
+        </Button>
+
         {/* Filtreleme butonu */}
         <Button
           className="header-filter-button"
