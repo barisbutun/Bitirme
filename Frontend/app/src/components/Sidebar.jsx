@@ -53,6 +53,11 @@ const items = [
     icon: <SettingOutlined />, // Ayarlar ikonu
     label: <Link to="/settings">Ayarlar</Link>, // Ayarlar sayfasına yönlendirme
   },
+  {
+    key: "8",
+    // icon: <SettingOutlined />, // Ayarlar ikonu
+    label: <Link to="/AdminPage">Admin</Link>, // Ayarlar sayfasına yönlendirme
+  },
 ];
 
 const Sidebar = ({ collapsed, setCollapsed }) => (

@@ -1,24 +1,38 @@
 .product-layout {
-  min-height: 100vh;
+  min-height:100vh;
   display: grid;
   grid-template-rows: auto 1fr auto; /* Üst: header, Orta: içerik, Alt: footer */
-  grid-template-columns: 1fr; /* Tek sütun */
+  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+ 
+  
+    gap: 15px;
   }
 
   .product-layout > Header {
-    grid-row: 1; /* Header üstte */
+    grid-row: 1/2; /* Header üstte */
+    width: 100%;
+    background-color: #f8f8f8;
+    padding: 20px;
+    text-align: center;
   }
 
   .product-layout > .content {
-    grid-row: 2; /* Ürün kartları burada gösterilecek */
+    grid-row: 2 / 3;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
-    gap:10px;
-    padding: 20px; /* Header ile içerik arasında boşluk */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Kartların yan yana sıralanması */
+    gap: 20px; /* Kartlar arasındaki boşluk */
+    padding: 20px;
+    width: 100%;
+    justify-items: center;
+    box-sizing: border-box;
  
   }
   
   .product-layout > Footer {
-    grid-row: 3; /* Footer en altta */
+    grid-row: 3 / 4;
+  width: 100%;
+  background-color: #f8f8f8;
+  padding: 20px;
+  text-align: center;
   }
   

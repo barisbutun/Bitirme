@@ -76,7 +76,7 @@ const ShoppingCard = ({ product }) => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 
     const product = data.find((item) => item.id === productId);
-    notification.success({
+    notification.warning({
       message: "Sepetten Çıkarıldı",
       description: `${
         product ? product.name : "Ürün"

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Card, Button, notification, Image } from "antd";
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { CardText, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/ProductCard.css";
@@ -25,6 +26,12 @@ function ProductCard({
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+
+  const [isFavorite, setIsFavorite] = useState(() => {
+    const savedFavorites = localStorage.getItem("favorites");
+    const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+    return favorites.includes(id);
+  });
   const addToCart = () => {
     const product = {
       id,
@@ -48,25 +55,45 @@ function ProductCard({
       placement: "topRight",
     });
   };
-
+  const toggleFavorite = () => {
+    const savedFavorites = localStorage.getItem("favorites");
+    let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+    if (isFavorite) {
+      favorites = favorites.filter((favId) => favId !== id);
+    } else {
+      favorites.push(id);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    setIsFavorite(!isFavorite);
+  };
   return (
     <Card className="ProductCard">
-      <CardTitle tag="h3">{name}</CardTitle>
+      <button
+        className={`favorite-button ${isFavorite ? "active" : ""}`}
+        onClick={toggleFavorite}
+      >
+        {isFavorite ? <HeartFilled /> : <HeartOutlined />}
+      </button>
+      {/* <span class="badge">Yeni Ürün</span> */}
+      <CardTitle className="product-title" tag="h3">
+        {name}
+      </CardTitle>
 
       <div className="image-container">
         <Image className="image" src={image} />
       </div>
 
-      <CardText className="cardtext">Fiyat:{price}</CardText>
-      <CardText className="cardtext">Açıklama:{description}</CardText>
-      <CardText className="cardtext">Stok Durumu:{stock}</CardText>
-
-      <Button className="SepetButon" onClick={addToCart}>
-        Sepete Ekle
-      </Button>
-      <Button className=" InceleButon" onClick={handleCardClick}>
-        İncele
-      </Button>
+      <CardText className="product-price">Fiyat:{price}</CardText>
+      <CardText className="product-info">Açıklama:{description}</CardText>
+      <CardText className="product-info">Stok Durumu:{stock}</CardText>
+      <div className="product-buttons">
+        <Button className="SepetButon" onClick={addToCart}>
+          Sepete Ekle
+        </Button>
+        <Button className=" InceleButon" onClick={handleCardClick}>
+          İncele
+        </Button>
+      </div>
     </Card>
   );
 }

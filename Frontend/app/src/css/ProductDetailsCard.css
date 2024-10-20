@@ -14,7 +14,8 @@
 
 .product-details-price {
   font-size: 18px;
-  color: #1890ff;
+  font-weight: bold;
+  color:black;
 }
 
 .product-details-description {
@@ -24,4 +25,70 @@
 
 .product-details-button {
   margin-top: 20px;
+  width: 800px;
+}
+.buttons{
+  display: flex;
+  justify-content:center;
+  align-items: center;
+}
+.favoriteButton {
+  margin-top: 20px;
+  background-color: transparent;
+  border: none;
+  font-size: 24px; /* İkonun boyutu */
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.favoriteButton:hover {
+  background-color: rgba(255, 0, 0, 0.1); /* Hover efekti */
+}
+
+.favoriteButton.active {
+  color: red; /* Aktifken renk değişir */
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+}
+
+.zoom-image {
+width: 100%;
+height: auto;
+  transition: transform 0.3s ease;
+}
+
+.image-container:hover .zoom-image {
+  transform: scale(1.2);
+}
+
+.small-image{
+  width: 100%;
+  height: auto;
+}
+@media (max-width: 768px) {
+  .product-details-row {
+    flex-direction: column; /* Küçük ekranlarda içerikler dikey sıraya geçer */
+  }
+
+  .product-details-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .image-container {
+    flex: 1 1 auto; /* Resim boyutu sabit kalır */
+  }
+
+  .product-details-content {
+    flex: 1 1 0; /* Diğer içerikler esneyip küçülür */
+  }
+
+  .product-details-button {
+    width: 100%; /* Buton genişliği küçülür */
+  }
 }

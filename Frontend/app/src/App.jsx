@@ -9,6 +9,7 @@ import ShoppingCard from "./pages/ShoppingCard";
 import SignUp from "./pages/SignUp";
 import Orders from "./pages/Orders";
 import ProductDetails from "./pages/ProductDetails";
+import AdminPage from "./pages/AdminPage";
 function App() {
   return (
     <Router>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/ShoppingCard" element={<ShoppingCard />} />
         <Route path="/Orders" element={<Orders />} />
         <Route path="/ProductDetails/:id" element={<ProductDetails />} />
+        <Route path="/AdminPage" element={<AdminPage />} />
       </Routes>
     </Router>
   );
