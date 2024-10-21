@@ -44,28 +44,34 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
+                    // Manuel login ve register için izin verilen endpoint'leri ayarlayın
+                    auth.requestMatchers("/api/user/v1/register").permitAll();
+                    auth.requestMatchers("/api/user/v1/login").permitAll();
+
+                    // OAuth2 ile login işlemi gerektirmeyen endpoint'ler
                     auth.requestMatchers("/api/order/**").permitAll();
-                    auth.requestMatchers("api/order/v1/orderItems/").permitAll();
                     auth.requestMatchers("/api/product/v1/**").permitAll();
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
-                    auth.requestMatchers("/api/users/v1/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
-                    auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name());
                     auth.requestMatchers("/api/shoppingCartItem/v1/**").permitAll();
 
+                    // Role bazlı erişim kontrolleri
+                    auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name());
                     auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+
+                    // Geri kalan tüm istekler için authentication zorunluluğu
                     auth.anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/oauth2/authorize")
+                                .baseUri("/oauth2/authorize") // OAuth2 endpoint
                         )
                         .tokenEndpoint(token -> token
                                 .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
                         )
-
-                        .defaultSuccessUrl("/homePage", true)
+                        .defaultSuccessUrl("/homePage", true) // OAuth2 login başarılı olduğunda
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+                // Oturum yönetimi
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }

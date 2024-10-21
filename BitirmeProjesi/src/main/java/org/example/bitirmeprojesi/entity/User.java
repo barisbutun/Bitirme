@@ -38,7 +38,7 @@ public class User implements Serializable, UserDetails {
     private String userName;
 
     @ToString.Exclude
-    private boolean registered = false;
+    private boolean registered = true;
 
     @Column(name = "password")
     private String password;
@@ -59,6 +59,9 @@ public class User implements Serializable, UserDetails {
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Orders> orders;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Favourite> favourites;
 
 
     @Override

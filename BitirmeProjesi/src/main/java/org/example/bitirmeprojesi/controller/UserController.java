@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.RegisterDto;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
+import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +15,34 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/v1")
+    @PostMapping("/v1/register")
     public ResponseEntity<UserDto> register(@RequestBody RegisterDto registerDto) {
         UserDto userDto = userService.register(registerDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
+    @PostMapping("/v1/google")
+    public ResponseEntity<String> googleRegister(@RequestBody UserDto userDto) {
+
+        User existingUser = userService.findUserByEmail(userDto.getEmail());
+        if (existingUser != null) {
+            return ResponseEntity.badRequest().body("Kullanıcı zaten mevcut.");
+        }
+
+        userService.googleRegister(userDto);
+        return ResponseEntity.ok("Kullanıcı başarıyla kaydedildi.");
+
+    }
+
     @PostMapping("/v1/login")
-    public ResponseEntity<Void> login(@RequestBody String userName, @RequestBody String password) {
-        userService.login(userName, password);
+    public ResponseEntity<Void> login(@RequestBody String user_name, @RequestBody String password) {
+        userService.login(user_name, password);
         return ResponseEntity.ok().build();
     }
 

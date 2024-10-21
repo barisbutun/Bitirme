@@ -31,6 +31,7 @@ public class OrderService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OrderItemMapper orderItemMapper;
     private final OrderItemRepository orderItemRepository;
+    private final TokenService tokenService;
 
     @Transactional
     public OrdersDto create(String userId, OrdersDto ordersDto) {

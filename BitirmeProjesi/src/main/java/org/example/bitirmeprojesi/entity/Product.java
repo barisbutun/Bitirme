@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.entity;
 
 
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,5 +48,9 @@ public class Product implements Serializable {
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ShoppingCartItem> shoppingCartItem;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Favourite> favourites;
 
 }

@@ -2,6 +2,8 @@ package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +32,8 @@ public class UserDto implements Serializable {
     private String password;
 
     @JsonProperty("email")
+    @NotBlank(message = "Email alanı zorunludur")
+    @Email(message = "Geçerli bir email adresi giriniz")
     private String email;
 
     @JsonProperty("role")

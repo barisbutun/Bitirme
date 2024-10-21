@@ -46,14 +46,21 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
-    public LoginResponseDto login(String userName, String password) {
+    public UserDto googleRegister(UserDto userDto) {
+        return userMapper.toDto(userRepository.save(userMapper.toEntity(userDto)));
+    }
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public LoginResponseDto login(String user_name, String password) {
 
         try {
             Authentication auth = authenticationManager.authenticate
-                    (new UsernamePasswordAuthenticationToken(userName, password));
+                    (new UsernamePasswordAuthenticationToken(user_name, password));
             String token = tokenService.generateJwt(auth);
             User user = (User) auth.getPrincipal();
-            return new LoginResponseDto(userRepository.findByUserName(userName).get(), token);
+            return new LoginResponseDto(userRepository.findByUserName(user_name).get(), token);
 
         } catch (AuthenticationException exception) {
             return new LoginResponseDto(Optional.ofNullable(null), "");
