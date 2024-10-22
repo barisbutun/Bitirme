@@ -5,7 +5,7 @@
     border:3px solid black;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  .form-container{
+  .profile-form-container{
     padding: 20px;
     margin-top: -8px;
     display: flex;

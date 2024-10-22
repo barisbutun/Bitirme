@@ -51,7 +51,7 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="profile-form-container">
       <Form
         form={form}
         name="profile-settings"

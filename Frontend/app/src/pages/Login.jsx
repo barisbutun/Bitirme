@@ -6,45 +6,27 @@ import "../css/Login.css";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [userCaptcha, setUserCaptcha] = useState("");
 
-  // JSON dosyasından kullanıcı verilerini çekme
-  // const [users, setUsers] = useState("");
-  // useEffect(() => {
-  //   fetch("/users.json")
-  //     .then((response) => response.json())
-  //     .then((data) => setUsers(data))
-  //     .catch((error) => console.error("error fetching user data:", error));
-  // }, []);
-
-  // // Giriş işlemi
-  // const handleLogin = () => {
-  //   const user = users.find(
-  //     (user) => user.username === username && user.password === password
-  //   );
-  //   if (user) {
-  //     navigate("/Homepage"); // Kullanıcı bilgileri doğruysa yönlendirme
-  //   } else {
-  //     alert("Geçersiz kullanıcı adı ve şifre");
-  //   }
-  // };
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(" ", {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:8082/api/user/v1/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          username,
+          userName,
           password,
         }),
       });
@@ -119,8 +101,8 @@ const LoginForm = () => {
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />} // Kullanıcı adı ikonu
             placeholder="Kullanıcı Adı"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
           />
         </Form.Item>
 

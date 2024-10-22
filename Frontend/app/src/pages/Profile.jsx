@@ -33,10 +33,6 @@ const Profile = () => {
             <TabPane tab="Settings" key="2">
               <ProfileSettings />
             </TabPane>
-
-            <TabPane tab="Favorites" key="3">
-              <Link to="/Favorites"></Link>
-            </TabPane>
           </Tabs>
         </Card>
 

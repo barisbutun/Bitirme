@@ -25,8 +25,8 @@ const tailFormItemLayout = {
 
 const SignUp = () => {
   const [form] = Form.useForm();
-
-  const [username, setUsername] = useState("");
+  const [Name, setName] = useState("");
+  const [user_name, setUsername] = useState("");
   const [useremail, setUseremail] = useState("");
   const [userpassword, setUserpassword] = useState("");
   const [useraddress, setUseraddress] = useState("");
@@ -37,20 +37,24 @@ const SignUp = () => {
   const registerUser = async (e) => {
     e.preventDefault();
     const newUser = {
-      name: username,
+      username: user_name,
+      name: Name,
       email: useremail,
       password: userpassword,
       address: useraddress,
       phone: userphone,
     };
     try {
-      const response = await fetch("   ", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
-      });
+      const response = await fetch(
+        "http://localhost:8082/api/user/v1/register ",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
+        }
+      );
       const savedUser = await response.json();
       if (response.ok) {
         setMessage(" Kayıt başarılı:", savedUser);
@@ -94,7 +98,25 @@ const SignUp = () => {
       >
         <Input
           className="form-input"
-          value={username}
+          value={Name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </Form.Item>
+      <Form.Item
+        name="username"
+        label="Kullanıcı İsmi"
+        rules={[
+          {
+            required: true,
+            message: "Lütfen isminizi giriniz.",
+            whitespace: true,
+          },
+        ]}
+        className="form-label"
+      >
+        <Input
+          className="form-input"
+          value={user_name}
           onChange={(e) => setUsername(e.target.value)}
         />
       </Form.Item>
