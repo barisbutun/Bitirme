@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Checkbox, Form, Input, Select } from "antd";
 import "../css/SignUp.css"; // CSS dosyasını içe aktarma
 import { useNavigate } from "react-router-dom";
+import { Register } from "../services/UserService/AuthService";
 
 const { Option } = Select;
 
@@ -34,38 +35,38 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const registerUser = async (e) => {
-    e.preventDefault();
-    const newUser = {
-      username: user_name,
-      name: Name,
-      email: useremail,
-      password: userpassword,
-      address: useraddress,
-      phone: userphone,
-    };
-    try {
-      const response = await fetch(
-        "http://localhost:8082/api/user/v1/register ",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
-        }
-      );
-      const savedUser = await response.json();
-      if (response.ok) {
-        setMessage(" Kayıt başarılı:", savedUser);
-        navigate("/Login");
-      } else {
-        setMessage("Kayıt başarısız: {$data.message}");
-      }
-    } catch (error) {
-      setMessage("Kayıt sırasında hata oluştu:");
-    }
-  };
+  // const registerUser = async (e) => {
+  //   e.preventDefault();
+  //   const newUser = {
+  //     username: user_name,
+  //     name: Name,
+  //     email: useremail,
+  //     password: userpassword,
+  //     address: useraddress,
+  //     phone: userphone,
+  //   };
+  //   try {
+  //     const response = await fetch(
+  //       "http://localhost:8082/api/user/v1/register ",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(newUser), // Verileri JSON formatında gönderiyoruz
+  //       }
+  //     );
+  //     const savedUser = await response.json();
+  //     if (response.ok) {
+  //       setMessage(" Kayıt başarılı:", savedUser);
+  //       navigate("/Login");
+  //     } else {
+  //       setMessage("Kayıt başarısız: {$data.message}");
+  //     }
+  //   } catch (error) {
+  //     setMessage("Kayıt sırasında hata oluştu:");
+  //   }
+  // };
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
@@ -222,7 +223,7 @@ const SignUp = () => {
           className="KayitButon"
           type="primary"
           htmlType="submit"
-          onClick={registerUser}
+          onClick={Register}
         >
           Kayıt Ol
         </Button>
