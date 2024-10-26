@@ -12,25 +12,25 @@ import java.util.UUID;
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.User}
  */
-@Value
+
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 public class RegisterDto implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    UUID id;
+private    UUID id;
     @JsonProperty("name")
-    String name;
+    private String name;
     @JsonProperty("user_name")
-    String userName;
+    private String userName;
     @JsonProperty("password")
     @Size(min = 4,max = 50, message = "Password must be at least 8 characters long")
-    String password;
+    private String password;
     @JsonProperty("email")
-    String email;
+    private String email;
     @JsonProperty("phone")
-    String phone;
+    private String phone;
     @JsonProperty("address")
-    String address;
+    private String address;
 }

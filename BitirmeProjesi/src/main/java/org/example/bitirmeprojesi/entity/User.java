@@ -70,6 +70,6 @@ public class User implements Serializable, UserDetails {
     }
     @Override
     public String getUsername() {
-        return this.userName;
+        return this.getEmail();
     }
 }

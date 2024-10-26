@@ -9,18 +9,18 @@ import java.io.Serializable;
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Favourite}
  */
-@Value
+
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor(force = true)
 public class FavouriteDto implements Serializable {
     @JsonIgnore
-    long id;
+    private long id;
     @JsonProperty("user")
-    UserDto user;
+    private    UserDto user;
     @JsonProperty("product")
-    ProductDto product;
+    private ProductDto product;
     @JsonProperty("category")
-    CategoryDto category;
+    private CategoryDto category;
 }

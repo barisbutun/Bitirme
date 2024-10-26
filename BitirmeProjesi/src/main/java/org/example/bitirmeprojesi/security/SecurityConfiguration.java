@@ -11,8 +11,13 @@ import org.example.bitirmeprojesi.enums.Role;
 import org.example.bitirmeprojesi.util.RSAkeyProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -30,6 +35,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private final RSAkeyProperties keys;
@@ -39,40 +45,60 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public AuthenticationManager authManager(UserDetailsService detailsService) {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
+        daoProvider.setUserDetailsService(detailsService);
+        daoProvider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(daoProvider);
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     // Manuel login ve register için izin verilen endpoint'leri ayarlayın
-                    auth.requestMatchers("/api/user/v1/register").permitAll();
-                    auth.requestMatchers("/api/user/v1/login").permitAll();
-
-                    // OAuth2 ile login işlemi gerektirmeyen endpoint'ler
+                    auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/api/auth/v1/login").permitAll();
+                    auth.requestMatchers("/api/auth/v1/register").permitAll();
+                    auth.requestMatchers("api/admin").hasRole(Role.ADMIN.name());
                     auth.requestMatchers("/api/order/**").permitAll();
                     auth.requestMatchers("/api/product/v1/**").permitAll();
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
                     auth.requestMatchers("/api/shoppingCartItem/v1/**").permitAll();
-
-                    // Role bazlı erişim kontrolleri
-                    auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name());
-                    auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
-
-                    // Geri kalan tüm istekler için authentication zorunluluğu
+                    auth.requestMatchers("/api/favourite/v1/findAll").hasRole(Role.ADMIN.name());
+                    auth.requestMatchers("/api/favourite/v1/**").permitAll();
+                    auth.requestMatchers("/api/user/v1/profile").authenticated();
                     auth.anyRequest().authenticated();
-                })
-                .oauth2Login(oauth2 -> oauth2
+                });
+        http.oauth2ResourceServer(
+                o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+        http.sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+
+        // Manuel form login devre dışı bırak
+
+                /*.formLogin(form -> form // Manuel login işlemi için formLogin kullan
+                        .loginPage("/api/user/v1/login")  // Manuel login endpoint'i
+                        .permitAll()
+                );*/
+
+                /*.oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/oauth2/authorize") // OAuth2 endpoint
                         )
                         .tokenEndpoint(token -> token
                                 .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
                         )
-                        .defaultSuccessUrl("/homePage", true) // OAuth2 login başarılı olduğunda
+                        .defaultSuccessUrl("/api/user/v1/x", true) // OAuth2 login başarılı olduğunda
                 )
                 // Oturum yönetimi
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+*/
         return http.build();
     }
 
@@ -111,7 +137,7 @@ public class SecurityConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:3000", "http://192.168.0.113:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };

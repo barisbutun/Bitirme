@@ -9,20 +9,20 @@ import java.io.Serializable;
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.OrderItem}
  */
-@Value
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class OrderItemDto implements Serializable {
     @JsonIgnore
-    Long id;
+    private    Long id;
     @JsonProperty("product_id")
-    ProductDto productDto;
+    private ProductDto productDto;
     @JsonProperty("order_id")
-    OrdersDto ordersDto;
+    private OrdersDto ordersDto;
     @JsonProperty("quantity")
-    Integer quantity;
+    private Integer quantity;
     @JsonProperty("user_id")
-    UserDto user;
+    private UserDto user;
 }

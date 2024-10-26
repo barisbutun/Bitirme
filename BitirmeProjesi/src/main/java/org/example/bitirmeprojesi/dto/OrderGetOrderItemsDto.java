@@ -13,35 +13,35 @@ import java.util.List;
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Orders}
  */
-@Value
+
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Getter
 @Setter
 public class OrderGetOrderItemsDto implements Serializable {
     @JsonIgnore
-    Long id;
+    private    Long id;
 
     @JsonProperty("description")
-    String description;
+    private String description;
 
     @JsonProperty("name")
-    String name;
+    private String name;
 
     @JsonProperty("sale_date")
-    LocalDateTime saleDate;
+    private LocalDateTime saleDate;
 
     @JsonProperty("order_id")
-    OrdersDto ordersDto;
+    private OrdersDto ordersDto;
 
     @JsonProperty("sum_price")
-    double sumPrice;
+    private double sumPrice;
 
     @JsonProperty("stock_state")
-    StockState stockState;
+    private StockState stockState;
 
     @JsonProperty("payment_state")
-    PaymentState paymentState;
+    private PaymentState paymentState;
 
     @JsonProperty("order_items")
     List<OrderItemDto> orderItems;

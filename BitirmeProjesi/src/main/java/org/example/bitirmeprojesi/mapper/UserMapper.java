@@ -4,6 +4,7 @@ package org.example.bitirmeprojesi.mapper;
 import org.example.bitirmeprojesi.dto.RegisterDto;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
+import org.example.bitirmeprojesi.dto.UserProfileDto;
 import org.example.bitirmeprojesi.entity.User;
 import org.mapstruct.*;
 
@@ -20,6 +21,9 @@ public interface UserMapper {
 
     User toEntity(final RegisterDto registerDto);
 
+    User toEntity(final UserProfileDto userProfileDto);
+
+    UserProfileDto toDtoProfile(final User user);
 
     List<UserDto> toDtoList(final List<User> userList);
 
