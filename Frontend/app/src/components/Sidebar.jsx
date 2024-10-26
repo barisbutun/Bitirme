@@ -43,21 +43,21 @@ const items = [
     icon: <ShoppingCartOutlined />, // Sepetim ikonu
     label: <Link to="/ShoppingCard">Sepetim</Link>, // Sepetim sayfasına yönlendirme
   },
-  {
-    key: "6",
-    icon: <TruckOutlined />, // Teslimatikonu
-    label: <Link to="/Delivery">Alışveriş Bilgileri</Link>, // Alışveriş bilgileri sayfasına yönlendirme
-  },
+  // {
+  //   key: "6",
+  //   icon: <TruckOutlined />, // Teslimatikonu
+  //   label: <Link to="/Delivery">Alışveriş Bilgileri</Link>, // Alışveriş bilgileri sayfasına yönlendirme
+  // },
   {
     key: "7",
     icon: <SettingOutlined />, // Ayarlar ikonu
     label: <Link to="/settings">Ayarlar</Link>, // Ayarlar sayfasına yönlendirme
   },
-  {
-    key: "8",
-    // icon: <SettingOutlined />, // Ayarlar ikonu
-    label: <Link to="/AdminPage">Admin</Link>, // Ayarlar sayfasına yönlendirme
-  },
+  // {
+  //   key: "8",
+  //   // icon: <SettingOutlined />, // Ayarlar ikonu
+  //   label: <Link to="/AdminPage">Admin</Link>, // Ayarlar sayfasına yönlendirme
+  // },
 ];
 
 const Sidebar = ({ collapsed, setCollapsed }) => (

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Layout, theme, Input, Button, Drawer, Menu } from "antd";
 import "../css/Header.css";
 import FilterComponent from "./FilterComponent";
-
 import { Link } from "react-router-dom";
 import {
   UserOutlined,

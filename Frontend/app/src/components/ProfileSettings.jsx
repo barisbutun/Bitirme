@@ -3,16 +3,19 @@ import { Form, Input, Button, Upload, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import "../css/ProfileSettings.css";
+
 const ProfileSettings = () => {
   const [form] = Form.useForm();
   const [avatar, setAvatar] = useState(null); // Avatar durumunu saklamak için
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    avatar: "",
+  }); // Profil bilgilerini saklamak için
 
   const handleFinish = async (values) => {
-    console.log("Form values:", values);
-    notification.success({
-      message: "Başarıyla Güncellendi",
-      description: "Bilgileriniz başarıyla güncellendi!",
-    });
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("email", values.email);
@@ -23,7 +26,7 @@ const ProfileSettings = () => {
     }
 
     try {
-      const response = await axios.put("/api/profile", formData, {
+      const response = await axios.put("  ", formData, {
         headers: {
           "Content-Type": "multipart/form-data", // FormData gönderirken bu header'ı eklemelisiniz
         },
@@ -33,6 +36,15 @@ const ProfileSettings = () => {
         notification.success({
           message: "Başarıyla Güncellendi",
           description: "Bilgileriniz başarıyla güncellendi!",
+        });
+
+        // Profil state'ini güncelle
+        setProfile({
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          address: values.address,
+          avatar: avatar || profile.avatar, // Yeni avatar yoksa eski avatarı kullan
         });
       }
     } catch (error) {
@@ -46,7 +58,8 @@ const ProfileSettings = () => {
 
   const handleAvatarChange = (info) => {
     if (info.file.status === "done") {
-      setAvatar(info.file.response.url); // Avatar URL'sini güncelle
+      const fileUrl = URL.createObjectURL(info.file.originFileObj);
+      setAvatar(fileUrl); // Avatar dosyasını güncelle
     }
   };
 
@@ -58,10 +71,10 @@ const ProfileSettings = () => {
         layout="vertical"
         onFinish={handleFinish}
         initialValues={{
-          name: "",
-          email: "",
-          phone: "",
-          address: "",
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          address: profile.address,
         }}
       >
         <Form.Item label="Avatar">

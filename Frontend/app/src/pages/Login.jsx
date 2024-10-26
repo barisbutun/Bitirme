@@ -192,7 +192,7 @@ const LoginForm = () => {
         </Form.Item>
 
         <Form.Item>
-          <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+          <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">
             <GoogleLogin
               onSuccess={handleGoogleLogin}
               onError={() => {
