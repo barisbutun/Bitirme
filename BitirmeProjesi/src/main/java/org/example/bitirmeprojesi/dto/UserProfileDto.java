@@ -1,7 +1,10 @@
 package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -12,10 +15,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor(force=true)
+@NoArgsConstructor(force = true)
 public class UserProfileDto implements Serializable {
     @JsonProperty("name")
-    private    String name;
+    private String name;
     @JsonProperty("email")
     private String email;
     @JsonProperty("phone")

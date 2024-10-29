@@ -2,9 +2,10 @@ package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -19,13 +20,13 @@ import java.util.UUID;
 @Setter
 public class RegisterDto implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-private    UUID id;
+    private UUID id;
     @JsonProperty("name")
     private String name;
     @JsonProperty("user_name")
     private String userName;
     @JsonProperty("password")
-    @Size(min = 4,max = 50, message = "Password must be at least 8 characters long")
+    @Size(min = 4, max = 50, message = "Password must be at least 8 characters long")
     private String password;
     @JsonProperty("email")
     private String email;

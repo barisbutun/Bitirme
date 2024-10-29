@@ -24,7 +24,7 @@ public class CancellationService {
     }
 
     public CancellationDto findById(Long id) {
-        Cancellation cancellation = cancellationRepository.findById(id).get();
+        Cancellation cancellation = cancellationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cancellation not found with id: " + id));
         return cancellationMapper.toDto(cancellation);
     }
 

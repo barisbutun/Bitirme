@@ -80,7 +80,7 @@ public class SecurityConfiguration {
         );
 
 
-        // Manuel form login devre dışı bırak
+
 
                 /*.formLogin(form -> form // Manuel login işlemi için formLogin kullan
                         .loginPage("/api/user/v1/login")  // Manuel login endpoint'i

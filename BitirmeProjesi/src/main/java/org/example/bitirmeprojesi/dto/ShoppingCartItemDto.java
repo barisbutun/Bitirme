@@ -17,12 +17,12 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class ShoppingCartItemDto implements Serializable {
-      @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-      private long id;
-      @JsonProperty("product_id")
-      private ProductDto product;
-      @JsonProperty("quantity")
-      private Integer quantity;
-      @JsonProperty("user_id")
-      private UserDto user;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private long id;
+    @JsonProperty("product_id")
+    private ProductDto product;
+    @JsonProperty("quantity")
+    private Integer quantity;
+    @JsonProperty("user_id")
+    private UserDto user;
 }

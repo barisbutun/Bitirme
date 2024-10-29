@@ -34,7 +34,7 @@ public class User implements Serializable, UserDetails {
     @Column(name = "name")
     private String name;
 
-    @Column(name="user_name",unique = true)
+    @Column(name = "user_name", unique = true)
     private String userName;
 
     @ToString.Exclude
@@ -68,6 +68,7 @@ public class User implements Serializable, UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.role != null ? List.of(new SimpleGrantedAuthority(this.role.name())) : List.of();
     }
+
     @Override
     public String getUsername() {
         return this.getEmail();

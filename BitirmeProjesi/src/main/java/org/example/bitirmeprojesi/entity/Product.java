@@ -1,7 +1,7 @@
 package org.example.bitirmeprojesi.entity;
 
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,16 +33,18 @@ public class Product implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @JsonBackReference
     private Category category;
 
     @Column(name = "price")
     private double price;
 
     @Column(name = "stock_state")
+    @Enumerated(EnumType.STRING)
     private StockState stockState;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "product",cascade= CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
     @JsonManagedReference

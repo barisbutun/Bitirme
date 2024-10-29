@@ -1,6 +1,5 @@
 package org.example.bitirmeprojesi.repository;
 
-import org.example.bitirmeprojesi.entity.OrderItem;
 import org.example.bitirmeprojesi.entity.ShoppingCartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

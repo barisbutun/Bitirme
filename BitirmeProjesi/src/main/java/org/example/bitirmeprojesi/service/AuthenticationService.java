@@ -13,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +48,7 @@ public class AuthenticationService {
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
             if(adminService.isAdmin(loginRequestDto.getEmail(), loginRequestDto.getPassword())) {
-                String adminToken = tokenService.generateJwt(auth); // Admin için özel bir token oluşturulabilir
-                // İsteğe bağlı olarak admin yetkileri veya rolleri döndürülebilir
+                String adminToken = tokenService.generateJwt(auth);
 
                 return new LoginResponseDto(Optional.ofNullable(null), adminToken);
             }

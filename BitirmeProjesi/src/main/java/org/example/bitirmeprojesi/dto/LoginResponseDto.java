@@ -1,10 +1,10 @@
 package org.example.bitirmeprojesi.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.example.bitirmeprojesi.entity.User;
 
 import java.util.Optional;
-
 
 
 @Getter
@@ -19,6 +19,7 @@ public class LoginResponseDto {
         this.user = byUsername.orElse(null);
         this.token = token;
     }
+
     public LoginResponseDto(User user, String token) {
         this.user = user;
         this.token = token;

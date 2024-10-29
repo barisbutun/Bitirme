@@ -25,7 +25,6 @@ public class CancellationController {
         return ResponseEntity.ok(cancellationService.findById(id));
     }
 
-
     @GetMapping("/v1")
     public ResponseEntity<List<CancellationDto>> findAll() {
         return ResponseEntity.ok(cancellationService.findAll());

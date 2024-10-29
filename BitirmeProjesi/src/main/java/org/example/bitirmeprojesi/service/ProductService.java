@@ -4,8 +4,14 @@ package org.example.bitirmeprojesi.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
+import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.entity.Product;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.CategoryNotFoundException;
+import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
+import org.example.bitirmeprojesi.mapper.CategoryMapper;
 import org.example.bitirmeprojesi.mapper.ProductMapper;
+import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,19 +27,28 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryMapper categoryMapper;
+    private final CategoryRepository categoryRepository;
 
     public ProductDto create(ProductDto productDto) {
+        if (productDto.getCategoryId() == null) {
+            throw new RuntimeException("Category ID is required");
+        }
+
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR, productDto.getCategoryId()));
 
         Product product = productMapper.toEntity(productDto);
+        product.setCategory(category);
         productRepository.save(product);
-        return productMapper.toDto(product);
 
+        return productMapper.toDto(product);
     }
 
 
     public ProductDto findById(long id) {
 
-        Product product = productRepository.findById(id).get();
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
         return productMapper.toDto(product);
     }
 

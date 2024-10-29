@@ -34,5 +34,5 @@ public class ProductDto implements Serializable {
     StockState stockState;
 
     @JsonProperty("category_id")
-    CategoryDto categoryDto;
+    private Long categoryId;
 }
