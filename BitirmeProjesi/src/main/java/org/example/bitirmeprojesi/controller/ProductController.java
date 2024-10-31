@@ -17,12 +17,7 @@ public class ProductController {
     private final ProductService productService;
 
 
-    @PostMapping("/v1")
-    public ResponseEntity<ProductDto> create(@RequestBody @Validated final ProductDto productDto) {
-        productService.create(productDto);
 
-        return ResponseEntity.ok(productDto);
-    }
 
     @GetMapping("/v1/{id}")
     public ResponseEntity<ProductDto> findById(@PathVariable final Long id) {

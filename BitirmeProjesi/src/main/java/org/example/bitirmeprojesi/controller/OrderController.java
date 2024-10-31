@@ -28,10 +28,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
-    @GetMapping("/v1")
-    public ResponseEntity<List<OrdersDto>> findAll() {
-        return ResponseEntity.ok(orderService.findAll());
-    }
+
 
     @PutMapping("/v1/{id}")
     public ResponseEntity<OrdersDto> update(@RequestBody OrdersDto ordersDto, long id) {

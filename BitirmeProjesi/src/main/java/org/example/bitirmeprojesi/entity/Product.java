@@ -39,6 +39,9 @@ public class Product implements Serializable {
     @Column(name = "price")
     private double price;
 
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
     @Column(name = "stock_state")
     @Enumerated(EnumType.STRING)
     private StockState stockState;
@@ -50,6 +53,9 @@ public class Product implements Serializable {
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ShoppingCartItem> shoppingCartItem;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
+    private List<Image> images;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)

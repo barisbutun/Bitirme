@@ -16,10 +16,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping("/v1")
-    public ResponseEntity<CategoryDto> create(@RequestBody CategoryDto categoryDto) {
-        return ResponseEntity.ok(categoryService.create(categoryDto));
-    }
+
 
     @GetMapping("/v1")
     public ResponseEntity<List<CategoryDto>> findAll() {
