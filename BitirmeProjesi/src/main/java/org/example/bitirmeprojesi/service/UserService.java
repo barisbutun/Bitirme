@@ -45,7 +45,6 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserDto> findAll() {
-
         return userMapper.toDtoList(userRepository.findAll());
     }
 

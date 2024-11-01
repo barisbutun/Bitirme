@@ -1,15 +1,13 @@
 package org.example.bitirmeprojesi.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @Table(name = "ımage")
 public class Image {
@@ -27,7 +25,9 @@ public class Image {
     private String type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumns({
+            @JoinColumn(name = "product_id", referencedColumnName = "id")
+    })
     private Product product;
 
 }

@@ -40,6 +40,9 @@ spring:
         - postgres
         - redis
 
+admin:
+  email: f211220005@ktun.edu.tr
+  password: 1234
 
 datasource:
   hikari:

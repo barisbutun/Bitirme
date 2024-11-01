@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.CategoryDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.dto.ProductDto;
-import org.example.bitirmeprojesi.service.CategoryService;
-import org.example.bitirmeprojesi.service.OrderService;
-import org.example.bitirmeprojesi.service.ProductService;
+import org.example.bitirmeprojesi.service.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,30 +17,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final ProductService productService;
-    private final CategoryService categoryService;
-    private final OrderService orderService;
+    private final AdminService adminService;
 
     @GetMapping("/v1")
-    public String success(){
+    public String success() {
         return "success admin";
     }
 
     @PostMapping("/v1/product")
     public ResponseEntity<ProductDto> createProduct(@RequestBody @Validated final ProductDto productDto) {
-        productService.create(productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productDto);
+        ProductDto createdProduct = adminService.createProduct(productDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     @PostMapping("/v1/category")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(categoryDto));
+        CategoryDto createdCategory = adminService.createCategory(categoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
-
 
     @GetMapping("/v1/orders")
     public ResponseEntity<List<OrdersDto>> getAllOrders() {
-        return ResponseEntity.ok(orderService.findAll());
+        List<OrdersDto> orders = adminService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
+
 }
 

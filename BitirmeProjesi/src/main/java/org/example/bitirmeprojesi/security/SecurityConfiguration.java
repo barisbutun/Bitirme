@@ -63,7 +63,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/auth/v1/login").permitAll();
                     auth.requestMatchers("/api/auth/v1/register").permitAll();
-                    auth.requestMatchers("api/admin").hasRole(Role.ADMIN.name());
+                    auth.requestMatchers("/api/admin").hasRole(Role.ADMIN.name());
+                    auth.requestMatchers("/api/image/**").hasRole(Role.ADMIN.name());
                     auth.requestMatchers("/api/order/**").permitAll();
                     auth.requestMatchers("/api/product/v1/**").permitAll();
                     auth.requestMatchers("/api/categories/v1/**").permitAll();

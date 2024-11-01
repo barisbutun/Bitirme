@@ -17,47 +17,41 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-
-    private final  PasswordEncoder passwordEncoder;
-
+    private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
-    private  final UserMapper userMapper;
-
-    private final AdminService adminService;
     public UserDto register(RegisterDto registerDto) {
-
-        String encodePassword = passwordEncoder.encode(registerDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(registerDto.getPassword());
         User user = userMapper.toEntity(registerDto);
         user.setRole(Role.USER);
-        user.setPassword(encodePassword);
+        user.setPassword(encodedPassword);
         return userMapper.toDto(userRepository.save(user));
     }
 
-    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+    public boolean isAdmin(User user) {
+        return user.getRole() == Role.ADMIN;
+    }
 
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         try {
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
-            if(adminService.isAdmin(loginRequestDto.getEmail(), loginRequestDto.getPassword())) {
-                String adminToken = tokenService.generateJwt(auth);
 
-                return new LoginResponseDto(Optional.ofNullable(null), adminToken);
+            User user = (User) auth.getPrincipal();
+            String token = tokenService.generateJwt(auth);
+
+            if (isAdmin(user)) {
+                return new LoginResponseDto(Optional.ofNullable(null), token); // Admin kullanıcı için yanıt
             }
 
-            String token = tokenService.generateJwt(auth);
-            User user = (User) auth.getPrincipal();
-
             return new LoginResponseDto(user, token);
-
 
         } catch (AuthenticationException exception) {
             throw new BadCredentialsException("Invalid email or password", exception);
