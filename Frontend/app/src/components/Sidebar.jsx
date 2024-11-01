@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   UserOutlined,
   SettingOutlined,
@@ -10,88 +10,85 @@ import {
   ShoppingOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
-import { Link } from "react-router-dom"; // Link to for routing
+import { Link } from "react-router-dom";
 import "../css/Sidebar.css";
 
 const { Sider } = Layout;
-const items = [
-  {
-    key: "1",
-    icon: <HomeOutlined />, // Anasayfa ikonu
-    label: <Link to="/Homepage">Anasayfaya </Link>, // Anasayfaya yönlendirme
-  },
-  {
-    key: "2",
-    icon: <UserOutlined />, // Profilim ikonu
-    label: <Link to="/Profile">Profilim</Link>, // Profilim sayfasına yönlendirme
-  },
-  {
-    key: "3",
-    icon: <LoginOutlined />, // Giriş ikonu
-    label: "Giriş/Kayıt", // Giriş sayfasına yönlendirme
-    children: [
-      { key: "31", label: <Link to="/SignUp">Kayıt Ol</Link> },
-      { key: "32", label: <Link to="/Login">Giriş</Link> },
-    ],
-  },
-  {
-    key: "4",
-    icon: <AppstoreOutlined />, // Ürünler ikonu
-    label: <Link to="/Products">Ürünler</Link>, // Ürünler sayfasına yönlendirme
-  },
-  {
-    key: "5",
-    icon: <ShoppingCartOutlined />, // Sepetim ikonu
-    label: <Link to="/ShoppingCard">Sepetim</Link>, // Sepetim sayfasına yönlendirme
-  },
-  // {
-  //   key: "6",
-  //   icon: <TruckOutlined />, // Teslimatikonu
-  //   label: <Link to="/Delivery">Alışveriş Bilgileri</Link>, // Alışveriş bilgileri sayfasına yönlendirme
-  // },
-  {
-    key: "7",
-    icon: <ShoppingOutlined />,
-    label: <Link to="/Orders">Siparişlerim</Link>, //Siparişlerim sayfasına yönlendirme
-  },
-  {
-    key: "8",
-    icon: <CreditCardFilled />,
-    label: <Link to="/Payment">Ödeme Bilgileri</Link>, // Ödeme sayfasına yönlendirme
-  },
 
-  {
-    key: "9",
-    icon: <SettingOutlined />, // Ayarlar ikonu
-    label: <Link to="/settings">Ayarlar</Link>, // Ayarlar sayfasına yönlendirme
-  },
-  // {
-  //   key: "8",
-  //   // icon: <SettingOutlined />, // Ayarlar ikonu
-  //   label: <Link to="/AdminPage">Admin</Link>, // Ayarlar sayfasına yönlendirme
-  // },
-];
+const Sidebar = ({ collapsed, setCollapsed }) => {
+  const [userRole, setUserRole] = useState("user"); // Role durumunu ayarlayın
 
-const Sidebar = ({ collapsed, setCollapsed }) => (
-  <Sider
-    collapsible
-    collapsed={collapsed}
-    trigger={null}
-    // onCollapse={(value) => setCollapsed(value)}
-    breakpoint="lg"
-    collapsedWidth="0"
-    onBreakpoint={(broken) => {
-      console.log(broken);
-    }}
-  >
-    <div className="demo-logo-vertical" />
-    <Menu
-      theme="dark"
-      mode="inline"
-      defaultSelectedKeys={["7"]}
-      items={items}
-    />
-  </Sider>
-);
+  // Rol durumuna göre filtrelenmiş menü öğeleri
+  const items = [
+    {
+      key: "1",
+      icon: <HomeOutlined />,
+      label: <Link to="/Homepage">Anasayfaya </Link>,
+    },
+    {
+      key: "2",
+      icon: <UserOutlined />,
+      label: <Link to="/Profile">Profilim</Link>,
+    },
+    {
+      key: "3",
+      icon: <LoginOutlined />,
+      label: "Giriş/Kayıt",
+      children: [
+        { key: "31", label: <Link to="/SignUp">Kayıt Ol</Link> },
+        { key: "32", label: <Link to="/Login">Giriş</Link> },
+      ],
+    },
+    {
+      key: "4",
+      icon: <AppstoreOutlined />,
+      label: <Link to="/Products">Ürünler</Link>,
+    },
+    {
+      key: "5",
+      icon: <ShoppingCartOutlined />,
+      label: <Link to="/ShoppingCard">Sepetim</Link>,
+    },
+    {
+      key: "7",
+      icon: <ShoppingOutlined />,
+      label: <Link to="/Orders">Siparişlerim</Link>,
+    },
+    {
+      key: "8",
+      icon: <CreditCardFilled />,
+      label: <Link to="/Payment">Ödeme Bilgileri</Link>,
+    },
+    {
+      key: "9",
+      icon: <SettingOutlined />,
+      label: <Link to="/settings">Ayarlar</Link>,
+    },
+    // Sadece admin kullanıcılar için görünür olan "Admin" menü öğesi
+    userRole === "admin" && {
+      key: "10",
+      icon: <SettingOutlined />,
+      label: <Link to="/AdminPage">Admin</Link>,
+    },
+  ].filter(Boolean); // undefined değerleri kaldırmak için filter(Boolean) kullanın
+
+  return (
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      trigger={null}
+      breakpoint="lg"
+      collapsedWidth="0"
+    >
+      <div className="demo-logo-vertical" />
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={["1"]}
+        items={items}
+      />
+    </Sider>
+  );
+};
 
 export default Sidebar;
