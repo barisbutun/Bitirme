@@ -11,6 +11,7 @@ import Orders from "./pages/Orders";
 import ProductDetails from "./pages/ProductDetails";
 import AdminPage from "./pages/AdminPage";
 import Favorites from "./pages/Favorites";
+import Payment from "./pages/Payment";
 function App() {
   return (
     <Router>
@@ -26,6 +27,7 @@ function App() {
         <Route path="/Orders" element={<Orders />} />
         <Route path="/ProductDetails/:id" element={<ProductDetails />} />
         <Route path="/Favorites" element={<Favorites />} />
+        <Route path="/Payment" element={<Payment />} />
         <Route path="/AdminPage" element={<AdminPage />} />
       </Routes>
     </Router>

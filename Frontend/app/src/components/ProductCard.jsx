@@ -55,6 +55,7 @@ function ProductCard({
       placement: "topRight",
     });
   };
+
   const toggleFavorite = () => {
     const savedFavorites = localStorage.getItem("favorites");
     let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
