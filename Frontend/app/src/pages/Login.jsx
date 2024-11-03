@@ -3,7 +3,7 @@ import { Form, Input, Button, Checkbox, Col, Row, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "../css/Login.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login, googleLogin } from "../services/UserService/AuthService";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
@@ -190,7 +190,9 @@ const LoginForm = () => {
             Giriş Yap
           </Button>
         </Form.Item>
-
+        <Form.Item>
+          <Link to={"/SignUp"}> Hesabınız yok mu?</Link>
+        </Form.Item>
         <Form.Item>
           <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">
             <GoogleLogin
