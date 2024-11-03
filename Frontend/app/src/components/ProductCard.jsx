@@ -111,7 +111,7 @@ function ProductCard({
       </CardTitle>
 
       <div className="image-container">
-        <Image className="image" src={`data:image/jpeg;base64,${image}`} />
+        <Image className="image" src={image} />
       </div>
 
       <CardText className="product-price">Fiyat: {price}</CardText>

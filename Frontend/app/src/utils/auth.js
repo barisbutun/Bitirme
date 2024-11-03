@@ -1,14 +1,13 @@
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode"; // Doğru import şekli
 
 export const decodeToken = (token) => {
-  // const token = localStorage.getItem("token"); // Token'ı localStorage'dan alın
   if (token) {
     try {
-      const decodedToken = jwtDecode(token); // Token'i çözümle
-      return decodedToken.roles; // Rol bilgilerini döner
+      const decodedToken = jwtDecode(token);
+      return decodedToken.roles;
     } catch (error) {
       console.error("Token'ı çözümleme sırasında hata:", error);
     }
   }
-  return null; // Token yoksa veya hata varsa null döner
+  return null;
 };

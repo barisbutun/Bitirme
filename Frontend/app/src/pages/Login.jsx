@@ -15,7 +15,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [userCaptcha, setUserCaptcha] = useState("");
-
+  const [error, setError] = useState("");
   // const handleLogin = async (e) => {
   //   e.preventDefault();
 
@@ -51,28 +51,14 @@ const LoginForm = () => {
   //   }
   // };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
-      const response = await login(email, password, setMessage, navigate);
-      if (response && response.token) {
-        // response varsa ve token içeriyorsa
-        const userData = decodeToken(response.token);
-        if (userData) {
-          console.log("Kullanıcı Bilgileri:", userData);
-          navigate("/Homepage");
-        } else {
-          setMessage("Token çözümleme sırasında bir hata oluştu.");
-        }
-      } else {
-        console.error(
-          "Login failed:",
-          response ? response.message : "Yanıt boş."
-        );
-        setMessage("Giriş sırasında beklenmeyen bir hata oluştu.");
-      }
+      const user = await login(email, password);
+      console.log("Giriş başarılı:", user);
+      navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
     } catch (error) {
-      console.error("Error during login:", error);
-      setMessage("Giriş sırasında bir hata oluştu.");
+      setError(error.message || "Giriş sırasında bir hata oluştu");
     }
   };
 
