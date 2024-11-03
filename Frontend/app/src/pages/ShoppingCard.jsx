@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../css/ShoppingCard.css"; // CSS dosyasını import ediyoruz
 import { useNavigate } from "react-router-dom";
-
+import { removeFromCart } from "../services/ProductService/ProductService";
 const ShoppingCard = ({ product }) => {
   const columns = [
     {
@@ -47,8 +47,9 @@ const ShoppingCard = ({ product }) => {
       ),
     },
   ];
-
+  const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
   // useEffect(() => {
   //   fetch("/Shopping.json")
   //     .then((response) => response.json())
@@ -62,28 +63,30 @@ const ShoppingCard = ({ product }) => {
       setData(cartData);
     }
   }, []);
-  const navigate = useNavigate();
+
   const handleOrder = (record) => {
     navigate("/Orders");
   };
 
-  const [collapsed, setCollapsed] = useState(false);
+  const removeFromCart = (productId) => {
+    removeFromCart(productId, data, setData);
+  };
   //sepetten silme işlemi
 
-  const removeFromCart = (productId) => {
-    const updatedCart = data.filter((item) => item.id !== productId);
-    setData(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  // const removeFromCart = (productId) => {
+  //   const updatedCart = data.filter((item) => item.id !== productId);
+  //   setData(updatedCart);
+  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-    const product = data.find((item) => item.id === productId);
-    notification.warning({
-      message: "Sepetten Çıkarıldı",
-      description: `${
-        product ? product.name : "Ürün"
-      } başarıyla sepette çıkarıldı!`,
-      placement: "topRight",
-    });
-  };
+  //   const product = data.find((item) => item.id === productId);
+  //   notification.warning({
+  //     message: "Sepetten Çıkarıldı",
+  //     description: `${
+  //       product ? product.name : "Ürün"
+  //     } başarıyla sepette çıkarıldı!`,
+  //     placement: "topRight",
+  //   });
+  // };
 
   return (
     <Layout>

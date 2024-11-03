@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   UserOutlined,
   SettingOutlined,
@@ -12,11 +12,17 @@ import {
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
 import "../css/Sidebar.css";
+import { getRoleFromToken } from "../utils/auth";
 
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
-  const [userRole, setUserRole] = useState("user"); // Role durumunu ayarlayın
+  const [userRole, setUserRole] = useState("null");
+
+  useEffect(() => {
+    const userRole = getRoleFromToken();
+    setUserRole(userRole);
+  }, []);
 
   // Rol durumuna göre filtrelenmiş menü öğeleri
   const items = [

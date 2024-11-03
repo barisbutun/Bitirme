@@ -12,11 +12,17 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredCategory, setFilteredCategory] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   // useEffect(() => {
   //   const getProducts = async () => {
-  //     const data = await fetchProducts();
-  //     setProducts(data);
+  //     try {
+  //       const data = await fetchProducts(); // Verileri servis ile çek
+  //       setProducts(data);
+  //       setFilteredProducts(data);
+  //     } catch (error) {
+  //       console.error("Ürünler yüklenirken hata:", error);
+  //     }
   //   };
   //   getProducts();
   // }, []);
@@ -33,31 +39,6 @@ const Products = () => {
       });
   }, []);
 
-  // const fetchData = async () => {
-  //   const url = "";
-  //   const options = {
-  //     method: "GET",
-  //     headers: {
-  //       "x-rapidapi-key": "Sign Up for Key",
-  //       "x-rapidapi-host": "amazon-product-info2.p.rapidapi.com",
-  //     },
-  //   };
-
-  //   try {
-  //     const response = await fetch(url, options);
-  //     const result = await response.json();
-  //     console.log(result);
-  //     setProducts(result);
-  //     setFilteredProducts(result);
-  //   } catch (error) {
-  //     console.error("veri çekme hatası", error);
-  //   }
-  // };
-  // // useEffect ile bileşen yüklendiğinde API'yi çağırma
-  // useEffect(() => {
-  //   fetchData(); // bileşen yüklendiğinde veri çekme
-  // }, []);
-
   // Kategoriye göre filtreleme
   const handleApplyFilter = (category) => {
     setFilteredCategory(category);
@@ -70,7 +51,7 @@ const Products = () => {
       setFilteredProducts(products); // Kategori seçilmezse tüm ürünler gösterilir
     }
   };
-  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />

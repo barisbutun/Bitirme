@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import { Card, Button, Rate, Row, Col, Image, notification } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
-import "../css/ProductDetailsCard.css";
-import Slider from "react-slick"; // react-slick kütüphanesini ekliyoruz
+import { useNavigate } from "react-router-dom";
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../css/ProductDetailsCard.css";
+import {
+  addToCart as addToCartService,
+  addToFavorites as addToFavoritesService,
+} from "../services/ProductService/ProductService";
 
 const ProductDetailsCard = ({ product }) => {
+  const navigate = useNavigate();
+
   const [isFavorite, setIsFavorite] = useState(() => {
     const savedFavorites = localStorage.getItem("favorites");
     const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
@@ -18,23 +24,39 @@ const ProductDetailsCard = ({ product }) => {
     return <p>Yükleniyor...</p>;
   }
 
-  const toggleFavorite = () => {
-    const savedFavorites = localStorage.getItem("favorites");
-    let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
-    if (isFavorite) {
-      favorites = favorites.filter((favId) => favId !== product.id);
-    } else {
-      favorites.push(product.id);
+  const isLoggedIn = () => {
+    return Boolean(localStorage.getItem("token"));
+  };
+
+  const toggleFavorite = async () => {
+    if (!isLoggedIn()) {
+      notification.info({
+        message: "Giriş Yapın",
+        description: "Favorilere eklemek için giriş yapmalısınız.",
+        placement: "topRight",
+      });
+      navigate("/Login");
+      return;
     }
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+
+    // Servis katmanındaki favorilere ekleme fonksiyonu çağrılıyor
+    await addToFavoritesService(product.id, navigate);
     setIsFavorite(!isFavorite);
   };
 
-  const addToCart = () => {
-    const currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+  const addToCart = async () => {
+    if (!isLoggedIn()) {
+      notification.info({
+        message: "Giriş Yapın",
+        description: "Sepete ürün eklemek için giriş yapmalısınız.",
+        placement: "topRight",
+      });
+      navigate("/Login");
+      return;
+    }
 
-    const newCart = [...currentCart, product];
-    localStorage.setItem("cart", JSON.stringify(newCart));
+    // Servis katmanındaki sepete ekleme fonksiyonu çağrılıyor
+    await addToCartService(product.id, navigate);
 
     notification.success({
       message: "Sepete Eklendi",
@@ -45,13 +67,13 @@ const ProductDetailsCard = ({ product }) => {
 
   // Slider ayarları
   const settings = {
-    dots: true, // altta nokta göstergeler
-    infinite: true, // sonsuz döngü
+    dots: true,
+    infinite: true,
     speed: 500,
-    slidesToShow: 1, // tek seferde 1 resim göster
-    slidesToScroll: 1, // birer birer kaydır
-    swipeToSlide: true, // mouse hareketi ile kaydırma
-    arrows: false, // okları kaldırıyoruz (mouse hareketi ile kontrol için)
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    arrows: false,
   };
 
   return (
