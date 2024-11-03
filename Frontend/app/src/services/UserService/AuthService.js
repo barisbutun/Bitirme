@@ -21,18 +21,27 @@ const login = async (email,password,setMessage,navigate) => {
       });
 
       const data = await response.json();
-      if (response.ok) {
+      console.log("Yanıt verisi:", data); // Yanıtı kontrol edin
+
+      if (response.ok &&data.token) {
         setMessage("Giriş başarılı!");
+        localStorage.setItem("token", data.token);
+       
         navigate("/Homepage");
         // Eğer JWT token dönerse, localStorage'a kaydedebiliriz
         if (data.token) {
+          setMessage("Giriş başarılı!");
           localStorage.setItem("token", data.token);
+          return data;
         }
       } else {
         setMessage(`Giriş başarısız: ${data.message}`);
+        return null;
       }
     } catch (error) {
       setMessage("Giriş sırasında bir hata oluştu.");
+      console.error("Login sırasında bir hata oluştu:", error);
+      return null;
     }
   };
 

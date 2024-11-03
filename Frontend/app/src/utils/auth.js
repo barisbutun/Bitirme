@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 
-export const decodeToken = () => {
-  const token = localStorage.getItem("token"); // Token'ı localStorage'dan alın
+export const decodeToken = (token) => {
+  // const token = localStorage.getItem("token"); // Token'ı localStorage'dan alın
   if (token) {
     try {
       const decodedToken = jwtDecode(token); // Token'i çözümle
