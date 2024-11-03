@@ -1,8 +1,8 @@
 
-const API_BASE_URL = "http://localhost:8082/api/user/v1";
+const API_BASE_URL = "http://localhost:8082/api/auth/v1";
 
 // Giriş işlemi
-const login = async (userName,password,setMessage,navigate) => {
+const login = async (email,password,setMessage,navigate) => {
     // e.preventDefault();
 
     try {
@@ -15,13 +15,12 @@ const login = async (userName,password,setMessage,navigate) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userName,
+          email,
           password,
         }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setMessage("Giriş başarılı!");
         navigate("/Homepage");
@@ -60,7 +59,7 @@ const googleLogin = async (token) => {
 };
 
 //kayıt işlemi
-const Register = async (user_name,Name,useremail,userpassword,useraddress,userphone,setMessage,navigate) => {
+ const Register = async (user_name,Name,useremail,userpassword,useraddress,userphone,setMessage,navigate) => {
     // e.preventDefault();
     const newUser = {
       username: user_name,

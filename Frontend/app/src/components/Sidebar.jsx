@@ -12,7 +12,7 @@ import {
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
 import "../css/Sidebar.css";
-import { getRoleFromToken } from "../utils/auth";
+import { decodeToken } from "../utils/auth";
 
 const { Sider } = Layout;
 
@@ -20,7 +20,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const [userRole, setUserRole] = useState("null");
 
   useEffect(() => {
-    const userRole = getRoleFromToken();
+    const userRole = decodeToken();
     setUserRole(userRole);
   }, []);
 

@@ -1,13 +1,14 @@
-// auth.js ( auth yardımcı dosyası)
-// JWT token çözümleyip rol bilgisi almayı sağlar
+import { jwtDecode } from "jwt-decode";
 
-import {jwtDecode} from "jwt-decode";
-
-export const getRoleFromToken = () => {
+export const decodeToken = () => {
   const token = localStorage.getItem("token"); // Token'ı localStorage'dan alın
   if (token) {
-    const decodedToken = jwtDecode(token); // Token'i çözümle
-    return decodedToken.role; // Rol bilgisini döner
+    try {
+      const decodedToken = jwtDecode(token); // Token'i çözümle
+      return decodedToken.roles; // Rol bilgilerini döner
+    } catch (error) {
+      console.error("Token'ı çözümleme sırasında hata:", error);
+    }
   }
-  return null;
+  return null; // Token yoksa veya hata varsa null döner
 };

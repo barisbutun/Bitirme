@@ -6,11 +6,12 @@ import "../css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { login, googleLogin } from "../services/UserService/AuthService";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { decodeToken } from "../utils/auth";
 
 const LoginForm = () => {
-  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [userCaptcha, setUserCaptcha] = useState("");
@@ -21,14 +22,14 @@ const LoginForm = () => {
   //   try {
   //     const token = localStorage.getItem("token");
 
-  //     const response = await fetch("http://localhost:8082/api/user/v1/login", {
+  //     const response = await fetch("http://localhost:8082/api/auth/v1/login", {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",
   //         Authorization: `Bearer ${token}`,
   //       },
   //       body: JSON.stringify({
-  //         userName,
+  //         email,
   //         password,
   //       }),
   //     });
@@ -42,9 +43,6 @@ const LoginForm = () => {
   //       if (data.token) {
   //         localStorage.setItem("token", data.token);
   //       }
-
-  //       // Giriş başarılı olduğunda kullanıcıyı başka bir sayfaya yönlendirebilirsiniz
-  //       // Örneğin: window.location.href = "/dashboard";
   //     } else {
   //       setMessage(`Giriş başarısız: ${data.message}`);
   //     }
@@ -55,15 +53,26 @@ const LoginForm = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await login(userName, password);
-      if (response.token) {
-        console.log("Login successful");
-        // Redirect to the dashboard or homepage
+      const response = await login(email, password, setMessage, navigate);
+      if (response && response.token) {
+        // response varsa ve token içeriyorsa
+        const userData = decodeToken(response.token);
+        if (userData) {
+          console.log("Kullanıcı Bilgileri:", userData);
+          navigate("/Homepage");
+        } else {
+          setMessage("Token çözümleme sırasında bir hata oluştu.");
+        }
       } else {
-        console.error("Login failed:", response.message);
+        console.error(
+          "Login failed:",
+          response ? response.message : "Yanıt boş."
+        );
+        setMessage("Giriş sırasında beklenmeyen bir hata oluştu.");
       }
     } catch (error) {
       console.error("Error during login:", error);
+      setMessage("Giriş sırasında bir hata oluştu.");
     }
   };
 
@@ -102,7 +111,7 @@ const LoginForm = () => {
   const onFinish = (values) => {
     if (userCaptcha === captcha) {
       console.log("Başarılı doğrulama!");
-      console.log("Formdan alınan değerler: ", values);
+
       handleLogin();
     } else {
       console.log("Captcha doğrulaması başarısız!");
@@ -131,8 +140,8 @@ const LoginForm = () => {
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />} // Kullanıcı adı ikonu
             placeholder="Kullanıcı Adı"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Item>
 

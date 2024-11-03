@@ -67,6 +67,30 @@ const SignUp = () => {
   //     setMessage("Kayıt sırasında hata oluştu:");
   //   }
   // };
+  const registerUser = async (e) => {
+    try {
+      const response = await Register(
+        user_name,
+        Name,
+        useremail,
+        userpassword,
+        useraddress,
+        userphone,
+        setMessage,
+        navigate
+      );
+
+      const savedUser = await response.json();
+      if (response.ok) {
+        setMessage(" Kayıt başarılı:", savedUser);
+        navigate("/Login");
+      } else {
+        setMessage("Kayıt başarısız: {$data.message}");
+      }
+    } catch (error) {
+      setMessage("Kayıt sırasında hata oluştu:");
+    }
+  };
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
@@ -223,7 +247,7 @@ const SignUp = () => {
           className="KayitButon"
           type="primary"
           htmlType="submit"
-          onClick={Register}
+          onClick={registerUser}
         >
           Kayıt Ol
         </Button>
