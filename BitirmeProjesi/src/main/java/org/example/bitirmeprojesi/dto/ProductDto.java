@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Product}
@@ -35,4 +37,10 @@ public class ProductDto implements Serializable {
 
     @JsonProperty("category_id")
     private Long categoryId;
+
+    @JsonProperty("quantity")
+    private Integer quantity;
+
+    @JsonProperty("images")
+    private List images;
 }

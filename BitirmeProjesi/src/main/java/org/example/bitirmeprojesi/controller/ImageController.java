@@ -27,7 +27,7 @@ public class ImageController {
                 .body(response);
     }
 
-    @GetMapping("/info/{name}")
+    @GetMapping("v1/info/{name}")
     public ResponseEntity<?> getImageInfoByName(@PathVariable("name") String name) {
         Image image = imageService.getInfoByImageByName(name);
 
@@ -35,7 +35,7 @@ public class ImageController {
                 .body(image);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("v1/{name}")
     public ResponseEntity<?> getImageByName(@PathVariable("name") String name) {
         byte[] image = imageService.getImage(name);
 
@@ -43,6 +43,16 @@ public class ImageController {
                 .contentType(MediaType.valueOf("image/png"))
                 .body(image);
     }
+
+    @GetMapping("v1/{id}")
+    public ResponseEntity<?> getImageByProductId(@PathVariable("id") Long id) {
+        byte[] image = imageService.getImage(id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf("image/png"))
+                .body(image);
+    }
+
 
 
 }

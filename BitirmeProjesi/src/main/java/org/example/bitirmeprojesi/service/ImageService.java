@@ -9,6 +9,7 @@ import org.example.bitirmeprojesi.util.ImageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,6 +40,12 @@ public class ImageService {
     @Transactional
     public byte[] getImage(String name) {
         Optional<Image> dbImage = imageRepository.findByName(name);
+        byte[] image = ImageUtil.decompressImage(dbImage.get().getImage());
+        return image;
+    }
+    @Transactional
+    public byte[] getImage(Long productId) {
+        Optional<Image> dbImage = imageRepository.findByProductId(productId);
         byte[] image = ImageUtil.decompressImage(dbImage.get().getImage());
         return image;
     }

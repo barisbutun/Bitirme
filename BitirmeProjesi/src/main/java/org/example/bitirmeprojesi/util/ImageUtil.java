@@ -1,9 +1,12 @@
 package org.example.bitirmeprojesi.util;
 
+import org.springframework.stereotype.Component;
+
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+@Component
 public class ImageUtil {
 
     public static byte[] compressImage(byte[] data) {
@@ -38,8 +41,8 @@ public class ImageUtil {
                 outputStream.write(tmp, 0, count);
             }
             outputStream.close();
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return new byte[0];
         }
         return outputStream.toByteArray();

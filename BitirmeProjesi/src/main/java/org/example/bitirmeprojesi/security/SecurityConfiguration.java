@@ -30,8 +30,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -58,6 +62,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 .authorizeHttpRequests(auth -> {
                     // Manuel login ve register için izin verilen endpoint'leri ayarlayın
                     auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
@@ -80,26 +86,6 @@ public class SecurityConfiguration {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
-
-
-
-                /*.formLogin(form -> form // Manuel login işlemi için formLogin kullan
-                        .loginPage("/api/user/v1/login")  // Manuel login endpoint'i
-                        .permitAll()
-                );*/
-
-                /*.oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/oauth2/authorize") // OAuth2 endpoint
-                        )
-                        .tokenEndpoint(token -> token
-                                .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
-                        )
-                        .defaultSuccessUrl("/api/user/v1/x", true) // OAuth2 login başarılı olduğunda
-                )
-                // Oturum yönetimi
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-*/
         return http.build();
     }
 
@@ -133,14 +119,32 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000", "http://192.168.0.113:3000")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE");
-            }
-        };
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(Collections.singletonList("http://192.168.1.144:3000"));
+        config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return (CorsConfigurationSource) source;
     }
 }
+ /*.formLogin(form -> form // Manuel login işlemi için formLogin kullan
+                        .loginPage("/api/user/v1/login")  // Manuel login endpoint'i
+                        .permitAll()
+                );*/
+
+                /*.oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorize") // OAuth2 endpoint
+                        )
+                        .tokenEndpoint(token -> token
+                                .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
+                        )
+                        .defaultSuccessUrl("/api/user/v1/x", true) // OAuth2 login başarılı olduğunda
+                )
+                // Oturum yönetimi
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+*/
