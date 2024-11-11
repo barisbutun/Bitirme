@@ -24,7 +24,7 @@ export const login = async (email, password) => {
     throw error;
   }
 };
-
+ 
 // Google ile giriş işlemi
 export const googleLogin = async (token) => {
   try {

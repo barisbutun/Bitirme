@@ -1,49 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Table, Drawer, Button, Typography, Descriptions } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom"; // useNavigate'i ekledik
+import { useNavigate } from "react-router-dom";
 import "../css/Orders.css";
 
 const Orders = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const navigate = useNavigate(); // navigate fonksiyonunu tanımladık
+  const [orders, setOrders] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false); //Admin kontrolü için
+  const navigate = useNavigate();
 
-  // Örnek sipariş verileri
-  const orders = [
-    {
-      key: "1",
-      orderId: "1234",
-      date: "2024-10-31",
-      total: "150 TL",
-      status: "Hazırlanıyor",
-    },
-    {
-      key: "2",
-      orderId: "5678",
-      date: "2024-10-30",
-      total: "200 TL",
-      status: "Kargoya Verildi",
-    },
-  ];
+  useEffect(() => {
+    // Kullanıcı-Admin Kontrolü
+    const adminStatus = localStorage.getItem("isAdmin") === "true";
+    setIsAdmin(adminStatus);
 
-  // Sipariş detaylarını göster
+    fetch("/Orders.json")
+      .then((response) => response.json())
+      .then((data) => setOrders(data))
+      .catch((error) =>
+        console.error("Sipariş verileri alınırken hata oluştu:", error)
+      );
+  }, []);
+
   const showOrderDetails = (order) => {
     setSelectedOrder(order);
     setDrawerVisible(true);
   };
 
-  // Ödeme sayfasına yönlendirme fonksiyonu
   const handleCheckout = (orderId) => {
     navigate(`/Payment?orderId=${orderId}`);
   };
 
-  // Tablo sütunları
   const columns = [
-    { title: "Sipariş ID", dataIndex: "orderId", key: "orderId" },
+    ...(isAdmin
+      ? [{ title: "Sipariş ID", dataIndex: "orderId", key: "orderId" }]
+      : []),
     { title: "Tarih", dataIndex: "date", key: "date" },
     { title: "Toplam Tutar", dataIndex: "total", key: "total" },
     { title: "Durum", dataIndex: "status", key: "status" },
@@ -69,7 +65,6 @@ const Orders = () => {
       <Layout className="Orders-layout">
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
 
-        {/* Sipariş Bilgileri Alanı */}
         <div className="orders-content">
           <Typography.Title level={2}>Siparişlerim</Typography.Title>
           <Table
@@ -107,8 +102,11 @@ const Orders = () => {
             </Descriptions.Item>
             <Descriptions.Item label="Ürünler">
               <ul>
-                <li>Ürün 1 - 50 TL</li>
-                <li>Ürün 2 - 100 TL</li>
+                {selectedOrder.products.map((product, index) => (
+                  <li key={index}>
+                    {product.name} - {product.price} TL
+                  </li>
+                ))}
               </ul>
             </Descriptions.Item>
           </Descriptions>

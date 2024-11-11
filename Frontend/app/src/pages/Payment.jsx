@@ -8,6 +8,7 @@ import {
   Divider,
   List,
   Typography,
+  notification,
 } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -16,11 +17,17 @@ import "../css/Payment.css";
 
 const Payment = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [drawerVisible, setDrawerVisible] = useState(false);
   const { Title, Text } = Typography;
 
   const handleFinish = (values) => {
     console.log("Ödeme Bilgileri:", values);
+
+    // Ödeme başarılı bildirimi göster
+    notification.success({
+      message: "Ödeme Başarılı",
+      description: "Ödemeniz başarıyla tamamlandı. Teşekkür ederiz!",
+      duration: 3,
+    });
   };
 
   return (

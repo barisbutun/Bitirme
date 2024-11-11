@@ -1,0 +1,22 @@
+[
+  {
+    "orderId": "1234",
+    "date": "2024-10-31",
+    "total": "150 TL",
+    "status": "Hazırlanıyor",
+    "products": [
+      { "name": "Ürün 1", "price": "50 TL" },
+      { "name": "Ürün 2", "price": "100 TL" }
+    ]
+  },
+  {
+    "orderId": "5678",
+    "date": "2024-10-30",
+    "total": "200 TL",
+    "status": "Kargoya Verildi",
+    "products": [
+      { "name": "Ürün 1", "price": "100 TL" },
+      { "name": "Ürün 2", "price": "100 TL" }
+    ]
+  }
+]
