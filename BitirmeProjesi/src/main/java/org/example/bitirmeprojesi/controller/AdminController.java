@@ -7,7 +7,6 @@ import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.service.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,16 +18,16 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping("/v1")
-    public String success() {
-        return "success admin";
-    }
 
     @PostMapping("/v1/product")
-    public ResponseEntity<ProductDto> createProduct(@RequestBody @Validated final ProductDto productDto) {
-        ProductDto createdProduct = adminService.createProduct(productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    public ResponseEntity<ProductDto> createProduct(
+            @RequestBody ProductDto productDto) throws Exception {
+
+       adminService.createProduct(productDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(productDto);
     }
+
 
     @PostMapping("/v1/category")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
@@ -41,6 +40,8 @@ public class AdminController {
         List<OrdersDto> orders = adminService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
+
+
 
 }
 

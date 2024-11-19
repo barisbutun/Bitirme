@@ -79,6 +79,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.FAVOURITE_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UserIdNotFoundException.class)
+    public ResponseEntity<Object> userIdNotFoundExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.USER_ID_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
+    }
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message, status));

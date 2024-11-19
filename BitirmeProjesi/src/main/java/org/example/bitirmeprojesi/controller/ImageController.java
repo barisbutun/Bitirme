@@ -1,15 +1,22 @@
 package org.example.bitirmeprojesi.controller;
 
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ImageResponseDto;
 import org.example.bitirmeprojesi.entity.Image;
+import org.example.bitirmeprojesi.repository.ImageRepository;
 import org.example.bitirmeprojesi.service.ImageService;
+import org.example.bitirmeprojesi.util.ImageUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -17,11 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ImageController {
 
+
+    private final ImageRepository imageRepository;
     private final ImageService imageService;
 
-    @PostMapping
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws Exception {
-        ImageResponseDto response = imageService.upload(file);
+    @PostMapping("/v1")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("productId") Long productId) throws Exception {
+        ImageResponseDto response = imageService.upload(file,productId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
@@ -29,10 +38,10 @@ public class ImageController {
 
     @GetMapping("v1/info/{name}")
     public ResponseEntity<?> getImageInfoByName(@PathVariable("name") String name) {
-        Image image = imageService.getInfoByImageByName(name);
+         imageService.getInfoByImageByName(name);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(image);
+                .body(imageService.getInfoByImageByName(name));
     }
 
     @GetMapping("v1/{name}")
@@ -44,14 +53,18 @@ public class ImageController {
                 .body(image);
     }
 
-    @GetMapping("v1/{id}")
-    public ResponseEntity<?> getImageByProductId(@PathVariable("id") Long id) {
-        byte[] image = imageService.getImage(id);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.valueOf("image/png"))
-                .body(image);
+    @GetMapping("v1/infos/{id}")
+    @Transactional
+    public ResponseEntity<List<String>> getImageUrlsByProductId(@PathVariable("id") Long productId) {
+        List<Image> dbImages = imageRepository.findByProductId(productId);
+        List<String> imageBase64List = dbImages.stream()
+                .map(dbImage -> Base64.getEncoder().encodeToString(ImageUtil.decompressImage(dbImage.getImage())))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(imageBase64List);
     }
+
 
 
 

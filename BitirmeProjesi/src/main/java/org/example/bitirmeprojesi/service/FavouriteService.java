@@ -3,12 +3,16 @@ package org.example.bitirmeprojesi.service;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.entity.Favourite;
+import org.example.bitirmeprojesi.entity.User;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.UserIdNotFoundException;
 import org.example.bitirmeprojesi.mapper.FavouriteMapper;
 import org.example.bitirmeprojesi.repository.FavouriteRepository;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +21,17 @@ public class FavouriteService {
     private final FavouriteMapper favouriteMapper;
     private final FavouriteRepository favouriteRepository;
     private final TokenService tokenService;
+    private final UserRepository userRepository;
 
+    public FavouriteDto create(FavouriteDto favouriteDto, UUID userId) {
 
-    public FavouriteDto create(FavouriteDto favouriteDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserIdNotFoundException(ErrorMesage.USER_ID_NOT_FOUND_ERROR));
+
         Favourite favourite = favouriteMapper.toEntity(favouriteDto);
+        favourite.setUser(user);
         favourite = favouriteRepository.save(favourite);
+
         return favouriteMapper.toDto(favourite);
     }
     public void delete(Long id) {

@@ -41,6 +41,6 @@ public class ProductDto implements Serializable {
     @JsonProperty("quantity")
     private Integer quantity;
 
-    @JsonProperty("images")
-    private List images;
+
+
 }

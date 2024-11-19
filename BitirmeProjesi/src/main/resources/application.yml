@@ -1,4 +1,9 @@
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 2MB
   datasource:
     url: jdbc:postgresql://localhost:5432/BitirmeProjesi
     username: barishafize
@@ -13,6 +18,7 @@ spring:
       properties:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQLDialect
+
   security:
     oauth2:
       client:

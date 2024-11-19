@@ -6,6 +6,7 @@ import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,8 +18,9 @@ public class AdminService {
     private final CategoryService categoryService;
     private final OrderService orderService;
     private final UserService userService;
+    private final ImageService imageService;
 
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductDto createProduct(ProductDto productDto) throws Exception {
         return productService.create(productDto);
     }
 
@@ -28,6 +30,10 @@ public class AdminService {
 
     public List<OrdersDto> getAllOrders() {
         return orderService.findAll();
+    }
+
+    public void deleteImage(long id){
+        imageService.delete(id);
     }
 
     public void deleteProduct(Long id) {

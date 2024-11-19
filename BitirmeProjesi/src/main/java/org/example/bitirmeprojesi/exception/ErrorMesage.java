@@ -11,5 +11,5 @@ public class ErrorMesage {
     public static final String SHOPPING_CART_ITEM_NOT_FOUND_ERROR="Shopping Cart Item does not exist in our systems";
     public static final String DELIVERY_NOT_FOUND_ERROR="Delivery does not exist in our systems";
     public static final String FAVOURITE_NOT_FOUND_ERROR="Favourite does not exist in our systems";
-
+    public static final String USER_ID_NOT_FOUND_ERROR="User Id does not exist in our systems";
 }

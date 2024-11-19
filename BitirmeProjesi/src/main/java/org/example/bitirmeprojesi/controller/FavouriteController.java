@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/favourite")
@@ -17,8 +18,8 @@ public class FavouriteController {
     private final FavouriteService favouriteService;
 
     @PostMapping("/v1")
-    public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto) {
-        return ResponseEntity.ok(favouriteService.create(favouriteDto));
+    public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto, @RequestParam UUID userId) {
+        return ResponseEntity.ok(favouriteService.create(favouriteDto, userId));
     }
 
     @DeleteMapping("/v1/{id}")
