@@ -24,31 +24,7 @@ export const login = async (email, password) => {
     throw error;
   }
 };
- 
-// Google ile giriş işlemi
-export const googleLogin = async (token) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/google-login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Google ile giriş başarısız");
-    }
-
-    const data = await response.json();
-    localStorage.setItem("token", data.token);
-    return data;
-  } catch (error) {
-    console.error("Google login sırasında hata:", error);
-    throw error;
-  }
-};
 
 // Kayıt işlemi
 export const Register = async (userDetails) => {
@@ -82,4 +58,29 @@ export const logout = () => {
 // Token'ı al
 export const getCurrentToken = () => {
   return localStorage.getItem("token");
+};
+ 
+// Google ile giriş işlemi
+export const googleLogin = async (token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/google-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Google ile giriş başarısız");
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    return data;
+  } catch (error) {
+    console.error("Google login sırasında hata:", error);
+    throw error;
+  }
 };

@@ -6,32 +6,57 @@ import Footer from "../components/Footer";
 import "../css/Homepage.css";
 import ProductCard from "../components/ProductCard";
 import FilterComponent from "../components/FilterComponent";
-
+import {
+  fetchProducts,
+  fetchProductImages,
+} from "../services/ProductService/ProductService";
 const Homepage = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [filteredCategory, setFilteredCategory] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetch("/products.json")
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data);
-        setFilteredProducts(data);
-      })
-      .catch((error) => {
-        console.error("Veri çekme hatası:", error);
-      });
+    const fetchAllProducts = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+
+        // Ürünleri servis katmanından al
+        const productsData = await fetchProducts(token);
+
+        // Resimleri ekle
+        const productsWithImages = await Promise.all(
+          productsData.map(async (product) => {
+            const images = await fetchProductImages(product.id, token);
+            return { ...product, images };
+          })
+        );
+
+        setProducts(productsWithImages);
+        setFilteredProducts(productsWithImages);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllProducts();
   }, []);
+
+  if (loading) return <div>Yükleniyor...</div>;
+  if (error) return <div>Hata: {error}</div>;
+
   const handleApplyFilter = (category) => {
-    setFilteredCategory(category);
     if (category) {
       const filtered = products.filter(
         (product) => product.category === category
       );
       setFilteredProducts(filtered);
     } else {
-      setFilteredProducts(products); // Kategori seçilmezse tüm ürünler gösterilir
+      setFilteredProducts(products);
     }
   };
   return (
@@ -48,10 +73,11 @@ const Homepage = () => {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                image={product.image}
+                image={product.images?.[0] || "default-image-path"} // İlk resmi veya varsayılan resmi göster
                 price={product.price}
                 description={product.description}
-                stock={product.stock}
+                quantity={product.quantity}
+                stock_state={product.stock_state}
               />
             ))
           ) : (

@@ -1,74 +1,101 @@
 import { notification } from "antd";
+import { getUserIdFromToken } from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
 
-// Ürünleri getirme
-export const fetchProducts = async () => {
-  const token = localStorage.getItem('token');
-  const response = await fetch('/api/product', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-  });
+//ürünleri çekme
 
-  if (!response.ok) {
-    throw new Error('Veri çekme hatası');
+const API_BASE_URL = "http://localhost:8082/api";
+
+export const fetchProducts = async (token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/product/v1/home`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Ürün bilgileri alınamadı");
+    }
+
+    const products = await response.json();
+    console.log("API'den gelen ürün verisi:", products);
+    return products;
+  } catch (error) {
+    console.error("fetchProducts Error:", error);
+    throw error;
   }
+};
 
-  return response.json();
+export const fetchProductImages = async (productId, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/image/v1/infos/${productId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Resim alınamadı: ${productId}`);
+    }
+
+    const images = await response.json();
+    return images.map((base64) => `data:image/jpeg;base64,${base64}`);
+  } catch (error) {
+    console.error("fetchProductImages Error:", error);
+    throw error;
+  }
 };
 
 // Ürün favorilere ekleme
-export const addToFavorites = async (productId) => {
-  const token = localStorage.getItem("token");
+
+export const addToFavorites = async (id, navigate) => {
+  const userId = getUserIdFromToken(); // Token'dan kullanıcı ID'sini al
+
+  if (!userId) {
+    notification.info({
+      message: "Giriş Yapın",
+      description: "Favori eklemek için giriş yapmalısınız.",
+      placement: "topRight",
+    });
+    navigate("/Login"); 
+    return;
+  }
+
   try {
-    const response = await fetch('/api/favorites/add', {
+    const response = await fetch(`${API_BASE_URL}/favourite/v1?userId=${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ productId }),
+      body: JSON.stringify({ productId: id }), // Göndermek istediğimiz veriyi JSON olarak stringify ediyoruz
     });
-    if (!response.ok) throw new Error("Favorilere ekleme hatası");
 
-    notification.success({
-      message: "Favorilere Eklendi",
-      description: "Ürün başarıyla favorilere eklendi!",
-    });
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    notification.error({
-      message: "Favorilere Eklenemedi",
-      description: "Bir hata oluştu, lütfen tekrar deneyin.",
-    });
-  }
-};
-
-// Ürünü favorilerden çıkarma
-export const removeToFavorites = async (productId) => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await fetch(`/api/cart/remove/${productId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
     if (response.ok) {
-      console.log('Product removed from cart');
+      const data = await response.json();
+      notification.success({
+        message: "Favorilere Eklendi",
+        description: "Ürün favorilerinize başarıyla eklendi.",
+        placement: "topRight",
+      });
+    } else {
+      const errorData = await response.json();
+      console.error("Favori eklerken hata:", errorData);
     }
   } catch (error) {
-    console.error('Error removing from cart:', error);
+    console.error("Favori eklerken hata:", error);
   }
 };
 
+
 // Sepete ürün ekleme
-export const addToCart = async (productId) => {
+export const addToCart = async (productId, navigate) => {
   const token = localStorage.getItem("token");
   try {
-    const response = await fetch("/api/cart", {
+    const response = await fetch(`${API_BASE_URL}/cart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,37 +115,6 @@ export const addToCart = async (productId) => {
     console.error(error);
     notification.error({
       message: "Sepete Eklenemedi",
-      description: "Bir hata oluştu, lütfen tekrar deneyin.",
-    });
-  }
-};
-
-// Sepetten ürün çıkarma
-export const removeFromCart = async (productId, data, setData) => {
-  const token = localStorage.getItem("token");
-  try {
-    const updatedCart = data.filter((item) => item.id !== productId);
-    setData(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    const response = await fetch(`/api/cart/${productId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) throw new Error("Sepetten çıkarma hatası");
-
-    notification.warning({
-      message: "Sepetten Çıkarıldı",
-      description: "Ürün başarıyla sepetten çıkarıldı!",
-    });
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    notification.error({
-      message: "Ürün Çıkarılamadı",
       description: "Bir hata oluştu, lütfen tekrar deneyin.",
     });
   }

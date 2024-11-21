@@ -13,7 +13,6 @@ const ProductDetails = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    // Ürün bilgilerini API'den al
     fetch(`/products.json?timestamp=${new Date().getTime()}`)
       .then((response) => {
         if (!response.ok) {

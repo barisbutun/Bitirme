@@ -11,3 +11,11 @@ export const decodeToken = (token) => {
   }
   return null;
 };
+ 
+export const getUserIdFromToken=()=>{
+  const token=localStorage.getItem("token");
+  if(!token)
+    return null;//token yoksa null döner
+  const decodedToken=jwtDecode(token);
+  return decodedToken.userId;
+}

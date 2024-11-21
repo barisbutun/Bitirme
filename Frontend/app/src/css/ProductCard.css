@@ -54,6 +54,15 @@
   color: #666; /* Light gray for less prominent info */
 }
 
+.product-info.available{
+  color:green;
+}
+
+.product-info.unavailable{
+  color: red;
+  font-weight: bold;
+}
+
 .product-buttons Button {
   font-size: 14px; /* Smaller font for compact buttons */
   padding: 6px 12px;
@@ -99,4 +108,9 @@
   font-size: 10px; /* Küçük yazı boyutu */
   padding: 5px;
   border-radius: 3px;
+}
+
+.SepetButon:disabled {
+  background-color: #d3d3d3;
+  color: #999;
 }

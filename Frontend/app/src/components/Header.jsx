@@ -91,8 +91,8 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
       <Drawer
         title="Ürün Filtreleme"
         placement="right"
+        open={isDrawerVisible}
         onClose={closeDrawer}
-        visible={isDrawerVisible}
       >
         <FilterComponent onApplyFilter={onFilterChange} />
       </Drawer>

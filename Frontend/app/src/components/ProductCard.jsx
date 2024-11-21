@@ -8,12 +8,14 @@ import {
   addToCart,
   addToFavorites,
 } from "../services/ProductService/ProductService";
+
 function ProductCard({
   id,
   name,
   image,
   price,
-  stock,
+  quantity,
+  stock_state, // 'AVAILABLE' or 'UNAVAILABLE'
   description,
   image1,
   image2,
@@ -25,19 +27,16 @@ function ProductCard({
     console.log("Navigating to:", url);
     navigate(url);
   };
+
   const isLoggedIn = () => {
     return Boolean(localStorage.getItem("token"));
   };
+
   const [isFavorite, setIsFavorite] = useState(() => {
     const savedFavorites = localStorage.getItem("favorites");
     const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
     return favorites.includes(id);
   });
-
-  // const [cart, setCart] = useState(() => {
-  //   const savedCart = localStorage.getItem("cart");
-  //   return savedCart ? JSON.parse(savedCart) : [];
-  // });
 
   const addToCartHandler = async (id) => {
     if (!isLoggedIn()) {
@@ -49,28 +48,8 @@ function ProductCard({
       navigate("/Login");
       return;
     }
-    // const product = {
-    //   id,
-    //   name,
-    //   image,
-    //   price,
-    //   stock,
-    //   description,
-    //   image1,
-    //   image2,
-    //   image3,
-    // };
-    // const currentcart = JSON.parse(localStorage.getItem("cart")) || [];
-    // const newCart = [...currentcart, product];
-    // localStorage.setItem("cart", JSON.stringify(newCart));
 
     await addToCart(id, navigate); // Servis katmanındaki sepete ekleme fonksiyonu çağrıldı
-
-    notification.success({
-      message: "Sepete Eklendi",
-      description: `${name} başarıyla sepete eklendi!`,
-      placement: "topRight",
-    });
   };
 
   const toggleFavoriteHandler = async (id) => {
@@ -83,19 +62,17 @@ function ProductCard({
       navigate("/Login");
       return;
     }
-    // const savedFavorites = localStorage.getItem("favorites");
-    // let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
-    // if (isFavorite) {
-    //   favorites = favorites.filter((favId) => favId !== id);
-    // } else {
-    //   favorites.push(id);
-    // }
-    // localStorage.setItem("favorites", JSON.stringify(favorites));
-    // setIsFavorite(!isFavorite);
 
     await addToFavorites(id, navigate); // Servis katmanındaki favorilere ekleme fonksiyonu çağrıldı
     setIsFavorite(!isFavorite);
   };
+
+  // Stok durumunu kontrol et ve hata durumlarına karşı güvenli hale getir
+  const isAvailable =
+    stock_state && stock_state.toUpperCase() === "AVAILABLE" && quantity > 0;
+  const isUnavailable = !isAvailable && stock_state !== undefined;
+
+  console.log("Stock State:", stock_state); // Hata kaynağını görmek için log eklendi
 
   return (
     <Card className="ProductCard">
@@ -116,9 +93,25 @@ function ProductCard({
 
       <CardText className="product-price">Fiyat: {price}</CardText>
       <CardText className="product-info">Açıklama: {description}</CardText>
-      <CardText className="product-info">Stok Durumu: {stock}</CardText>
+
+      {/* Stok Durumu */}
+      <CardText
+        className={`product-info ${isAvailable ? "available" : "unavailable"}`}
+      >
+        {isAvailable ? "Stokta Var" : "Stokta Yok"}
+      </CardText>
+
+      {/* Kalan Miktar */}
+      {isAvailable && (
+        <CardText className="product-info">Kalan Miktar: {quantity}</CardText>
+      )}
+
       <div className="product-buttons">
-        <Button className="SepetButon" onClick={() => addToCartHandler(id)}>
+        <Button
+          className="SepetButon"
+          onClick={() => addToCartHandler(id)}
+          disabled={!isAvailable} // Stokta olmayan ürün eklenmesin
+        >
           Sepete Ekle
         </Button>
         <Button className="InceleButon" onClick={handleCardClick}>
