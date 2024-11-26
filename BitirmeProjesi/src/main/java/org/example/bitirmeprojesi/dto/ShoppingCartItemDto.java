@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.ShoppingCartItem}
@@ -20,9 +21,9 @@ public class ShoppingCartItemDto implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id;
     @JsonProperty("product_id")
-    private ProductDto product;
+    private long productId;
     @JsonProperty("quantity")
     private Integer quantity;
     @JsonProperty("user_id")
-    private UserDto user;
+    private UUID userId;
 }

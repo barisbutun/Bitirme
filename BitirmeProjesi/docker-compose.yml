@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres:
     image: 'postgres:latest'
@@ -7,7 +9,13 @@ services:
       - 'POSTGRES_USER=barishafize'
     ports:
       - '5432:5432'
+
+
   redis:
     image: redislabs/redismod
     ports:
-      - 6379:6379
+      - '6379:6379'
+
+
+
+

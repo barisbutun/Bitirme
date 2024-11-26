@@ -22,8 +22,8 @@ public class FavouriteDto implements Serializable {
     private long id;
     @JsonProperty("user")
     private UserDto user;
-    @JsonProperty("product")
-    private ProductDto product;
-    @JsonProperty("category")
-    private CategoryDto category;
+    @JsonProperty("product_id")
+    private long productId;
+    @JsonProperty("category_id")
+    private long categoryId;
 }

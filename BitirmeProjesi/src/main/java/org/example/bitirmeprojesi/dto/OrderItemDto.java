@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.OrderItem}
@@ -21,11 +22,11 @@ public class OrderItemDto implements Serializable {
     @JsonIgnore
     private Long id;
     @JsonProperty("product_id")
-    private ProductDto productDto;
+    private long productId;
     @JsonProperty("order_id")
-    private OrdersDto ordersDto;
+    private long orderId;
     @JsonProperty("quantity")
     private Integer quantity;
     @JsonProperty("user_id")
-    private UserDto user;
+    private UUID userId;
 }

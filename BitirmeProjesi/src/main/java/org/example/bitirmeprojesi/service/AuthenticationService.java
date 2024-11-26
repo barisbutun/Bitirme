@@ -16,7 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -48,10 +47,10 @@ public class AuthenticationService {
             String token = tokenService.generateJwt(auth);
 
             if (isAdmin(user)) {
-                return new LoginResponseDto(Optional.ofNullable(null), token); // Admin kullanıcı için yanıt
+                return new LoginResponseDto(token); // Admin kullanıcı için yanıt
             }
 
-            return new LoginResponseDto(user, token);
+            return new LoginResponseDto(token);
 
         } catch (AuthenticationException exception) {
             throw new BadCredentialsException("Invalid email or password", exception);

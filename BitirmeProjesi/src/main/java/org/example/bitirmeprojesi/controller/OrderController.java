@@ -6,9 +6,12 @@ import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/order")
@@ -19,7 +22,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/v1")
-    public ResponseEntity<OrdersDto> create(String userId, OrdersDto ordersDto) {
+    public ResponseEntity<OrdersDto> create( @RequestBody OrdersDto ordersDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
         return ResponseEntity.ok(orderService.create(userId, ordersDto));
     }
 

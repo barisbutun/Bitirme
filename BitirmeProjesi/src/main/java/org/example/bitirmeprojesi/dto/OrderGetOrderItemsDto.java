@@ -33,7 +33,7 @@ public class OrderGetOrderItemsDto implements Serializable {
     @JsonProperty("sale_date")
     private LocalDateTime saleDate;
     @JsonProperty("order_id")
-    private OrdersDto ordersDto;
+    private long orderId;
     @JsonProperty("sum_price")
     private double sumPrice;
     @JsonProperty("stock_state")
