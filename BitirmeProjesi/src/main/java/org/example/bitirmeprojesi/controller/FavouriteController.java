@@ -1,10 +1,13 @@
 package org.example.bitirmeprojesi.controller;
 
 
+import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.service.FavouriteService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +21,9 @@ public class FavouriteController {
     private final FavouriteService favouriteService;
 
     @PostMapping("/v1")
-    public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto, @RequestParam UUID userId) {
+    public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID userId = (UUID) authentication.getPrincipal();
         return ResponseEntity.ok(favouriteService.create(favouriteDto, userId));
     }
 

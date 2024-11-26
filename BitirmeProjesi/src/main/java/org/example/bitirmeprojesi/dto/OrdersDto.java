@@ -12,6 +12,7 @@ import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO for {@link Orders}
@@ -39,6 +40,9 @@ public class OrdersDto implements Serializable {
 
     @JsonProperty("stock_state")
     StockState stockState;
+
+    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
+    UUID userId;
 
     @JsonProperty("payment_state")
     PaymentState paymentState;

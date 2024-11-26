@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Favourite}
@@ -20,8 +21,8 @@ import java.io.Serializable;
 public class FavouriteDto implements Serializable {
     @JsonIgnore
     private long id;
-    @JsonProperty("user")
-    private UserDto user;
+    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
+    private UUID userId;
     @JsonProperty("product_id")
     private long productId;
     @JsonProperty("category_id")
