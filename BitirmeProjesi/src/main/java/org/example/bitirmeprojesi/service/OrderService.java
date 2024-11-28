@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
@@ -7,11 +8,13 @@ import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.entity.OrderItem;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.entity.ShoppingCartItem;
+import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.mapper.OrderItemMapper;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderItemRepository;
 import org.example.bitirmeprojesi.repository.OrderRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.OrderValidator;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +34,13 @@ public class OrderService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OrderItemMapper orderItemMapper;
     private final OrderItemRepository orderItemRepository;
+    private final UserRepository userRepository;
     private final TokenService tokenService;
 
     @Transactional
-    public OrdersDto create(String userId, OrdersDto ordersDto) {
-        UUID uuidUserId = UUID.fromString(userId);
-        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(uuidUserId);
+    public OrdersDto create(UUID userId, OrdersDto ordersDto) {
+
+        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
 
         if (shoppingCartItems.isEmpty()) {
             throw new NoSuchElementException("Sepetinizde ürün bulunmamaktadır!");
@@ -66,7 +70,7 @@ public class OrderService {
 
         orderItemRepository.saveAll(orderItems);
 
-        shoppingCartItemRepository.deleteAllByUserId(uuidUserId);
+        shoppingCartItemRepository.deleteAllByUserId(userId);
 
         return orderMapper.toDto(orders);
     }
@@ -101,6 +105,13 @@ public class OrderService {
 
     }
 
+    public List<OrdersDto> findAllByUserId(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        List<Orders> ordersList = orderRepository.findAllByUserId(user.getId());
+        return orderMapper.toDtoList(ordersList);
+    }
 }
 
  /* UUID uuidUserId = UUID.fromString(userId);

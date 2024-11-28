@@ -51,7 +51,7 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
 
-    @GetMapping("/v1/register/{id}")
+    /*@GetMapping("/v1/register/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable("id") UUID id) {
         UserDto userDto = userService.findById(id);
         if (userDto != null) {
@@ -59,11 +59,16 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-    }
+    }*/
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable("id") UUID id, @RequestBody UserDto userDto) {
-        UserDto updatedUserDto = userService.update(userDto, id);
+    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt= (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+
+        UserDto updatedUserDto = userService.update(userDto,userId);
         if (updatedUserDto != null) {
             return ResponseEntity.ok(updatedUserDto);
         } else {
@@ -88,15 +93,24 @@ public class UserController {
         return ResponseEntity.ok(userProfileDto);
     }
 
-    @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
-        userService.delete(id);
+    @DeleteMapping("/v1")
+    public ResponseEntity<Void> delete() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/v1/{id}")
-    public ResponseEntity<UserPatchDto> patch(@PathVariable("id") UUID id, @RequestBody UserPatchDto userPatchDto) {
-        UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, id);
+    @PatchMapping("/v1")
+    public ResponseEntity<UserPatchDto> patch (@RequestBody UserPatchDto userPatchDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt= (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+
+    UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, userId);
         if (updatedUserDto != null) {
             return ResponseEntity.ok(updatedUserDto);
         } else {

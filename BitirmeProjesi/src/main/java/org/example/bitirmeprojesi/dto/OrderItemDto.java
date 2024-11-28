@@ -27,6 +27,6 @@ public class OrderItemDto implements Serializable {
     private long orderId;
     @JsonProperty("quantity")
     private Integer quantity;
-    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private UUID userId;
 }

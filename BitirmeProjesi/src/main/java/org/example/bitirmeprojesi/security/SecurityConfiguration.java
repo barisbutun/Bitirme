@@ -70,15 +70,10 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/auth/v1/login").permitAll();
                     auth.requestMatchers("/api/auth/v1/register").permitAll();
                     auth.requestMatchers("/api/admin").hasRole(Role.ADMIN.name());
-                    auth.requestMatchers("/api/image/**").hasAnyRole(Role.ADMIN.name(),Role.USER.name());
-                    auth.requestMatchers("/api/order/**").permitAll();
-                    auth.requestMatchers("/api/product/v1/**").permitAll();
+                    auth.requestMatchers("/api/order/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/api/shoppingCartItem/v1").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
-                    auth.requestMatchers("/api/shoppingCartItem/v1/**").permitAll();
-                    auth.requestMatchers("/api/favourite/v1/findAll").hasRole(Role.ADMIN.name());
-                    auth.requestMatchers("/api/favourite/v1/**").permitAll();
-                    auth.requestMatchers("/api/user/v1/profile").authenticated();
-                    auth.anyRequest().authenticated();
+                    auth.anyRequest().permitAll();
                 });
         http.oauth2ResourceServer(
                 o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
@@ -114,6 +109,8 @@ public class SecurityConfiguration {
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+
+        jwtConverter.setPrincipalClaimName("userId");
         jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtConverter;
     }

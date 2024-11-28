@@ -8,6 +8,7 @@ import org.example.bitirmeprojesi.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,9 @@ public class OrderController {
     @PostMapping("/v1")
     public ResponseEntity<OrdersDto> create( @RequestBody OrdersDto ordersDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
+        Jwt jwt= (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
         return ResponseEntity.ok(orderService.create(userId, ordersDto));
     }
 
@@ -33,6 +36,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
+    @GetMapping("/v1")
+    public ResponseEntity<List<OrdersDto>> findAllByUserId(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt= (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        return ResponseEntity.ok(orderService.findAllByUserId(userId));
+    }
 
 
     @PutMapping("/v1/{id}")

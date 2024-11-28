@@ -53,6 +53,6 @@ public class ProductController {
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         productService.delete(id);
-        return ResponseEntity.noContent().build(); // 204 No Content döner
+        return ResponseEntity.noContent().build();
     }
 }

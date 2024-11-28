@@ -28,13 +28,7 @@ public class ImageController {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
 
-    @PostMapping("/v1")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("productId") Long productId) throws Exception {
-        ImageResponseDto response = imageService.upload(file,productId);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
 
     @GetMapping("v1/info/{name}")
     public ResponseEntity<?> getImageInfoByName(@PathVariable("name") String name) {

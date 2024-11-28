@@ -16,8 +16,6 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-
-
     @GetMapping("/v1")
     public ResponseEntity<List<CategoryDto>> findAll() {
         return ResponseEntity.ok(categoryService.findAll());
@@ -28,14 +26,4 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.findById(id));
     }
 
-    @PutMapping("/v1/{id}")
-    public ResponseEntity<CategoryDto> update(CategoryDto categoryDto, long id) {
-        return ResponseEntity.ok(categoryService.update(categoryDto, id));
-    }
-
-    @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(long id) {
-        categoryService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

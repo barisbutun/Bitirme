@@ -41,8 +41,8 @@ public class OrdersDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
-    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
-    UUID userId;
+    @JsonIgnore
+    private UUID userId;
 
     @JsonProperty("payment_state")
     PaymentState paymentState;

@@ -1,10 +1,7 @@
 package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.CategoryDto;
-import org.example.bitirmeprojesi.dto.OrdersDto;
-import org.example.bitirmeprojesi.dto.ProductDto;
-import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +16,7 @@ public class AdminService {
     private final OrderService orderService;
     private final UserService userService;
     private final ImageService imageService;
+    private final FavouriteService favouriteService;
 
     public ProductDto createProduct(ProductDto productDto) throws Exception {
         return productService.create(productDto);
@@ -36,6 +34,9 @@ public class AdminService {
         imageService.delete(id);
     }
 
+    public ImageResponseDto uploadImage(MultipartFile file, long productId) throws Exception {
+        return imageService.upload(file, productId);
+    }
     public void deleteProduct(Long id) {
         productService.delete(id);
     }
@@ -59,4 +60,14 @@ public class AdminService {
     public List<UserDto> findAllUsers() {
         return userService.findAll();
     }
+
+    public List<FavouriteDto> getAllFavourites() {
+        return favouriteService.findAll();
+    }
+
+    public FavouriteDto updateFavourite(FavouriteDto favouriteDto, Long id) {
+        return favouriteService.update(favouriteDto, id);
+    }
+
+
 }

@@ -32,6 +32,7 @@ public class DeliveryController {
 
     @PutMapping("/v1/{id}")
     public ResponseEntity<DeliveryDto> update(DeliveryDto deliveryDto, UUID id) {
+
         return ResponseEntity.ok(deliveryService.update(deliveryDto, id));
     }
 
