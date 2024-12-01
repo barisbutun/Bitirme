@@ -6,10 +6,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../css/ProductDetailsCard.css";
-import {
-  addToCart as addToCartService,
-  addToFavorites as addToFavoritesService,
-} from "../services/ProductService/ProductService";
+import { addToCart } from "../services/ProductService/ShoppingCardService";
+import { addFavorite } from "../services/ProductService/FavoriteService";
 
 const ProductDetailsCard = ({ product }) => {
   const navigate = useNavigate();
@@ -39,12 +37,12 @@ const ProductDetailsCard = ({ product }) => {
       return;
     }
 
-    // Servis katmanındaki favorilere ekleme fonksiyonu çağrılıyor
-    await addToFavoritesService(product.id, navigate);
+    // Favorilere eklemek için doğru servis fonksiyonunu çağırıyoruz
+    await addFavorite(product.id, navigate);
     setIsFavorite(!isFavorite);
   };
 
-  const addToCart = async () => {
+  const addToCartHandler = async () => {
     if (!isLoggedIn()) {
       notification.info({
         message: "Giriş Yapın",
@@ -55,8 +53,8 @@ const ProductDetailsCard = ({ product }) => {
       return;
     }
 
-    // Servis katmanındaki sepete ekleme fonksiyonu çağrılıyor
-    await addToCartService(product.id, navigate);
+    // Sepete eklemek için doğru servis fonksiyonunu çağırıyoruz
+    await addToCart(product.id, navigate);
 
     notification.success({
       message: "Sepete Eklendi",
@@ -105,7 +103,7 @@ const ProductDetailsCard = ({ product }) => {
               type="primary"
               size="large"
               className="product-details-button"
-              onClick={addToCart}
+              onClick={addToCartHandler}
             >
               Sepete Ekle
             </Button>

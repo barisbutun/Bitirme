@@ -21,16 +21,16 @@ export const addFavorite = async (product, navigate) => {
   
     // Ürün bilgilerini içeren favori verisi oluştur
     const favoriteData = {
-      userId, // Kullanıcı ID'si
-      productId: product.id, // Ürün ID'si
-      productName: product.name, // Ürün Adı
-      productPrice: product.price, // Ürün Fiyatı
-      productImage: product.image1, // Ürün Görseli
-      productStock: product.stock, // Ürün Stok Durumu
+      userId,
+      productId: product.id, 
+      productName: product.name, 
+      productPrice: product.price, 
+      productImage: product.image1, 
+      productStock: product.stock, 
     };
   
     try {
-      const response = await fetch(`${API_BASE_URL}/favourites`, {
+      const response = await fetch(`${API_BASE_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export const removeFavorite = (id, setFavoriteProducts) => {
     }
   
     // Favoriden çıkarma isteği gönder
-    fetch(`/api/favourites/${id}`, { method: "DELETE" })
+    fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" })
       .then((response) => {
         if (!response.ok) throw new Error("Favoriden çıkarılamadı.");
         // Favoriler listesini güncelle
@@ -95,7 +95,7 @@ export const fetchFavorites = async (setFavoriteProducts) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/findAll?userId=${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/?userId=${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

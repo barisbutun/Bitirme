@@ -3,10 +3,61 @@ import { Button, Layout, Table, notification } from "antd";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../css/ShoppingCard.css"; // CSS dosyasını import ediyoruz
+import "../css/ShoppingCard.css";
 import { useNavigate } from "react-router-dom";
-import { removeFromCart } from "../services/ProductService/ProductService";
-const ShoppingCard = ({ product }) => {
+import {
+  removeFromCart as removeFromCartService,
+  getCartByUserId,
+} from "../services/ProductService/ShoppingCardService";
+
+const ShoppingCard = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [data, setData] = useState([]);
+  const navigate = useNavigate();
+
+  // Sepet verisini backend'den alıyoruz
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        const userId = 1; // Kullanıcı ID'si, genellikle oturumdan alınır
+        const cartItems = await getCartByUserId(userId); // Servisten sepet verisini alıyoruz
+        setData(cartItems); // Veriyi state'e kaydediyoruz
+      } catch (error) {
+        console.error("Sepet verisi alınamadı:", error);
+      }
+    };
+
+    fetchCartData();
+  }, []);
+
+  const handleOrder = () => {
+    navigate("/Orders"); // Sepeti onaylamak için "Orders" sayfasına yönlendiriyoruz
+  };
+
+  const handleRemoveFromCart = async (productId) => {
+    try {
+      // Ürünü API'den silme işlemi
+      await removeFromCartService(productId);
+
+      // Sepetten ürünü çıkarıyoruz
+      const updatedCart = data.filter((item) => item.id !== productId);
+      setData(updatedCart);
+
+      // Kullanıcıyı bilgilendiriyoruz
+      notification.warning({
+        message: "Sepetten Çıkarıldı",
+        description: "Ürün başarıyla sepette çıkarıldı!",
+        placement: "topRight",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Hata",
+        description: "Sepetten çıkarma işlemi başarısız oldu.",
+        placement: "topRight",
+      });
+    }
+  };
+
   const columns = [
     {
       title: "Ürün Resmi", // Product Image
@@ -14,7 +65,6 @@ const ShoppingCard = ({ product }) => {
       key: "image",
       render: (image) => <img className="image" src={image} alt="Ürün Resmi" />, // Resmi gösteriyoruz
     },
-
     {
       title: "Ürün Adı", // Product Name
       dataIndex: "name", // name alanını kullanıyoruz
@@ -38,55 +88,15 @@ const ShoppingCard = ({ product }) => {
       key: "stock",
     },
     {
-      title: "İşlem",
+      title: "İşlem", // Action
       key: "action",
       render: (text, record) => (
-        <Button type="primary" onClick={() => removeFromCart(record.id)}>
+        <Button type="primary" onClick={() => handleRemoveFromCart(record.id)}>
           Sepetten Çıkar
         </Button>
       ),
     },
   ];
-  const [collapsed, setCollapsed] = useState(false);
-  const [data, setData] = useState([]);
-  const navigate = useNavigate();
-  // useEffect(() => {
-  //   fetch("/Shopping.json")
-  //     .then((response) => response.json())
-  //     .then((data) => setData(data))
-  //     .catch((error) => console.error("vei çekme hatası:", error));
-  // }, []);
-
-  useEffect(() => {
-    const cartData = JSON.parse(localStorage.getItem("cart")) || [];
-    if (cartData) {
-      setData(cartData);
-    }
-  }, []);
-
-  const handleOrder = (record) => {
-    navigate("/Orders");
-  };
-
-  const removeFromCart = (productId) => {
-    removeFromCart(productId, data, setData);
-  };
-  //sepetten silme işlemi
-
-  // const removeFromCart = (productId) => {
-  //   const updatedCart = data.filter((item) => item.id !== productId);
-  //   setData(updatedCart);
-  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-  //   const product = data.find((item) => item.id === productId);
-  //   notification.warning({
-  //     message: "Sepetten Çıkarıldı",
-  //     description: `${
-  //       product ? product.name : "Ürün"
-  //     } başarıyla sepette çıkarıldı!`,
-  //     placement: "topRight",
-  //   });
-  // };
 
   return (
     <Layout>
@@ -97,7 +107,7 @@ const ShoppingCard = ({ product }) => {
           className="shopping-card-table"
           columns={columns}
           dataSource={data}
-          rowKey={(record) => record.id}
+          rowKey={(record) => record.id} // Verilerin benzersizliğini sağlıyoruz
           expandable={{
             expandedRowRender: (record) => (
               <Table
@@ -126,14 +136,13 @@ const ShoppingCard = ({ product }) => {
               <Button
                 className="SiparisButon"
                 type="primary"
-                onClick={() => handleOrder()}
+                onClick={handleOrder}
               >
                 Sepeti Onayla
               </Button>
             </div>
           )}
         />
-
         <Footer />
       </Layout>
     </Layout>

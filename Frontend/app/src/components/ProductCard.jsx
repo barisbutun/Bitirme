@@ -4,10 +4,11 @@ import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { CardText, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/ProductCard.css";
+import { addToCart } from "../services/ProductService/ShoppingCardService";
 import {
-  addToCart,
-  addToFavorites,
-} from "../services/ProductService/ProductService";
+  addFavorite,
+  removeFavorite,
+} from "../services/ProductService/FavoriteService";
 
 function ProductCard({
   id,
@@ -17,20 +18,10 @@ function ProductCard({
   quantity,
   stock_state, // 'AVAILABLE' or 'UNAVAILABLE'
   description,
-  image1,
-  image2,
-  image3,
 }) {
   const navigate = useNavigate();
-  const handleCardClick = () => {
-    const url = `/ProductDetails/${id}`;
-    console.log("Navigating to:", url);
-    navigate(url);
-  };
 
-  const isLoggedIn = () => {
-    return Boolean(localStorage.getItem("token"));
-  };
+  const isLoggedIn = () => Boolean(localStorage.getItem("token"));
 
   const [isFavorite, setIsFavorite] = useState(() => {
     const savedFavorites = localStorage.getItem("favorites");
@@ -38,7 +29,7 @@ function ProductCard({
     return favorites.includes(id);
   });
 
-  const addToCartHandler = async (id) => {
+  const addToCartHandler = async () => {
     if (!isLoggedIn()) {
       notification.info({
         message: "Giriş Yapın",
@@ -49,10 +40,24 @@ function ProductCard({
       return;
     }
 
-    await addToCart(id, navigate); // Servis katmanındaki sepete ekleme fonksiyonu çağrıldı
+    const shoppingCartItemDto = { productId: id, quantity: 1 }; // Sepete eklenecek ürün verisi
+    try {
+      await addToCart(shoppingCartItemDto);
+      notification.success({
+        message: "Sepete Eklendi",
+        description: "Ürün başarıyla sepete eklendi.",
+        placement: "topRight",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Hata",
+        description: "Sepete ekleme sırasında bir sorun oluştu.",
+        placement: "topRight",
+      });
+    }
   };
 
-  const toggleFavoriteHandler = async (id) => {
+  const toggleFavoriteHandler = async () => {
     if (!isLoggedIn()) {
       notification.info({
         message: "Giriş Yapın",
@@ -63,22 +68,51 @@ function ProductCard({
       return;
     }
 
-    await addToFavorites(id, navigate); // Servis katmanındaki favorilere ekleme fonksiyonu çağrıldı
-    setIsFavorite(!isFavorite);
+    if (isFavorite) {
+      try {
+        await removeFavorite(id);
+        setIsFavorite(false);
+        notification.success({
+          message: "Favorilerden Çıkarıldı",
+          description: "Ürün favorilerden başarıyla çıkarıldı.",
+          placement: "topRight",
+        });
+      } catch (error) {
+        notification.error({
+          message: "Hata",
+          description: "Favorilerden çıkarma sırasında bir sorun oluştu.",
+          placement: "topRight",
+        });
+      }
+    } else {
+      try {
+        const favoriteData = {
+          id,
+          name,
+          price,
+          image,
+          stock_state,
+        };
+        await addFavorite(favoriteData, navigate);
+        setIsFavorite(true);
+      } catch (error) {
+        notification.error({
+          message: "Hata",
+          description: "Favorilere ekleme sırasında bir sorun oluştu.",
+          placement: "topRight",
+        });
+      }
+    }
   };
 
-  // Stok durumunu kontrol et ve hata durumlarına karşı güvenli hale getir
   const isAvailable =
     stock_state && stock_state.toUpperCase() === "AVAILABLE" && quantity > 0;
-  const isUnavailable = !isAvailable && stock_state !== undefined;
-
-  console.log("Stock State:", stock_state); // Hata kaynağını görmek için log eklendi
 
   return (
     <Card className="ProductCard">
       <button
         className={`favorite-button ${isFavorite ? "active" : ""}`}
-        onClick={() => toggleFavoriteHandler(id)}
+        onClick={toggleFavoriteHandler}
       >
         {isFavorite ? <HeartFilled /> : <HeartOutlined />}
       </button>
@@ -94,14 +128,12 @@ function ProductCard({
       <CardText className="product-price">Fiyat: {price}</CardText>
       <CardText className="product-info">Açıklama: {description}</CardText>
 
-      {/* Stok Durumu */}
       <CardText
         className={`product-info ${isAvailable ? "available" : "unavailable"}`}
       >
         {isAvailable ? "Stokta Var" : "Stokta Yok"}
       </CardText>
 
-      {/* Kalan Miktar */}
       {isAvailable && (
         <CardText className="product-info">Kalan Miktar: {quantity}</CardText>
       )}
@@ -109,12 +141,15 @@ function ProductCard({
       <div className="product-buttons">
         <Button
           className="SepetButon"
-          onClick={() => addToCartHandler(id)}
-          disabled={!isAvailable} // Stokta olmayan ürün eklenmesin
+          onClick={addToCartHandler}
+          disabled={!isAvailable}
         >
           Sepete Ekle
         </Button>
-        <Button className="InceleButon" onClick={handleCardClick}>
+        <Button
+          className="InceleButon"
+          onClick={() => navigate(`/ProductDetails/${id}`)}
+        >
           İncele
         </Button>
       </div>
