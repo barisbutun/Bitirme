@@ -6,10 +6,10 @@ import Footer from "../components/Footer";
 import "../css/Homepage.css";
 import ProductCard from "../components/ProductCard";
 import FilterComponent from "../components/FilterComponent";
-import {
-  fetchProducts,
-  fetchProductImages,
-} from "../services/ProductService/ProductService";
+// import {
+//   fetchProducts,
+//   fetchProductImages,
+// } from "../services/ProductService/ProductService";
 const Homepage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -21,21 +21,18 @@ const Homepage = () => {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
 
-        // Ürünleri servis katmanından al
-        const productsData = await fetchProducts(token);
+        // JSON dosyasından ürün verilerini al
+        const response = await fetch("/products.json"); // JSON dosyasının yolu
+        if (!response.ok) {
+          throw new Error("JSON dosyası yüklenemedi");
+        }
 
-        // Resimleri ekle
-        const productsWithImages = await Promise.all(
-          productsData.map(async (product) => {
-            const images = await fetchProductImages(product.id, token);
-            return { ...product, images };
-          })
-        );
+        const productsData = await response.json();
 
-        setProducts(productsWithImages);
-        setFilteredProducts(productsWithImages);
+        // JSON'dan gelen verileri doğrudan state'e aktar
+        setProducts(productsData);
+        setFilteredProducts(productsData);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -59,6 +56,7 @@ const Homepage = () => {
       setFilteredProducts(products);
     }
   };
+
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
