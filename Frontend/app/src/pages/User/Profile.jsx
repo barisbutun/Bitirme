@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";
-import ProfileSettings from "../components/ProfileSettings";
+import ProfileSettings from "../../components/ProfileSettings";
 import { Layout, Avatar, Card, Descriptions, Tabs } from "antd";
-import "../css/Profile.css";
+import "../User/UserCss/Profile.css";
 
 const { TabPane } = Tabs;
 

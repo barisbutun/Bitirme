@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Image, Button, Layout, Table } from "antd";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "../css/Favorites.css";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import "../User/UserCss/Favorites.css";
 import {
   fetchFavorites,
   removeFavorite,
-} from "../services/ProductService/FavoriteService";
+} from "../../services/ProductService/FavoriteService";
 
 const Favorites = () => {
   const [collapsed, setCollapsed] = useState(false);

@@ -1,6 +1,7 @@
+import { decodeToken } from "../../utils/auth";
 const API_BASE_URL = "http://localhost:8082/api/auth/v1";
 
-// Giriş işlemi
+
 export const login = async (email, password) => {
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
@@ -17,13 +18,56 @@ export const login = async (email, password) => {
     }
 
     const data = await response.json();
-    localStorage.setItem("token", data.token);
+    const token = data.token;
+
+    localStorage.setItem("token", token);
+
+    // Token'dan kullanıcı rolünü çöz
+    const roles = decodeToken(token);
+
+    // Rol bilgisine göre yönlendirme
+    if (roles.includes("ADMIN")) {
+      window.location.href = "/admin"; // Admin sayfasına yönlendir
+    } else if (roles.includes("USER")) {
+      window.location.href = "/user"; // Kullanıcı sayfasına yönlendir
+    } else {
+      throw new Error("Geçersiz kullanıcı rolü");
+    }
+
     return data;
   } catch (error) {
     console.error("Login sırasında hata:", error);
     throw error;
   }
 };
+
+// // Giriş işlemi
+// export const login = async (email, password) => {
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/login`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ email, password }),
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.message || "Giriş başarısız");
+//     }
+
+//     const data = await response.json();
+//     localStorage.setItem("token", data.token);
+//     return data;
+//   } catch (error) {
+//     console.error("Login sırasında hata:", error);
+//     throw error;
+//   }
+// };
+
+
+
 
 
 // Kayıt işlemi

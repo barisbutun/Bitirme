@@ -10,10 +10,10 @@ import {
   Typography,
   notification,
 } from "antd";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "../css/Payment.css";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import "../User/UserCss/Payment.css";
 
 const Payment = () => {
   const [collapsed, setCollapsed] = useState(false);

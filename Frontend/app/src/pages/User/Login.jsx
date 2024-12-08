@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Checkbox, Col, Row, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
-import "../css/Login.css";
+import "../User/UserCss/Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { login, googleLogin } from "../services/UserService/AuthService";
+import { login, googleLogin } from "../../services/UserService/AuthService";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { decodeToken } from "../utils/auth";
+import { decodeToken } from "../../utils/auth";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -16,51 +16,37 @@ const LoginForm = () => {
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [userCaptcha, setUserCaptcha] = useState("");
   const [error, setError] = useState("");
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const token = localStorage.getItem("token");
-
-  //     const response = await fetch("http://localhost:8082/api/auth/v1/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify({
-  //         email,
-  //         password,
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       setMessage("Giriş başarılı!");
-  //       navigate("/Homepage");
-  //       // Eğer JWT token dönerse, localStorage'a kaydedebiliriz
-  //       if (data.token) {
-  //         localStorage.setItem("token", data.token);
-  //       }
-  //     } else {
-  //       setMessage(`Giriş başarısız: ${data.message}`);
-  //     }
-  //   } catch (error) {
-  //     setMessage("Giriş sırasında bir hata oluştu.");
-  //   }
-  // };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const user = await login(email, password);
-      console.log("Giriş başarılı:", user);
-      navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
-    } catch (error) {
-      setError(error.message || "Giriş sırasında bir hata oluştu");
+      await login(email, password);
+      const token = localStorage.getItem("token");
+      const roles = decodeToken(token);
+
+      if (roles.includes("admin")) {
+        navigate("/admin");
+      } else if (roles.includes("user")) {
+        navigate("/user");
+      } else {
+        setError("Geçersiz kullanıcı rolü");
+      }
+    } catch (err) {
+      setError(err.message || "Giriş sırasında hata oluştu");
     }
   };
+  //  ###############################################
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const user = await login(email, password);
+  //     console.log("Giriş başarılı:", user);
+  //     navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
+  //   } catch (error) {
+  //     setError(error.message || "Giriş sırasında bir hata oluştu");
+  //   }
+  // };
+  // ###############################################
 
   const handleGoogleLogin = async (credentialResponse) => {
     try {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Table, Drawer, Button, Typography, Descriptions } from "antd";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
-import "../css/Orders.css";
+import "../User/UserCss/Orders.css";
 
 const Orders = () => {
   const [collapsed, setCollapsed] = useState(false);

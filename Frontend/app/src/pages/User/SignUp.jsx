@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Checkbox, Form, Input, Select } from "antd";
-import "../css/SignUp.css"; // CSS dosyasını içe aktarma
+import "../User/UserCss/SignUp.css";
 import { useNavigate } from "react-router-dom";
-import { Register } from "../services/UserService/AuthService";
+import { Register } from "../../services/UserService/AuthService";
 
 const { Option } = Select;
 

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Button, Layout, Table, notification } from "antd";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "../css/ShoppingCard.css";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import "../User/UserCss/ShoppingCard.css";
 import { useNavigate } from "react-router-dom";
 import {
   removeFromCart as removeFromCartService,
   getCartByUserId,
-} from "../services/ProductService/ShoppingCardService";
+} from "../../services/ProductService/ShoppingCardService";
 
 const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);

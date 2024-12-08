@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import ProductDetailsCard from "../components/ProductDetailsCard";
-import "../css/ProductDetails.css";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import ProductDetailsCard from "../../components/ProductDetailsCard";
+import "../User/UserCss/ProductDetails.css";
 import { useParams } from "react-router-dom";
 import {
   fetchProducts,
   fetchProductImages,
-} from "../services/ProductService/ProductService";
+} from "../../services/ProductService/ProductService";
 const ProductDetails = ({ token }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [product, setProduct] = useState(null);

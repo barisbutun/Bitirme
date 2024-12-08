@@ -6,12 +6,12 @@ export const decodeToken = (token) => {
     try {
       const decodedToken = jwtDecode(token);  // Token'ı decode ediyoruz
       console.log("decoded token:",decodedToken);
-      return decodedToken.roles;  // Kullanıcı rolleri döndürülüyor
+      return decodedToken.roles || [];  // Kullanıcı rolleri döndürülüyor yoksa boş dizi
     } catch (error) {
       console.error("Token'ı çözümleme sırasında hata:", error);
     }
   }
-  return null;  // Token yoksa null döndürülür
+  return [];  // Token yoksa null döndürülür
 };
 
 // Token'dan userId'yi almak için fonksiyon
