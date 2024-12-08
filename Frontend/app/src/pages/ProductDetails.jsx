@@ -6,38 +6,43 @@ import Footer from "../components/Footer";
 import ProductDetailsCard from "../components/ProductDetailsCard";
 import "../css/ProductDetails.css";
 import { useParams } from "react-router-dom";
-
-const ProductDetails = () => {
+import {
+  fetchProducts,
+  fetchProductImages,
+} from "../services/ProductService/ProductService";
+const ProductDetails = ({ token }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [product, setProduct] = useState(null);
+  const [images, setImages] = useState([]);
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`/products.json?timestamp=${new Date().getTime()}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const selectedProduct = data.find(
+    const fetchProductDetails = async () => {
+      if (!id) return; // Eğer id boşsa işlem yapma
+      try {
+        const products = await fetchProducts(token);
+        const selectedProduct = products.find(
           (product) => product.id === parseInt(id, 10)
         );
+
         if (selectedProduct) {
           setProduct(selectedProduct);
+
+          const productImages = await fetchProductImages(
+            selectedProduct.id,
+            token
+          );
+          setImages(productImages);
         } else {
           console.error("Ürün bulunamadı");
         }
-      })
-      .catch((error) => {
-        console.error("Veri alınırken hata oluştu:", error);
-      });
-  }, [id]);
+      } catch (error) {
+        console.error("Veriler alınırken hata oluştu:", error);
+      }
+    };
 
-  if (!product) {
-    return <div>Loading...</div>; // Veri gelene kadar bir yükleme ekranı göster
-  }
+    fetchProductDetails();
+  }, [id, token]);
 
   return (
     <Layout>

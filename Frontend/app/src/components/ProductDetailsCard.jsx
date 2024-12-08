@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Button, Rate, Row, Col, Image, notification } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -11,12 +11,16 @@ import { addFavorite } from "../services/ProductService/FavoriteService";
 
 const ProductDetailsCard = ({ product }) => {
   const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  const [isFavorite, setIsFavorite] = useState(() => {
-    const savedFavorites = localStorage.getItem("favorites");
-    const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
-    return favorites.includes(product.id);
-  });
+  // Favori durumu için localStorage kontrolü
+  useEffect(() => {
+    if (product) {
+      const savedFavorites = localStorage.getItem("favorites");
+      const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+      setIsFavorite(favorites.includes(product.id));
+    }
+  }, [product]);
 
   if (!product) {
     return <p>Yükleniyor...</p>;
@@ -37,7 +41,6 @@ const ProductDetailsCard = ({ product }) => {
       return;
     }
 
-    // Favorilere eklemek için doğru servis fonksiyonunu çağırıyoruz
     await addFavorite(product.id, navigate);
     setIsFavorite(!isFavorite);
   };
@@ -53,7 +56,6 @@ const ProductDetailsCard = ({ product }) => {
       return;
     }
 
-    // Sepete eklemek için doğru servis fonksiyonunu çağırıyoruz
     await addToCart(product.id, navigate);
 
     notification.success({
@@ -62,6 +64,11 @@ const ProductDetailsCard = ({ product }) => {
       placement: "topRight",
     });
   };
+
+  // Slider resimlerini bir liste olarak ayarlama
+  const images = [product.image1, product.image2, product.image3].filter(
+    Boolean
+  );
 
   // Slider ayarları
   const settings = {
@@ -80,15 +87,11 @@ const ProductDetailsCard = ({ product }) => {
         {/* Ürün resmi ve küçük resimler */}
         <Col span={10}>
           <Slider {...settings}>
-            <div className="image-container">
-              <Image className="zoom-image" width={400} src={product.image1} />
-            </div>
-            <div className="image-container">
-              <Image className="small-image" width={400} src={product.image2} />
-            </div>
-            <div className="image-container">
-              <Image className="small-image" width={400} src={product.image3} />
-            </div>
+            {images.map((src, index) => (
+              <div key={index} className="image-container">
+                <Image className="small-image" width={400} src={src} />
+              </div>
+            ))}
           </Slider>
         </Col>
 
