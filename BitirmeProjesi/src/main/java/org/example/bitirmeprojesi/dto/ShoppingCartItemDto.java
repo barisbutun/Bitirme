@@ -1,6 +1,6 @@
 package org.example.bitirmeprojesi.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +25,4 @@ public class ShoppingCartItemDto implements Serializable {
     private long productId;
     @JsonProperty("quantity")
     private Integer quantity;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private UUID userId;
 }

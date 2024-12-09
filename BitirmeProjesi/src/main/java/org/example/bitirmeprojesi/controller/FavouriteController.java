@@ -7,6 +7,7 @@ import org.example.bitirmeprojesi.service.FavouriteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,7 +22,10 @@ public class FavouriteController {
     @PostMapping("/v1")
     public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID userId = (UUID) authentication.getPrincipal();
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
         return ResponseEntity.ok(favouriteService.create(favouriteDto, userId));
     }
 

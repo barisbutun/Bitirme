@@ -39,7 +39,8 @@ public class OrderController {
     @GetMapping("/v1")
     public ResponseEntity<List<OrdersDto>> findAllByUserId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt= (Jwt) authentication.getPrincipal();
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
 
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
         return ResponseEntity.ok(orderService.findAllByUserId(userId));

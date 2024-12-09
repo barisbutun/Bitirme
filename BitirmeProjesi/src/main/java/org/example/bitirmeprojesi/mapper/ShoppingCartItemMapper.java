@@ -13,9 +13,12 @@ import java.util.List;
 public interface ShoppingCartItemMapper {
 
 
-    ShoppingCartItemDto toDto(final ShoppingCartItem shoppingCartItem);
+    @Mapping(source = "product.id", target = "productId")
+    ShoppingCartItemDto toDto(ShoppingCartItem shoppingCartItem);
 
-    ShoppingCartItem toEntity(final ShoppingCartItemDto shoppingCartItemDto);
+    @Mapping(source = "productId", target = "product.id")
+    ShoppingCartItem toEntity(ShoppingCartItemDto shoppingCartItemDto);
+
 
     List<ShoppingCartItemDto> toDtoList(final List<ShoppingCartItem> shoppingCartItems);
 

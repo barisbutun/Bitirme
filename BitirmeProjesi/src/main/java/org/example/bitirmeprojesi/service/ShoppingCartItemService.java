@@ -29,25 +29,18 @@ public class ShoppingCartItemService {
     private final ProductRepository productRepository;
 
     public ShoppingCartItemDto create(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
-        // Kullanıcıyı kontrol et ve getir
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
-        // Ürünü kontrol et ve getir
-        Product product = productRepository.findById(shoppingCartItemDto.getProductId())
+        User user=userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        Product product=productRepository.findById(shoppingCartItemDto.getProductId())
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
 
-        // ShoppingCartItem nesnesini oluştur ve değerlerini ata
-        ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
-        shoppingCartItem.setQuantity(shoppingCartItemDto.getQuantity());
-        shoppingCartItem.setProduct(product);
+        ShoppingCartItem shoppingCartItem = shoppingCartItemMapper.toEntity(shoppingCartItemDto);
         shoppingCartItem.setUser(user);
+        shoppingCartItem.setProduct(product);
+        ShoppingCartItem savedShoppingCartItem = shoppingCartItemRepository.save(shoppingCartItem);
+        return shoppingCartItemMapper.toDto(savedShoppingCartItem);
 
-        // Veritabanına kaydet
-        shoppingCartItem = shoppingCartItemRepository.save(shoppingCartItem);
-
-        // Kaydedilen nesneyi DTO'ya dönüştür ve döndür
-        return shoppingCartItemMapper.toDto(shoppingCartItem);
     }
 
     public ShoppingCartItemDto findById(long id) {
