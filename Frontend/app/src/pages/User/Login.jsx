@@ -5,13 +5,12 @@ import "antd/dist/reset.css";
 import "../User/UserCss/Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { login, googleLogin } from "../../services/UserService/AuthService";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+// import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { decodeToken } from "../../utils/auth";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [userCaptcha, setUserCaptcha] = useState("");
@@ -48,19 +47,21 @@ const LoginForm = () => {
   // };
   // ###############################################
 
-  const handleGoogleLogin = async (credentialResponse) => {
-    try {
-      const response = await googleLogin(credentialResponse.credential);
-      if (response.token) {
-        console.log("Google login successful");
-        // Redirect to the dashboard or homepage
-      } else {
-        console.error("Google login failed:", response.message);
-      }
-    } catch (error) {
-      console.error("Error during Google login:", error);
-    }
-  };
+  //google giriş fonksiyonu
+
+  // const handleGoogleLogin = async (credentialResponse) => {
+  //   try {
+  //     const response = await googleLogin(credentialResponse.credential);
+  //     if (response.token) {
+  //       console.log("Google login successful");
+  //       // Redirect to the dashboard or homepage
+  //     } else {
+  //       console.error("Google login failed:", response.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during Google login:", error);
+  //   }
+  // };
 
   //captcha oluşturma fonksiyonu
   function generateCaptcha() {
@@ -174,7 +175,7 @@ const LoginForm = () => {
         <Form.Item>
           <Link to={"/SignUp"}> Hesabınız yok mu?</Link>
         </Form.Item>
-        <Form.Item>
+        {/* <Form.Item>
           <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">
             <GoogleLogin
               onSuccess={handleGoogleLogin}
@@ -183,7 +184,7 @@ const LoginForm = () => {
               }}
             />
           </GoogleOAuthProvider>
-        </Form.Item>
+        </Form.Item> */}
       </Form>
     </div>
   );

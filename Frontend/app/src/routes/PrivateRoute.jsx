@@ -1,13 +1,13 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({ children, role }) => {
+const PrivateRoute = ({ children, roles }) => {
   const token = localStorage.getItem("token");
-  const userRole = localStorage.getItem("role");
+  const userRole = localStorage.getItem("roles");
 
-  if (!token || userRole !== role) {
+  if (!token || userRole !== roles) {
     return (
-      <Navigate to={role === "admin" ? "/admin/login" : "/login"} replace />
+      <Navigate to={roles === "admin" ? "/admin/login" : "/login"} replace />
     );
   }
 

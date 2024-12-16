@@ -14,6 +14,24 @@ export const decodeToken = (token) => {
   return [];  // Token yoksa null döndürülür
 };
 
+export const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");  // Token'ı localStorage'dan alıyoruz
+  if (!token) {
+    console.warn("Token bulunamadı.");  
+    return null;
+  }
+
+  try {
+    const decodedToken = jwtDecode(token);
+    console.log("Çözümlenmiş Token:", decodedToken);  
+    console.log("Kullanıcı ID:", decodedToken.userId);  
+    return decodedToken.userId;  // UserId'yi döndürüyoruz
+  } catch (error) {
+    console.error("Token decode hatası:", error.message);  
+    return null;
+  }
+};
+
 // Token'dan userId'yi almak için fonksiyon
 // export const getUserIdFromToken = () => {
 //   const token = localStorage.getItem("token");  // Token'ı localStorage'dan alıyoruz
@@ -30,20 +48,4 @@ export const decodeToken = (token) => {
 //     return null;  // Hata durumunda null döndürüyoruz
 //   }
 // };
-export const getUserIdFromToken = () => {
-  const token = localStorage.getItem("token");  // Token'ı localStorage'dan alıyoruz
-  if (!token) {
-    console.warn("Token bulunamadı.");  // Token yoksa uyarı ver
-    return null;
-  }
 
-  try {
-    const decodedToken = jwtDecode(token);  // Token'ı decode ediyoruz
-    console.log("Çözümlenmiş Token:", decodedToken);  // Çözümlenmiş tokenın tamamını yazdır
-    console.log("Kullanıcı ID:", decodedToken.userId);  // Kullanıcı ID'yi yazdır
-    return decodedToken.userId;  // UserId'yi döndürüyoruz
-  } catch (error) {
-    console.error("Token decode hatası:", error.message);  // Hata varsa mesajını yazdır
-    return null;
-  }
-};
