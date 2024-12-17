@@ -11,13 +11,16 @@ import ImageManagement from "../pages/Admin/ImageManagement";
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<AdminPage />} />
-      <Route path="/ProductManagement" element={<ProductManagement />} />
-      <Route path="/UserManagement" element={<UserManagement />} />
-      <Route path="/OrderManagement" element={<OrderManagement />} />
-      <Route path="/CategoryManagement" element={<CategoryManagement />} />
-      <Route path="/FavoriteManagement" element={<FavoriteManagement />} />
-      <Route path="/ImageManagement" element={<ImageManagement />} />
+      {/* Admin Ana Sayfası */}
+      <Route index element={<AdminPage />} />
+
+      {/* Admin Alt Rotaları */}
+      <Route path="ProductManagement" element={<ProductManagement />} />
+      <Route path="UserManagement" element={<UserManagement />} />
+      <Route path="OrderManagement" element={<OrderManagement />} />
+      <Route path="CategoryManagement" element={<CategoryManagement />} />
+      <Route path="FavoriteManagement" element={<FavoriteManagement />} />
+      <Route path="ImageManagement" element={<ImageManagement />} />
     </Routes>
   );
 };

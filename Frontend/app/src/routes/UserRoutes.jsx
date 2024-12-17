@@ -1,7 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Homepage from "../pages/User/Homepage";
-import Login from "../pages/User/Login";
 import Profile from "../pages/User/Profile";
 import Products from "../pages/User/Products";
 import Delivery from "../pages/Delivery";
@@ -15,12 +14,11 @@ import Payment from "../pages/User/Payment";
 const UserRoutes = () => {
   return (
     <Routes>
-      {/* Varsayılan rota (Homepage) */}
+      {/* Kullanıcı Ana Sayfası */}
       <Route index element={<Homepage />} />
 
-      {/* Kullanıcı rotaları */}
+      {/* Kullanıcı Alt Rotaları */}
       <Route path="Profile" element={<Profile />} />
-      <Route path="Login" element={<Login />} />
       <Route path="SignUp" element={<SignUp />} />
       <Route path="Products" element={<Products />} />
       <Route path="Delivery" element={<Delivery />} />

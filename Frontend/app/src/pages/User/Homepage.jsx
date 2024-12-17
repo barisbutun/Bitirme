@@ -6,33 +6,35 @@ import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import ProductCard from "../../components/ProductCard";
 import FilterComponent from "../../components/FilterComponent";
-// import {
-//   fetchProducts,
-//   fetchProductImages,
-// } from "../services/ProductService/ProductService";
+import {
+  fetchProducts,
+  fetchProductImages,
+} from "../../services/ProductService/ProductService";
 const Homepage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem("token");
 
-        // JSON dosyasından ürün verilerini al
-        const response = await fetch("/products.json"); // JSON dosyasının yolu
-        if (!response.ok) {
-          throw new Error("JSON dosyası yüklenemedi");
-        }
+        // Ürünleri servis katmanından al
+        const productsData = await fetchProducts(token);
 
-        const productsData = await response.json();
+        // Resimleri ekle
+        const productsWithImages = await Promise.all(
+          productsData.map(async (product) => {
+            const images = await fetchProductImages(product.id, token);
+            return { ...product, images };
+          })
+        );
 
-        // JSON'dan gelen verileri doğrudan state'e aktar
-        setProducts(productsData);
-        setFilteredProducts(productsData);
+        setProducts(productsWithImages);
+        setFilteredProducts(productsWithImages);
       } catch (error) {
         setError(error.message);
       } finally {

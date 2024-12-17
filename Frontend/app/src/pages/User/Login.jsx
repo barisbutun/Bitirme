@@ -16,35 +16,35 @@ const LoginForm = () => {
   const [userCaptcha, setUserCaptcha] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      const token = localStorage.getItem("token");
-      const roles = decodeToken(token);
-
-      if (roles.includes("admin")) {
-        navigate("/admin");
-      } else if (roles.includes("user")) {
-        navigate("/user");
-      } else {
-        setError("Geçersiz kullanıcı rolü");
-      }
-    } catch (err) {
-      setError(err.message || "Giriş sırasında hata oluştu");
-    }
-  };
-  //  ###############################################
   // const handleLogin = async (e) => {
   //   e.preventDefault();
   //   try {
-  //     const user = await login(email, password);
-  //     console.log("Giriş başarılı:", user);
-  //     navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
-  //   } catch (error) {
-  //     setError(error.message || "Giriş sırasında bir hata oluştu");
+  //     await login(email, password);
+  //     const token = localStorage.getItem("token");
+  //     const roles = decodeToken(token);
+
+  //     if (roles.includes("admin")) {
+  //       navigate("/admin");
+  //     } else if (roles.includes("user")) {
+  //       navigate("/user");
+  //     } else {
+  //       setError("Geçersiz kullanıcı rolü");
+  //     }
+  //   } catch (err) {
+  //     setError(err.message || "Giriş sırasında hata oluştu");
   //   }
   // };
+  //  ###############################################
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const user = await login(email, password);
+      console.log("Giriş başarılı:", user);
+      navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
+    } catch (error) {
+      setError(error.message || "Giriş sırasında bir hata oluştu");
+    }
+  };
   // ###############################################
 
   //google giriş fonksiyonu

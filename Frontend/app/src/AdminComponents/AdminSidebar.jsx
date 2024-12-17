@@ -27,45 +27,45 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
     {
       key: "1",
       icon: <HomeOutlined />,
-      label: <Link to="/AdminPage">Anasayfaya </Link>,
+      label: <Link to="/admin/AdminPage">Anasayfaya </Link>,
     },
     {
       key: "2",
       icon: <UserOutlined />,
-      label: <Link to="/UserManagement">Kullanıcı İşlemleri</Link>,
+      label: <Link to="/admin/UserManagement">Kullanıcı İşlemleri</Link>,
     },
     {
       key: "3",
       icon: <AppstoreOutlined />,
-      label: <Link to="/CategoryManagement">Kategori İşlemleri</Link>,
+      label: <Link to="/admin/CategoryManagement">Kategori İşlemleri</Link>,
     },
     {
       key: "4",
       icon: <AppstoreOutlined />,
-      label: <Link to="/ProductManagement">Ürün İşlemleri</Link>,
+      label: <Link to="/admin/ProductManagement">Ürün İşlemleri</Link>,
     },
 
     {
       key: "5",
       icon: <ShoppingOutlined />,
-      label: <Link to="/Orders">Sipariş İşlemleri</Link>,
+      label: <Link to="/admin/Orders">Sipariş İşlemleri</Link>,
     },
 
     {
       key: "6",
       icon: <FileImageFilled />,
-      label: <Link to="/ImageManagement">Resim İşlemleri</Link>,
+      label: <Link to="/admin/ImageManagement">Resim İşlemleri</Link>,
     },
 
     {
       key: "7",
       icon: <HeartOutlined />,
-      label: <Link to="/FavoriteManagement">Favori İşlemleri</Link>,
+      label: <Link to="/admin/FavoriteManagement">Favori İşlemleri</Link>,
     },
     {
       key: "8",
       icon: <SettingOutlined />,
-      label: <Link to="/settings">Ayarlar</Link>,
+      label: <Link to="/admin/settings">Ayarlar</Link>,
     },
   ];
 
