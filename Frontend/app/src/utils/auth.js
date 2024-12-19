@@ -1,11 +1,15 @@
 import { jwtDecode } from "jwt-decode"; // jwt-decode kütüphanesini import ediyoruz
 
+export const getToken = () => {
+  return localStorage.getItem('token'); // 'token' localStorage'da saklanıyor
+};
+
 // Token'dan rolleri çözümleyen fonksiyon
 export const decodeToken = (token) => {
   if (token) {
     try {
       const decodedToken = jwtDecode(token);  // Token'ı decode ediyoruz
-      console.log("decoded token:",decodedToken);
+      // console.log("decoded token:",decodedToken);
       return decodedToken.roles || [];  // Kullanıcı rolleri döndürülüyor yoksa boş dizi
     } catch (error) {
       console.error("Token'ı çözümleme sırasında hata:", error);
@@ -23,8 +27,8 @@ export const getUserIdFromToken = () => {
 
   try {
     const decodedToken = jwtDecode(token);
-    console.log("Çözümlenmiş Token:", decodedToken);  
-    console.log("Kullanıcı ID:", decodedToken.userId);  
+    // console.log("Çözümlenmiş Token:", decodedToken);  
+    // console.log("Kullanıcı ID:", decodedToken.userId);  
     return decodedToken.userId;  // UserId'yi döndürüyoruz
   } catch (error) {
     console.error("Token decode hatası:", error.message);  

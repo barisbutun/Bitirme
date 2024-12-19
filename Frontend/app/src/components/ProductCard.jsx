@@ -29,26 +29,36 @@ function ProductCard({
     return favorites.includes(id);
   });
 
-  const addToCartHandler = async () => {
+  const addToCartHandler = async (id) => {
+    // Kullanıcının giriş yapıp yapmadığını kontrol et
     if (!isLoggedIn()) {
       notification.info({
         message: "Giriş Yapın",
         description: "Sepete ürün eklemek için giriş yapmalısınız.",
         placement: "topRight",
       });
-      navigate("/Login");
+      navigate("/Login"); // Giriş sayfasına yönlendir
       return;
     }
 
-    const shoppingCartItemDto = { productId: id, quantity: 1 }; // Sepete eklenecek ürün verisi
+    // Sepete eklenecek ürün verisini doğrudan oluşturuyoruz
+    const productData = {
+      productId: id,
+      quantity: 1,
+    };
+
     try {
-      await addToCart(shoppingCartItemDto);
+      // Sepete ekleme işlemini servisteki fonksiyona gönderiyoruz
+      await addToCart(productData); // Servis katmanındaki fonksiyonu çağırıyoruz
+
+      // Başarılı olduğunda bildirim göster
       notification.success({
         message: "Sepete Eklendi",
         description: "Ürün başarıyla sepete eklendi.",
         placement: "topRight",
       });
     } catch (error) {
+      // Hata durumunda bildirim göster
       notification.error({
         message: "Hata",
         description: "Sepete ekleme sırasında bir sorun oluştu.",

@@ -16,7 +16,7 @@ export const fetchProducts = async () => {
     }
 
     const products = await response.json();
-    console.log("API'den gelen ürün verisi:", products);
+    // console.log("API'den gelen ürün verisi:", products);
     return products;
   } catch (error) {
     console.error("fetchProducts Error:", error);
