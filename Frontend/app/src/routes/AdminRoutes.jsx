@@ -11,10 +11,9 @@ import ImageManagement from "../pages/Admin/ImageManagement";
 const AdminRoutes = () => {
   return (
     <Routes>
-      {/* Admin Ana Sayfası */}
+      {/* admin anasayfa */}
       <Route index element={<AdminPage />} />
 
-      {/* Admin Alt Rotaları */}
       <Route path="ProductManagement" element={<ProductManagement />} />
       <Route path="UserManagement" element={<UserManagement />} />
       <Route path="OrderManagement" element={<OrderManagement />} />

@@ -21,7 +21,9 @@ const Homepage = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
-
+        if (!token) {
+          throw new Error("Kullanıcı giriş yapmamış.");
+        }
         // Ürünleri servis katmanından al
         const productsData = await fetchProducts(token);
 
@@ -37,11 +39,11 @@ const Homepage = () => {
         setFilteredProducts(productsWithImages);
       } catch (error) {
         setError(error.message);
+        console.error("Ürünler yüklenirken hata oluştu:", error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchAllProducts();
   }, []);
 

@@ -22,7 +22,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     {
       key: "1",
       icon: <HomeOutlined />,
-      label: <Link to="/user/Homepage">Anasayfaya </Link>,
+      label: <Link to="/Homepage">Anasayfaya </Link>,
     },
     {
       key: "2",

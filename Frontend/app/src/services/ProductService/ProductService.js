@@ -2,13 +2,12 @@
 
 const API_BASE_URL = "http://localhost:8082/api";
 
-export const fetchProducts = async (token) => {
+export const fetchProducts = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/product/v1/home`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -25,13 +24,10 @@ export const fetchProducts = async (token) => {
   }
 };
 
-export const fetchProductImages = async (productId, token) => {
+export const fetchProductImages = async (productId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/image/v1/infos/${productId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      method: "GET"
     });
 
     if (!response.ok) {
@@ -45,5 +41,3 @@ export const fetchProductImages = async (productId, token) => {
     throw error;
   }
 };
-
-
