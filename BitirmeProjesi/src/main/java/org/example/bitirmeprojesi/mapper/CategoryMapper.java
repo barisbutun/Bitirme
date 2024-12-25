@@ -17,6 +17,7 @@ public interface CategoryMapper {
 
     List<CategoryDto> toDtoList(final List<Category> categoryList);
 
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(final CategoryDto categoryDto, @MappingTarget final Category category);
 

@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.Category;
-import org.example.bitirmeprojesi.entity.Image;
 import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.CategoryNotFoundException;
@@ -19,10 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class ProductService {
         }
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR, productDto.getCategoryId()));
+                .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
         Product product = productMapper.toEntity(productDto);
         product.setCategory(category);

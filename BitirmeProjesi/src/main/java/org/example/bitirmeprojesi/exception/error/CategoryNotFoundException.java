@@ -4,8 +4,8 @@ public class CategoryNotFoundException extends RuntimeException {
 
 
     private long id;
-    public CategoryNotFoundException(String message, long id) {
+    public CategoryNotFoundException(String message) {
         super(message);
-        this.id = id;
+
     }
 }

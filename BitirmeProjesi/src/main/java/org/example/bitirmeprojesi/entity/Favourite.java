@@ -25,8 +25,6 @@ public class Favourite implements Serializable {
             @JoinColumn(name = "user_id", referencedColumnName = "id"),
             @JoinColumn(name = "user_name", referencedColumnName = "name")
     })
-
-
     private User user;
 
     @ManyToOne

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.bitirmeprojesi.enums.StockState;
 
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;

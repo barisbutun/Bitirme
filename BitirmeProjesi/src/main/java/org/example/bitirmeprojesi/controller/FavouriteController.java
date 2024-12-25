@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,12 +23,19 @@ public class FavouriteController {
     @PostMapping("/v1")
     public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         Jwt jwt = (Jwt) authentication.getPrincipal();
-
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
         return ResponseEntity.ok(favouriteService.create(favouriteDto, userId));
     }
+
+    @GetMapping("/v1/getAllByUserId")
+    public ResponseEntity<List<FavouriteDto>> getlAllByUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        return ResponseEntity.ok(favouriteService.getlAllByUserId(userId));
+    }
+
 
     @GetMapping("/v1/{id}")
     public ResponseEntity<FavouriteDto> findById(long id) {

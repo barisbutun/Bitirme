@@ -21,8 +21,6 @@ import java.util.UUID;
 public class FavouriteDto implements Serializable {
     @JsonIgnore
     private long id;
-    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
-    private UUID userId;
     @JsonProperty("product_id")
     private long productId;
     @JsonProperty("category_id")

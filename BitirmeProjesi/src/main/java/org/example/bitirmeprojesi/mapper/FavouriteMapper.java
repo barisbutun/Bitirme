@@ -11,8 +11,13 @@ import java.util.List;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface FavouriteMapper {
 
+
+    @Mapping(source = "productId", target = "product.id")
+    @Mapping(source = "categoryId", target = "category.id")
     Favourite toEntity(FavouriteDto favouriteDto);
 
+    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "category.id", target = "categoryId")
     FavouriteDto toDto(Favourite favourite);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

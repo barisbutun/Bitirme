@@ -1,4 +1,4 @@
-package org.example.bitirmeprojesi.security;
+package org.example.bitirmeprojesi.configuration;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -17,6 +17,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,8 +36,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -69,8 +73,9 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/user/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/auth/v1/login").permitAll();
                     auth.requestMatchers("/api/auth/v1/register").permitAll();
-                    auth.requestMatchers("/api/admin").hasRole(Role.ADMIN.name());
+                    auth.requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name());
                     auth.requestMatchers("/api/order/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/api/favourite/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/shoppingCartItem/v1").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
                     auth.anyRequest().permitAll();
@@ -111,7 +116,18 @@ public class SecurityConfiguration {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
 
         jwtConverter.setPrincipalClaimName("userId");
-        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            Object roles = jwt.getClaims().get("roles");
+
+            if (roles instanceof String) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + roles));
+            } else if (roles instanceof List<?>) {
+                ((List<?>) roles).forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+            }
+
+            return authorities;
+        });
         return jwtConverter;
     }
 
@@ -121,6 +137,7 @@ public class SecurityConfiguration {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Collections.singletonList("http://192.168.90.16:3000"));
         config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+        config.setAllowedOrigins(Collections.singletonList("http://localhost:9600"));
         config.setAllowedOrigins(Collections.singletonList("http://192.168.1.113:3000"));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH"));
