@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class OrdersDto implements Serializable {
     String name;
 
     @JsonProperty("sale_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime saleDate;
 
     @JsonProperty("sum_price")

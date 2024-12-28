@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,7 +30,9 @@ public class Orders implements Serializable {
     private String name;
 
     @Column(name = "sale_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime saleDate;
+
 
     @Column(name = "sum_price")
     private double sumPrice;

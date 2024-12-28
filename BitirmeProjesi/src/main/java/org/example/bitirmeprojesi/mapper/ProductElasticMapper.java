@@ -2,7 +2,6 @@ package org.example.bitirmeprojesi.mapper;
 
 
 import org.example.bitirmeprojesi.dto.ProductDto;
-import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.entity.ProductElastic;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

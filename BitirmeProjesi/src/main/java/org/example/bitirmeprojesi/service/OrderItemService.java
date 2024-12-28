@@ -14,10 +14,18 @@ public class OrderItemService {
     private final OrderMapper orderMapper;
     private final OrderItemRepository orderItemRepository;
 
-    public OrderItemDto create(OrderItemDto orderItemDto) {
-        OrderItem orderItem = orderMapper.toOrderItem(orderItemDto);
-        orderItemRepository.save(orderItem);
-        return orderMapper.toOrderItemDto(orderItem);
-    }
 
+    public OrderItem create(OrderItem orderItem) {
+        // ShoppingCartItem ID ve quantity kombinasyonuyla mevcut bir OrderItem var mı kontrol et
+        OrderItem existingOrderItem = orderItemRepository.findByShoppingCartItemIdAndShoppingCartItemQuantity(
+                orderItem.getShoppingCartItem().getId(), orderItem.getShoppingCartItem().getQuantity());
+
+        // Eğer varsa, yeni bir kayıt ekleme, mevcut kaydı döndür
+        if (existingOrderItem != null) {
+            return existingOrderItem;
+        }
+
+        // Eğer yoksa, yeni OrderItem oluştur ve kaydet
+        return orderItemRepository.save(orderItem);
+    }
 }

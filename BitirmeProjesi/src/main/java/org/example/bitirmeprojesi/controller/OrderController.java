@@ -28,7 +28,7 @@ public class OrderController {
         Jwt jwt= (Jwt) authentication.getPrincipal();
 
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-        return ResponseEntity.ok(orderService.create(userId, ordersDto));
+        return ResponseEntity.ok(orderService.create(ordersDto, userId));
     }
 
     @GetMapping("/v1/{id}")

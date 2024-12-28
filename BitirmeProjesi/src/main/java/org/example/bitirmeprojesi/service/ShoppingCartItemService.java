@@ -13,10 +13,9 @@ import org.example.bitirmeprojesi.mapper.ShoppingCartItemMapper;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
+import org.example.bitirmeprojesi.validator.ShoppingCartItemValidator;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-
 import java.util.UUID;
 
 @Service
@@ -27,7 +26,9 @@ public class ShoppingCartItemService {
     private final ShoppingCartItemMapper shoppingCartItemMapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ShoppingCartItemValidator shoppingCartItemValidator;
 
+    @Transactional
     public ShoppingCartItemDto create(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
 
         User user=userRepository.findById(userId)
@@ -35,6 +36,7 @@ public class ShoppingCartItemService {
         Product product=productRepository.findById(shoppingCartItemDto.getProductId())
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
 
+        shoppingCartItemValidator.validateStockState(product,shoppingCartItemDto.getQuantity());
         ShoppingCartItem shoppingCartItem = shoppingCartItemMapper.toEntity(shoppingCartItemDto);
         shoppingCartItem.setUser(user);
         shoppingCartItem.setProduct(product);

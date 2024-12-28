@@ -85,6 +85,14 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.USER_ID_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<Object> shoppingCartOverFlowExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INSUFFICIENT_STOCK_ERROR, HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler(QueryNotFoundException.class)
     public ResponseEntity<Object> queryNotFoundExceptionHandler(Exception ex) {
         log.error(ex.getLocalizedMessage(), ex);

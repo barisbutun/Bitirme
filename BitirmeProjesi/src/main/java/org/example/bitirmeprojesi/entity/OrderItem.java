@@ -17,17 +17,34 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "order_id")
     private Orders order;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
+
+    @OneToOne(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+        @JoinColumns({
+                @JoinColumn(name = "shopping_cart_item_id", referencedColumnName = "id"),
+                @JoinColumn(name = "shopping_cart_item_quantity", referencedColumnName = "quantity")
+        })
+    private ShoppingCartItem shoppingCartItem;
+
+
 
 }

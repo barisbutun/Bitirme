@@ -47,7 +47,7 @@ public class AuthenticationService {
             String token = tokenService.generateJwt(auth);
 
             if (isAdmin(user)) {
-                return new LoginResponseDto(token); // Admin kullanıcı için yanıt
+                return new LoginResponseDto(token);
             }
 
             return new LoginResponseDto(token);

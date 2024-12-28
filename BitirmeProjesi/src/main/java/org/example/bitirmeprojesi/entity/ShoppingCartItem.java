@@ -27,6 +27,7 @@ public class ShoppingCartItem {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference

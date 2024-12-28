@@ -9,6 +9,8 @@ import org.example.bitirmeprojesi.entity.OrderItem;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.entity.ShoppingCartItem;
 import org.example.bitirmeprojesi.entity.User;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
 import org.example.bitirmeprojesi.mapper.OrderItemMapper;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderItemRepository;
@@ -35,44 +37,36 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
-    private final TokenService tokenService;
+    private final OrderItemService orderItemService;
 
-    @Transactional
-    public OrdersDto create(UUID userId, OrdersDto ordersDto) {
-
-        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
-
-        if (shoppingCartItems.isEmpty()) {
-            throw new NoSuchElementException("Sepetinizde ürün bulunmamaktadır!");
-        }
-
+    public OrdersDto create(OrdersDto ordersDto,UUID userId){
+        User user=userRepository.findById(userId).orElseThrow(() ->new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
         Orders orders = orderMapper.toEntity(ordersDto);
-        orders = orderRepository.save(orders);  // İlk kaydetme, ID oluşturma
-
+        orders.setUser(user);
+        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
+        orderRepository.save(orders);
         Orders finalOrders = orders;
+        List<OrderItem> orderItems = shoppingCartItems.stream().map(shoppingCartItem -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(shoppingCartItem.getProduct());
+            orderItem.setShoppingCartItem(shoppingCartItem);
+            orderItem.setUser(shoppingCartItem.getUser());
+            orderItem.setOrder(finalOrders);
+            return orderItemService.create(orderItem);
+        }).collect(Collectors.toList());
 
-        List<OrderItem> orderItems = shoppingCartItems.stream()
-                .map(shoppingCartItem -> {
-                    OrderItem orderItem = orderItemMapper.toOrderItem(shoppingCartItem);
-                    orderItem.setOrder(finalOrders);
-                    return orderItem;
-                })
-                .collect(Collectors.toList());
 
-        // Ürün isimlerini virgülle birleştirerek Orders name alanına ekliyoruz.
+        orders.setOrderItems(orderItems);
+
         String productNames = orderItems.stream()
                 .map(orderItem -> orderItem.getProduct().getName())
                 .collect(Collectors.joining(", "));
 
-        finalOrders.setName(productNames);
         orderValidator.sumPriceCalculating(orders);
-        orderRepository.save(finalOrders);  // Name alanı güncelleniyor.
-
+        finalOrders.setName(productNames);
         orderItemRepository.saveAll(orderItems);
-
-        shoppingCartItemRepository.deleteAllByUserId(userId);
-
         return orderMapper.toDto(orders);
+
     }
 
 
@@ -113,58 +107,3 @@ public class OrderService {
         return orderMapper.toDtoList(ordersList);
     }
 }
-
- /* UUID uuidUserId = UUID.fromString(userId);
-        List<OrderItem> orderItems = orderItemRepository.findByUserId(uuidUserId);
-        if (orderItems.isEmpty()) {
-            throw new RuntimeException("Sepetinizde ürün bulunmamaktadır!");
-        }
-
-        Orders orders = orderMapper.toEntity(ordersDto);
-
-        for (OrderItem orderItem : orderItems) {
-            orderItem.setOrder(orders);
-        }
-        orderValidator.sumPriceCalculating(orders);
-
-        orders.setOrderItems(orderItems);
-        Orders savedOrder = orderRepository.save(orders);
-
-        return orderMapper.toDto(savedOrder);*/
-
-       /* UUID uuidUserId = UUID.fromString(userId);
-        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(uuidUserId);
-        if (shoppingCartItems.isEmpty()) {
-            throw new RuntimeException("Sepetinizde ürün bulunmamaktadır!");
-        }
-        Orders orders = orderMapper.toEntity(ordersDto);
-        for(ShoppingCartItem shoppingCartItem : shoppingCartItems){
-            OrderItem orderItem = new OrderItem();
-            orderItemMapper.toOrderItem(shoppingCartItem);
-        }
-        orderRepository.save(orders);
-        orderItemRepository.saveAll(shoppingCartItems);
-        return orderMapper.toDto(orders);*/
-      /*  UUID uuidUserId = UUID.fromString(userId);
-        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(uuidUserId);
-        if (shoppingCartItems.isEmpty()) {
-            throw new RuntimeException("Sepetinizde ürün bulunmamaktadır!");
-        }
-
-        Orders orders = orderMapper.toEntity(ordersDto);
-        orders = orderRepository.save(orders); // Önce siparişi kaydediyoruz.
-
-        Orders finalOrders = orders;
-        List<OrderItem> orderItems = shoppingCartItems.stream()
-                .map(shoppingCartItem -> {
-                    OrderItem orderItem = orderItemMapper.toOrderItem(shoppingCartItem);
-                    orderItem.setOrder(finalOrders); // Her OrderItem'a siparişi ekliyoruz.
-                    return orderItem;
-                })
-                .collect(Collectors.toList());
-
-        orderItemRepository.saveAll(orderItems); // OrderItem'ları kaydediyoruz.
-
-        shoppingCartItemRepository.deleteAllByUserId(uuidUserId); // Sepeti temizliyoruz.
-
-        return orderMapper.toDto(orders); // DTO'yu döndürüyoruz.*/
