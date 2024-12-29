@@ -20,17 +20,12 @@ const Homepage = () => {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Kullanıcı giriş yapmamış.");
-        }
-        // Ürünleri servis katmanından al
-        const productsData = await fetchProducts(token);
+        const productsData = await fetchProducts();
 
         // Resimleri ekle
         const productsWithImages = await Promise.all(
           productsData.map(async (product) => {
-            const images = await fetchProductImages(product.id, token);
+            const images = await fetchProductImages(product.id);
             return { ...product, images };
           })
         );

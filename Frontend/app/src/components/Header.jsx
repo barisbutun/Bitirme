@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Layout, theme, Input, Button, Drawer, Menu } from "antd";
 import "../css/Header.css";
 import FilterComponent from "./FilterComponent";
-import { Link } from "react-router-dom";
+import { logout } from "../services/UserService/AuthService";
+import { Link, useNavigate } from "react-router-dom";
 import {
   UserOutlined,
   ShoppingCartOutlined,
@@ -14,14 +15,27 @@ const { Header } = Layout;
 const { Search } = Input;
 
 const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    if (logout()) {
+      navigate("/");
+    } else {
+      console.error("Çıkış işlemi başarısız.");
+    }
+  };
+
   const items = [
     {
       key: "1",
       icon: <UserOutlined />, // Profilim ikonu
       label: <Link to="/">Giriş Yap</Link>, // Profilim sayfasına yönlendirme
       children: [
-        { key: "11", label: <Link to="/SignUp">Kayıt Ol</Link> },
+        { key: "11", label: <Link to="/user/SignUp">Kayıt Ol</Link> },
         { key: "12", label: <Link to="/Login">Giriş Yap</Link> },
+        {
+          key: "13",
+          label: <span onClick={handleLogout}>Çıkış Yap</span>,
+        },
       ],
     },
   ];
@@ -70,11 +84,11 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
         <Menu mode="horizontal" defaultSelectedKeys={["2"]} items={items} />
 
         <Button icon={<ShoppingCartOutlined />}>
-          <Link to="/ShoppingCard">Sepetim</Link>
+          <Link to="/user/ShoppingCard">Sepetim</Link>
         </Button>
 
         <Button className="header-favorite" icon={<HeartOutlined />}>
-          <Link to="/Favorites">Favorilerim</Link>
+          <Link to="/user/Favorites">Favorilerim</Link>
         </Button>
 
         {/* Filtreleme butonu */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   UserOutlined,
   SettingOutlined,
@@ -10,13 +10,20 @@ import {
   ShoppingOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/Sidebar.css";
-import { decodeToken } from "../utils/auth";
-
+import { logout } from "../services/UserService/AuthService";
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    if (logout()) {
+      navigate("/");
+    } else {
+      console.error("Çıkış işlemi başarısız.");
+    }
+  };
   // Rol durumuna göre filtrelenmiş menü öğeleri
   const items = [
     {
@@ -36,6 +43,10 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       children: [
         { key: "31", label: <Link to="/user/SignUp">Kayıt Ol</Link> },
         { key: "32", label: <Link to="/Login">Giriş</Link> },
+        {
+          key: "13",
+          label: <span onClick={handleLogout}>Çıkış Yap</span>,
+        },
       ],
     },
     {

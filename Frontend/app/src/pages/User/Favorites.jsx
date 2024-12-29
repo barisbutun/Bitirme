@@ -15,7 +15,6 @@ const Favorites = () => {
 
   useEffect(() => {
     fetchFavorites((data) => {
-      // Backend'den dönen veriyi doğru şekilde işleyin
       const formattedData = data.map((item) => ({
         id: item.id || null, // Favori ID
         name: item.product?.name || "Ürün Adı Yok", // Product Name

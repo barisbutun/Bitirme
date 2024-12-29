@@ -71,8 +71,16 @@ export const login = async (email, password) => {
 
 
 // Kayıt işlemi
-export const Register = async (userDetails) => {
+export const Register = async (username, name, email, password, address, phone) => {
   try {
+    const userDetails = {
+      username: username,
+      name: name,
+      email: email,
+      password: password,
+      address: address,
+      phone: phone,
+    };
     const response = await fetch(`${API_BASE_URL}/register`, {
       method: "POST",
       headers: {
@@ -96,7 +104,13 @@ export const Register = async (userDetails) => {
 
 // Çıkış işlemi
 export const logout = () => {
+ try {
   localStorage.removeItem("token");
+  return true;
+ } catch (error) {
+  console.error("Çıkış yaparak hata oluştu:",error);
+  return false;
+ }
 };
 
 // Token'ı al

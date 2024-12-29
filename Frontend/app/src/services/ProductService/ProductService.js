@@ -3,7 +3,7 @@
 const API_BASE_URL = "http://localhost:8082/api";
 
 export const fetchProducts = async () => {
-  try {
+  try { 
     const response = await fetch(`${API_BASE_URL}/product/v1/home`, {
       method: "GET",
       headers: {

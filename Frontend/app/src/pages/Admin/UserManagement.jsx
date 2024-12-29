@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Layout } from "antd";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import FilterComponent from "../../components/FilterComponent";
-
+import User from "../../AdminComponents/UserComponent";
+import "../Admin/AdminCss/UserManagement.css";
 const Homepage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -29,7 +30,9 @@ const Homepage = () => {
         <Header collapsed={collapsed} setCollapsed={setCollapsed}>
           <FilterComponent onApplyFilter={handleApplyFilter} />
         </Header>
-        <div className="content">Kullanıcı İşlemleri Sayfası</div>
+        <div>
+          <User />
+        </div>
         <Footer />
       </Layout>
     </Layout>

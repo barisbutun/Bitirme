@@ -26,12 +26,12 @@ const tailFormItemLayout = {
 
 const SignUp = () => {
   const [form] = Form.useForm();
-  const [Name, setName] = useState("");
+  const [name, setName] = useState("");
   const [user_name, setUsername] = useState("");
-  const [useremail, setUseremail] = useState("");
-  const [userpassword, setUserpassword] = useState("");
-  const [useraddress, setUseraddress] = useState("");
-  const [userphone, setUserphone] = useState("");
+  const [email, setUseremail] = useState("");
+  const [password, setUserpassword] = useState("");
+  const [address, setUseraddress] = useState("");
+  const [phone, setUserphone] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -67,22 +67,19 @@ const SignUp = () => {
   //     setMessage("Kayıt sırasında hata oluştu:");
   //   }
   // };
-  const registerUser = async (e) => {
+  const registerUser = async () => {
     try {
       const response = await Register(
         user_name,
-        Name,
-        useremail,
-        userpassword,
-        useraddress,
-        userphone,
-        setMessage,
+        name,
+        email,
+        password,
+        address,
+        phone,
         navigate
       );
-
-      const savedUser = await response.json();
-      if (response.ok) {
-        setMessage(" Kayıt başarılı:", savedUser);
+      if (response) {
+        setMessage(" Kayıt başarılı:");
         navigate("/Login");
       } else {
         setMessage("Kayıt başarısız: {$data.message}");
@@ -123,10 +120,11 @@ const SignUp = () => {
       >
         <Input
           className="form-input"
-          value={Name}
+          value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </Form.Item>
+
       <Form.Item
         name="username"
         label="Kullanıcı İsmi"
@@ -156,7 +154,7 @@ const SignUp = () => {
       >
         <Input
           className="form-input"
-          value={useremail}
+          value={email}
           onChange={(e) => setUseremail(e.target.value)}
         />
       </Form.Item>
@@ -169,7 +167,7 @@ const SignUp = () => {
       >
         <Input.Password
           className="form-input"
-          value={userpassword}
+          value={password}
           onChange={(e) => setUserpassword(e.target.value)}
         />
       </Form.Item>
@@ -204,7 +202,7 @@ const SignUp = () => {
       >
         <Input
           className="form-input"
-          value={useraddress}
+          value={address}
           onChange={(e) => setUseraddress(e.target.value)}
         />
       </Form.Item>
@@ -219,7 +217,7 @@ const SignUp = () => {
         <Input
           addonBefore={prefixSelector}
           className="form-input"
-          value={userphone}
+          value={phone}
           onChange={(e) => setUserphone(e.target.value)}
         />
       </Form.Item>

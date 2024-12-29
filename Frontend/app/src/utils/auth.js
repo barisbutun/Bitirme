@@ -18,7 +18,7 @@ export const decodeToken = (token) => {
   return [];  // Token yoksa null döndürülür
 };
 
-export const getUserIdFromToken = () => {
+export const getUserIdFromToken = () => { 
   const token = localStorage.getItem("token");  // Token'ı localStorage'dan alıyoruz
   if (!token) {
     console.warn("Token bulunamadı.");  

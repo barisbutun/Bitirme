@@ -5,32 +5,30 @@ const API_BASE_URL = "http://localhost:8082/api/favourite/v1";
 
 
 // Favori Ekleme
-export const addFavorite = async (product, navigate) => {
+export const addFavorite = async (product) => {
     const token = localStorage.getItem("token");
-    const userId = getUserIdFromToken(token);
-  
-    if (!userId) {
-      notification.info({
+    if(!token){
+  notification.info({
         message: "Giriş Yapın",
         description: "Favori eklemek için giriş yapmalısınız.",
         placement: "topRight",
       });
-      navigate("/Login");
+       
       return;
+    }
+    const userId = getUserIdFromToken(token);
+    if (!userId) {
+      throw new Error("Geçersiz token.");
     }
   
     // Ürün bilgilerini içeren favori verisi oluştur
     const favoriteData = {
-      userId,
-      productId: product.id, 
-      productName: product.name, 
-      productPrice: product.price, 
-      productImage: product.image1, 
-      productStock: product.stock, 
+      product_id: product.id, 
+      category_id:product.category_id
     };
   
     try {
-      const response = await fetch(`${API_BASE_URL}`, {
+      const response = await fetch(`http://localhost:8082/api/favourite/v1`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,26 +62,31 @@ export const addFavorite = async (product, navigate) => {
   };
   
 // Favori Silme
-export const removeFavorite = (id, setFavoriteProducts) => {
-    if (!id) {
-      console.error("Favori ID değeri bulunamadı!");
-      return;
+export const removeFavorite = async (id) => {
+  const token=localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("Giriş yapmalısınız");
     }
   
-    // Favoriden çıkarma isteği gönder
-    fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" })
-      .then((response) => {
-        if (!response.ok) throw new Error("Favoriden çıkarılamadı.");
-        // Favoriler listesini güncelle
-        setFavoriteProducts((prevFavorites) =>
-          prevFavorites.filter((product) => product.id !== id)
-        );
-      })
-      .catch((error) => console.error("Hata:", error.message));
-  };
-  
+   try{
+    const response=await fetch(`${API_BASE_URL}/${id}`,{
+      method:"DELETE",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:`Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Favoriden çıkarma sırasında bir hata oluştu.");
+    }
 
-
+    return true; // Favori silme başarılıysa true döndür
+  } catch (error) {
+    throw new Error(error.message || "Bir hata oluştu.");
+  }
+};
+   
 // Favori Bilgilerini Çekme
 export const fetchFavorites = async (setFavoriteProducts) => {
   const token = localStorage.getItem("token");
@@ -95,7 +98,7 @@ export const fetchFavorites = async (setFavoriteProducts) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/?userId=${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/getAllUser`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

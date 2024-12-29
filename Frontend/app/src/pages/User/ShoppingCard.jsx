@@ -66,9 +66,9 @@ const ShoppingCard = () => {
       render: (image) => <img className="image" src={image} alt="Ürün Resmi" />, // Resmi gösteriyoruz
     },
     {
-      title: "Ürün Adı", // Product Name
-      dataIndex: "name", // name alanını kullanıyoruz
-      key: "name",
+      title: "Ürün id", // Product Name
+      dataIndex: "id", // name alanını kullanıyoruz
+      key: "id",
     },
     {
       title: "Açıklama", // Description

@@ -21,15 +21,13 @@ const Products = () => {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
 
-        // Ürünleri servis katmanından al
-        const productsData = await fetchProducts(token);
+        const productsData = await fetchProducts();
 
         // Resimleri ekle
         const productsWithImages = await Promise.all(
           productsData.map(async (product) => {
-            const images = await fetchProductImages(product.id, token);
+            const images = await fetchProductImages(product.id);
             return { ...product, images };
           })
         );
