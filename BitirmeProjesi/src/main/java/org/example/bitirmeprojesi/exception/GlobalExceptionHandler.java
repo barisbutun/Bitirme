@@ -92,6 +92,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INSUFFICIENT_STOCK_ERROR, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidProductInformationException.class)
+    public ResponseEntity<Object> invalidProductInformationExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_PRODUCT_INFORMATION_ERROR, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(QueryNotFoundException.class)
     public ResponseEntity<Object> queryNotFoundExceptionHandler(Exception ex) {

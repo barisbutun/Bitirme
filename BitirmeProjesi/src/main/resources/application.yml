@@ -69,6 +69,8 @@ spring:
     password: 123456B
 
 
+
+
 server:
   port: 8082
 
@@ -79,6 +81,16 @@ datasource:
     idle-timeout: 30000
     connection-timeout: 20000
     pool-name: HikariPool
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+  loggers:
+    - name: org.springframework.web
+      level: ERROR
+  file:
+    path: C:\Users\Baris\OneDrive - ktun.edu.tr\Masaustu\SpringBoot\Bitirme Projesi\Bitirme\BitirmeProjesi\logs
 
 admin:
   email: f211220005@ktun.edu.tr

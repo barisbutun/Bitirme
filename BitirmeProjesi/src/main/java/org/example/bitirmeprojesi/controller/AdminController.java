@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.*;
 import org.example.bitirmeprojesi.service.AdminService;
@@ -20,7 +21,7 @@ public class AdminController {
 
     @PostMapping("/v1/product")
     public ResponseEntity<ProductDto> createProduct(
-            @RequestBody ProductDto productDto) throws Exception {
+           @Valid @RequestBody ProductDto productDto) throws Exception {
        adminService.createProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productDto);
     }

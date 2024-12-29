@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.entity.Product;
@@ -14,6 +15,7 @@ import org.example.bitirmeprojesi.mapper.ProductMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.example.bitirmeprojesi.repository.ImageRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
+import org.example.bitirmeprojesi.validator.ProductValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,12 +26,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
+    private final ProductValidator productValidator;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
 
@@ -38,14 +42,15 @@ public class ProductService {
         if (productDto.getCategoryId() == null) {
             throw new RuntimeException("Category ID is required");
         }
-
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
         Product product = productMapper.toEntity(productDto);
         product.setCategory(category);
+        productValidator.checkStokState(productDto);
         productRepository.save(product);
-
+        productDto.setId(product.getId());
+        log.info("Product created: {}", product);
         return productMapper.toDto(product);
     }
 
@@ -57,8 +62,10 @@ public class ProductService {
     }
 
     public List<ProductDto> findAll(int page, int size) {
+
         Pageable pageable =  PageRequest.of(page, size);
         Page<Product> productPage = productRepository.findAll(pageable);
+        log.info("Product Page: {}", productPage);
         return productMapper.toDtoList(productPage.getContent());
     }
 
