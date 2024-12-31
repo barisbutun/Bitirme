@@ -66,6 +66,7 @@ export const removeFromCart = async (id) => {
   }
 };
 
+
 // Kullanıcıya ait tüm ürünleri sepetten silme
 export const clearCartByUserId = async () => {
   const token = getToken();

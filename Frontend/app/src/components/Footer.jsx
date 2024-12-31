@@ -5,9 +5,7 @@ import "../css/Footer.css";
 const { Footer } = Layout;
 
 const FooterComponent = () => (
-  <Footer className="site-layout-footer">
-    Ant Design ©{new Date().getFullYear()} Created by Ant UED
-  </Footer>
+  <Footer className="site-layout-footer">Fashion Design</Footer>
 );
 
 export default FooterComponent;

@@ -78,6 +78,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
   return (
     <Sider
+      className="sidebar"
       collapsible
       collapsed={collapsed}
       trigger={null}

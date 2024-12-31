@@ -150,7 +150,7 @@ function ProductCard({
         </Button>
         <Button
           className="InceleButon"
-          onClick={() => navigate(`/ProductDetails/${id}`)}
+          onClick={() => navigate(`user/ProductDetails/${id}`)}
         >
           İncele
         </Button>

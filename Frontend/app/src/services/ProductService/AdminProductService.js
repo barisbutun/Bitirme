@@ -49,19 +49,27 @@ export const createProduct = async (productData) => {
 };
 
 export const updateProduct = async (id, product) => {
-  console.log(`Updating product with ID: ${id}`, product); // Debug log
-  const response = await fetch(`${API_URL}/product/${id}`, {
-    method: "PUT",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(product),
-  });
+  console.log(`Updating product with ID: ${id}`, product); 
+  try {
+    const response = await fetch(`${API_URL}/product/${id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(product),
+    });
 
-  if (!response.ok) {
-    console.error(`Error updating product: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error(`Error updating product: ${response.status} ${response.statusText}`, errorData);
+      throw new Error(errorData.message || "Ürün güncellenirken bir hata oluştu.");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Request failed:", error);
     throw new Error("Ürün güncellenirken bir hata oluştu.");
   }
-  return response.json();
 };
+
 
 export const deleteProduct = async (id) => {
   const response = await fetch(`${API_URL}/product/${id}`, {
@@ -76,17 +84,18 @@ export const deleteProduct = async (id) => {
 export const uploadProductImage = async (id, file) => {
   const formData = new FormData();
   formData.append("image", file);
-  
+
+ 
   const queryParams = new URLSearchParams({
-    productId: id.toString(),
-  }).toString();  // 'productId' query parametresini URL'ye ekliyoruz
+    productId: id, 
+  }).toString();
 
   const response = await fetch(`http://localhost:8082/api/admin/v1?${queryParams}`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${getToken()}`,  // Token ile yetkilendirme
+      Authorization: `Bearer ${getToken()}`,  
     },
-    body: formData,  // FormData'yı POST body olarak gönderiyoruz
+    body: formData, 
   });
 
   if (!response.ok) {
@@ -95,6 +104,7 @@ export const uploadProductImage = async (id, file) => {
 
   return response.json();
 };
+
 
 export const deleteProductImage = async (id) => {
   const response = await fetch(`${API_URL}/image/${id}`, {
@@ -138,4 +148,3 @@ export const Categories = async () => {
   }
   return response.json();
 };
-

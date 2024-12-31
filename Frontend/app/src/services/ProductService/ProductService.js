@@ -10,7 +10,7 @@ export const fetchProducts = async () => {
         "Content-Type": "application/json",
       },
     });
-
+ 
     if (!response.ok) {
       throw new Error("Ürün bilgileri alınamadı");
     }

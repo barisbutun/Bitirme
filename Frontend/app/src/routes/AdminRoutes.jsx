@@ -10,7 +10,7 @@ import ProductManagement from "../pages/Admin/ProductManagement";
 import AddProduct from "../pages/Admin/AddProduct";
 import UpdateProduct from "../pages/Admin/UpdateProduct";
 import DeleteProduct from "../pages/Admin/DeleteProduct";
-// import CategoryManagement from "../pages/Admin/CategoryManagement";
+import CategoryManagement from "../pages/Admin/CategoryManagement";
 // import ImageManagement from "../pages/Admin/ImageManagement";
 const AdminRoutes = () => {
   return (
@@ -28,7 +28,7 @@ const AdminRoutes = () => {
       {/* <Route path="DeleteOrders" element={<DeleteOrders />} /> */}
       <Route path="FavoriteManagement" element={<FavoriteManagement />} />
       {/* <Route path="ImageManagement" element={<ImageManagement />} /> */}
-      {/* <Route path="CategoryManagement" element={<CategoryManagement />} /> */}
+      <Route path="CategoryManagement" element={<CategoryManagement />} />
     </Routes>
   );
 };

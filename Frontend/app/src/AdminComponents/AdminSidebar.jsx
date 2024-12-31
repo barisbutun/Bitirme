@@ -6,6 +6,7 @@ import {
   AppstoreOutlined,
   ShoppingOutlined,
   HeartOutlined,
+  TagsOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
@@ -16,7 +17,6 @@ const { Sider } = Layout;
 
 const AdminSidebar = ({ collapsed, setCollapsed }) => {
   const [userRole, setUserRole] = useState(null);
-
   useEffect(() => {
     const role = decodeToken();
     setUserRole(role);
@@ -33,51 +33,49 @@ const AdminSidebar = ({ collapsed, setCollapsed }) => {
       icon: <UserOutlined />,
       label: <Link to="/admin/UserManagement">Kullanıcı İşlemleri</Link>,
     },
-
     {
       key: "3",
+      icon: <TagsOutlined />,
+      label: <Link to="/admin/CategoryManagement">Kategori İşlemleri</Link>,
+    },
+    {
+      key: "4",
       icon: <AppstoreOutlined />,
       label: <Link to="/admin/ProductManagement">Ürün İşlemleri</Link>,
       children: [
-        { key: 31, label: <Link to="/admin/AddProduct">Ürün Ekle</Link> },
+        { key: 41, label: <Link to="/admin/AddProduct">Ürün Ekle</Link> },
         {
-          key: 32,
+          key: 42,
           label: (
             <Link to="/admin/UpdateProduct">Ürün Bilgileri Güncelleme</Link>
           ),
         },
-        { key: 33, label: <Link to="/admin/DeleteProduct">Ürün Silme</Link> },
+        { key: 43, label: <Link to="/admin/DeleteProduct">Ürün Silme</Link> },
       ],
     },
 
     {
-      key: "4",
+      key: "5",
       icon: <ShoppingOutlined />,
       label: <Link to="/admin/Orders">Sipariş İşlemleri</Link>,
       children: [
         {
-          key: 41,
+          key: 51,
           label: <Link to="/admin/RegisteredOrders">Kayıtlı Siparişler</Link>,
         },
-        { key: 42, label: <Link to="/admin/DeleteOrders">Sipariş Silme</Link> },
+        { key: 52, label: <Link to="/admin/DeleteOrders">Sipariş Silme</Link> },
       ],
     },
     {
-      key: "5",
+      key: "6",
       icon: <HeartOutlined />,
       label: <Link to="/admin/FavoriteManagement">Favori İşlemleri</Link>,
     },
     {
-      key: "6",
+      key: "7",
       icon: <SettingOutlined />,
       label: <Link to="/admin/settings">Ayarlar</Link>,
     },
-
-    // {
-    //   key: "3",
-    //   icon: <AppstoreOutlined />,
-    //   label: <Link to="/admin/CategoryManagement">Kategori İşlemleri</Link>,
-    // },
   ];
 
   return (

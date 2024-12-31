@@ -1,4 +1,3 @@
-//
 import React, { useState, useEffect } from "react";
 import {
   Layout,
@@ -69,6 +68,17 @@ const AddProductContent = () => {
       setFileList(savedProductData.images || []);
       setCurrentStep(2); // Eğer ürün verisi varsa, resim yükleme adımına geç
     }
+  }, []);
+
+  useEffect(() => {
+    // Sayfa yeniden yüklendiğinde veya işlemler tamamlandığında formu sıfırlamak
+    return () => {
+      setTempProductData(null); // Geçici veriyi temizle
+      setProductId(null); // Ürün ID'sini sıfırla
+      setFileList([]); // Yüklenen dosyaları sıfırla
+      form.resetFields(); // Formu sıfırla
+      setCurrentStep(1); // Başlangıç adımına dön
+    };
   }, []);
 
   const handleProductSubmit = async (values) => {
@@ -145,6 +155,7 @@ const AddProductContent = () => {
 
   const handleFileChange = ({ file, fileList: newFileList }) => {
     const isImage = file.type.startsWith("image/");
+
     if (!isImage) {
       message.error("Sadece görüntü dosyaları yüklenebilir!");
       return;
@@ -221,7 +232,7 @@ const AddProductContent = () => {
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Devam Et
+                  Ürünü Kaydet
                 </Button>
               </Form.Item>
             </Form>
@@ -232,17 +243,18 @@ const AddProductContent = () => {
               <Upload
                 beforeUpload={() => false}
                 onChange={handleFileChange}
-                multiple
                 fileList={fileList}
-                accept="image/*"
+                listType="picture-card"
               >
-                <Button icon={<UploadOutlined />}>Resim Yükle</Button>
+                <div>
+                  <UploadOutlined />
+                  <div className="ant-upload-text">Resim Yükle</div>
+                </div>
               </Upload>
               <Button
                 type="primary"
                 onClick={handleImageUpload}
-                disabled={!fileList.length}
-                style={{ marginTop: "20px" }}
+                style={{ marginTop: "16px" }}
               >
                 Resimleri Yükle
               </Button>
