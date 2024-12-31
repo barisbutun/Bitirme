@@ -105,6 +105,13 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.QUERY_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);}
 
+    @ExceptionHandler(ConflictProductAndCategory.class)
+    public ResponseEntity<Object> conflictProductAndCategoryHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY, HttpStatus.CONFLICT);
+    }
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message, status));

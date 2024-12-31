@@ -15,4 +15,5 @@ public class ErrorMesage {
     public static final String QUERY_NOT_FOUND_ERROR="Query does not exist in our systems with";
     public static final String INSUFFICIENT_STOCK_ERROR ="Shopping Cart is over flow";
     public static final String INVALID_PRODUCT_INFORMATION_ERROR="Product information is not valid";
+    public static final String CONFLICT_PRODUCT_AND_CATEGORY="Product does not exist in Category";
 }

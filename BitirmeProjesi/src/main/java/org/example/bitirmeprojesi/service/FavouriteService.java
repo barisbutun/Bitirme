@@ -7,10 +7,7 @@ import org.example.bitirmeprojesi.entity.Favourite;
 import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
-import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
-import org.example.bitirmeprojesi.exception.error.CategoryNotFoundException;
-import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
-import org.example.bitirmeprojesi.exception.error.UserIdNotFoundException;
+import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.FavouriteMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.example.bitirmeprojesi.repository.FavouriteRepository;
@@ -40,6 +37,10 @@ public class FavouriteService {
 
         Category category= categoryRepository.findById(favouriteDto.getCategoryId()).orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
+
+        if(productRepository.findCategoryIdByProductId(favouriteDto.getProductId())!=favouriteDto.getCategoryId()){
+            throw new ConflictProductAndCategory(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
+        }
 
         Favourite favourite = favouriteMapper.toEntity(favouriteDto);
         favourite.setProduct(product);

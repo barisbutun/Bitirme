@@ -24,4 +24,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
                                 @Param("category") String category,
                                 @Param("minPrice") Double minPrice,
                                 @Param("maxPrice") Double maxPrice);
+
+    @Query("SELECT p.category.id FROM Product p WHERE p.id = :productId")
+    Long findCategoryIdByProductId(Long productId);
+
+
+
 }

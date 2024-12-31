@@ -47,7 +47,7 @@ public class ProductService {
 
         Product product = productMapper.toEntity(productDto);
         product.setCategory(category);
-        productValidator.checkStokState(productDto);
+        productValidator.checkStokState(productDto,product);
         productRepository.save(product);
         productDto.setId(product.getId());
         log.info("Product created: {}", product);

@@ -11,9 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductValidator {
 
-        public void checkStokState(ProductDto productDto){
+        public void checkStokState(ProductDto productDto,Product product) {
+
             if(productDto.getStockState() == null||productDto.getQuantity()!=null){
                 productDto.setStockState(StockState.AVAILABLE);
+                product.setStockState(StockState.AVAILABLE);
             }
             else{
                 throw new InvalidProductInformationException(ErrorMesage.INVALID_PRODUCT_INFORMATION_ERROR);

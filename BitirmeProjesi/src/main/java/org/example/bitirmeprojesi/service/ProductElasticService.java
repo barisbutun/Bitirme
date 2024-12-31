@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.ProductElastic;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductElasticService {
 
     private final ProductElasticRepository productElasticRepository;
@@ -29,6 +31,13 @@ public class ProductElasticService {
         List<ProductDto> ProductDto=productMapper.toDtoList(productElastics);
         return ProductDto;
     }
+
+    public List<ProductDto> findByNameOrDescription(String name, String description) {
+        log.info(("query: " + name + " " + description));
+        List<ProductElastic> productElastics = productElasticRepository.findByNameOrDescription(name, description);
+        return productMapper.toDtoList(productElastics);
+    }
+
 
 
 }
