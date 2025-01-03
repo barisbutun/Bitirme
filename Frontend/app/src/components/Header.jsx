@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Layout, theme, Input, Button, Drawer, Menu } from "antd";
+import { Layout, theme, Button, Drawer, Menu } from "antd";
 import "../css/Header.css";
 import FilterComponent from "./FilterComponent";
+import SearchBar from "./SearchBar"; // SearchBar bileşenini import ettik
 import { logout } from "../services/UserService/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -11,11 +12,12 @@ import {
   MenuUnfoldOutlined,
   HeartOutlined,
 } from "@ant-design/icons";
+
 const { Header } = Layout;
-const { Search } = Input;
 
 const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
   const navigate = useNavigate();
+
   const handleLogout = () => {
     if (logout()) {
       navigate("/");
@@ -27,8 +29,8 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
   const items = [
     {
       key: "1",
-      icon: <UserOutlined />, // Profilim ikonu
-      label: <Link to="/">Giriş Yap</Link>, // Profilim sayfasına yönlendirme
+      icon: <UserOutlined />,
+      label: <Link to="/">Giriş Yap</Link>,
       children: [
         { key: "11", label: <Link to="/user/SignUp">Kayıt Ol</Link> },
         { key: "12", label: <Link to="/Login">Giriş Yap</Link> },
@@ -39,19 +41,14 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
       ],
     },
   ];
-  const [isDrawerVisible, setDrawerVisible] = useState(false);
 
-  // Arama fonksiyonu
-  const onSearch = (value) => {
-    console.log("Arama sorgusu:", value);
-  };
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
 
   // Drawer açma fonksiyonu
   const showDrawer = () => {
     setDrawerVisible(true);
   };
 
-  // Drawer kapama fonksiyonu
   const closeDrawer = () => {
     setDrawerVisible(false);
   };
@@ -72,13 +69,8 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
         className="toggle-button"
       />
 
-      {/* Arama kutusu */}
-      <Search
-        className="header-search"
-        placeholder="Ara..."
-        allowClear
-        onSearch={onSearch}
-      />
+      {/* SearchBar bileşenini buraya entegre ettik */}
+      <SearchBar />
 
       <div className="headerbuttons">
         <Menu mode="horizontal" defaultSelectedKeys={["2"]} items={items} />
@@ -91,7 +83,6 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
           <Link to="/user/Favorites">Favorilerim</Link>
         </Button>
 
-        {/* Filtreleme butonu */}
         <Button
           className="header-filter-button"
           type="primary"
@@ -101,7 +92,6 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
         </Button>
       </div>
 
-      {/* Drawer ile filtreleme bileşeni */}
       <Drawer
         title="Ürün Filtreleme"
         placement="right"

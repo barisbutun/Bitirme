@@ -18,6 +18,7 @@ function ProductCard({
   quantity,
   stock_state, // 'AVAILABLE' or 'UNAVAILABLE'
   description,
+  category_id,
 }) {
   const navigate = useNavigate();
 
@@ -29,26 +30,23 @@ function ProductCard({
     return favorites.includes(id);
   });
 
-  const addToCartHandler = async (id) => {
-    // Kullanıcının giriş yapıp yapmadığını kontrol et
+  const addToCartHandler = async () => {
     if (!isLoggedIn()) {
       notification.info({
         message: "Giriş Yapın",
         description: "Sepete ürün eklemek için giriş yapmalısınız.",
         placement: "topRight",
       });
-      navigate("/Login"); // Giriş sayfasına yönlendir
+      navigate("/Login");
       return;
     }
 
-    // Sepete eklenecek ürün verisini doğrudan oluşturuyoruz
     const productData = {
       id,
       quantity,
     };
 
     try {
-      // Sepete ekleme işlemini servisteki fonksiyona gönderiyoruz
       await addToCart(productData);
       notification.success({
         message: "Sepete Eklendi",
@@ -56,7 +54,6 @@ function ProductCard({
         placement: "topRight",
       });
     } catch (error) {
-      // Hata durumunda bildirim göster
       notification.error({
         message: "Hata",
         description: "Sepete ekleme sırasında bir sorun oluştu.",
@@ -66,45 +63,59 @@ function ProductCard({
   };
 
   const toggleFavoriteHandler = async () => {
+    console.log("product data for favorite:", {
+      id,
+      name,
+      price,
+      image,
+      stock_state,
+      category_id,
+    });
     try {
+      const favoriteData = {
+        id,
+        name,
+        price,
+        image,
+        stock_state,
+        category_id, // Eksiksiz gönderiliyor
+      };
+
       if (isFavorite) {
-        const success = await removeFavorite(id); // Servis üzerinden silme
+        const success = await removeFavorite(id);
         if (success) {
           setIsFavorite(false);
-          notification.success({
-            message: "Favorilerden Çıkarıldı",
-            description: "Ürün favorilerden başarıyla çıkarıldı.",
-            placement: "topRight",
-          });
+          showNotification(
+            "success",
+            "Favorilerden Çıkarıldı",
+            "Ürün favorilerden başarıyla çıkarıldı."
+          );
         }
       } else {
-        const success = await addFavorite({
-          id,
-          name,
-          price,
-          image,
-          stock_state,
-        }); // Servis üzerinden ekleme
+        const success = await addFavorite(favoriteData);
         if (success) {
           setIsFavorite(true);
-          notification.success({
-            message: "Favorilere Eklendi",
-            description: "Ürün favorilerinize başarıyla eklendi.",
-            placement: "topRight",
-          });
+          showNotification(
+            "success",
+            "Favorilere Eklendi",
+            "Ürün favorilerinize başarıyla eklendi."
+          );
         }
       }
     } catch (error) {
-      notification.error({
-        message: "Hata",
-        description: error.message || "Bir hata oluştu.",
-        placement: "topRight",
-      });
-
+      showNotification("error", "Hata", error.message || "Bir hata oluştu.");
       if (error.message === "Giriş yapmalısınız.") {
         navigate("/user/login");
       }
     }
+  };
+
+  const showNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+      placement: "topRight",
+    });
   };
 
   const isAvailable =

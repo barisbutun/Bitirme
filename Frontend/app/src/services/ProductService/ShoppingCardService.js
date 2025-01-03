@@ -19,12 +19,12 @@ export const addToCart = async (productData) => {
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       body: JSON.stringify({
-        product_id: productData.productId,
-        quantity: productData.quantity,
+        product_id: productData.productId,  // Ürün ID'si
+        quantity: productData.quantity,     // Sepetteki ürün adedi
       }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // Token ile kimlik doğrulaması
       },
     });
 
@@ -33,12 +33,13 @@ export const addToCart = async (productData) => {
       throw new Error(errorData.message || "Sepete ekleme işlemi başarısız oldu.");
     }
 
-    return response.json(); // Başarılı olduğunda dönen veriyi döndür
+    return response.json();  // Başarılı olduğunda dönen veriyi döndür
   } catch (error) {
     console.error("Sepete eklerken hata oluştu:", error);
     throw error;
   }
 };
+
 
 // Sepetten ürün silme
 export const removeFromCart = async (id) => {
@@ -49,10 +50,10 @@ export const removeFromCart = async (id) => {
       throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, { // Backend'deki UUID id'yi kullanıyoruz
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // Token ile kimlik doğrulaması
       },
     });
 
@@ -65,7 +66,6 @@ export const removeFromCart = async (id) => {
     throw error;
   }
 };
-
 
 // Kullanıcıya ait tüm ürünleri sepetten silme
 export const clearCartByUserId = async () => {
@@ -80,7 +80,8 @@ export const clearCartByUserId = async () => {
     const response = await fetch(`${API_BASE_URL}/user`, {
       method: "DELETE",
       headers: {
-       "Content-Type": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // Token ile kimlik doğrulaması
       },
     });
 
@@ -104,10 +105,11 @@ export const getCartByUserId = async () => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/user`, {
+    const response = await fetch(`${API_BASE_URL}/user`, { // Backend'e sadece token ile gidiyoruz
       method: "GET",
       headers: {
-    "Content-Type": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // Token ile kimlik doğrulaması
       },
     });
 

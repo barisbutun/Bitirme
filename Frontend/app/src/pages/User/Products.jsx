@@ -77,6 +77,7 @@ const Products = () => {
                 description={product.description}
                 quantity={product.quantity}
                 stock_state={product.stock_state}
+                category_id={product.category_id}
               />
             ))
           ) : (

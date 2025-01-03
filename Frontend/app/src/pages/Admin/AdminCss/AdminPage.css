@@ -1,4 +1,4 @@
-.dashboard-container {
+/* .dashboard-container {
     padding: 20px;
     font-family: Arial, sans-serif;
   }
@@ -54,5 +54,43 @@
   select {
     padding: 5px;
     font-size: 16px;
-  }
+  } */
+
+  .homepage-layout {
+    min-height:100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Üst: header, Orta: içerik, Alt: footer */
+    /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+   
+    
+      gap: 15px;
+    }
   
+    .homepage-layout > Header {
+      grid-row: 1/2; /* Header üstte */
+      width: 100%;
+      background-color: #f8f8f8;
+      padding: 20px;
+      text-align: center;
+    }
+  
+    .homepage-layout > .content {
+      grid-row: 2 / 3;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Kartların yan yana sıralanması */
+      gap: 20px; /* Kartlar arasındaki boşluk */
+      padding: 20px;
+      width: 100%;
+      justify-items: center;
+      box-sizing: border-box;
+      margin-right:300px;
+    }
+    
+    .homepage-layout > Footer {
+      grid-row: 3 / 4;
+    width: 100%;
+    background-color: #f8f8f8;
+    padding: 20px;
+    text-align: center;
+    }
+    

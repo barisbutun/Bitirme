@@ -3,89 +3,115 @@ import { getUserIdFromToken } from "../../utils/auth";
 
 const API_BASE_URL = "http://localhost:8082/api/favourite/v1";
 
-
 // Favori Ekleme
 export const addFavorite = async (product) => {
-    const token = localStorage.getItem("token");
-    if(!token){
-  notification.info({
-        message: "Giriş Yapın",
-        description: "Favori eklemek için giriş yapmalısınız.",
-        placement: "topRight",
-      });
-       
-      return;
-    }
-    const userId = getUserIdFromToken(token);
-    if (!userId) {
-      throw new Error("Geçersiz token.");
-    }
-  
-    // Ürün bilgilerini içeren favori verisi oluştur
-    const favoriteData = {
-      product_id: product.id, 
-      category_id:product.category_id
-    };
-  
-    try {
-      const response = await fetch(`http://localhost:8082/api/favourite/v1`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(favoriteData), // Tüm favori verisini gönder
-      });
-  
-      if (response.ok) {
-        notification.success({
-          message: "Favorilere Eklendi",
-          description: "Ürün favorilerinize başarıyla eklendi.",
-          placement: "topRight",
-        });
-      } else {
-        const errorData = await response.json();
-        console.error("Favori eklerken hata:", errorData);
-        notification.error({
-          message: "Favori Eklenemedi",
-          description: "Bir hata oluştu, lütfen tekrar deneyin.",
-        });
-      }
-    } catch (error) {
-      console.error("Favori eklerken hata:", error);
-      notification.error({
-        message: "Bağlantı Hatası",
-        description: "Sunucuyla bağlantı kurulurken bir hata oluştu.",
-        placement: "topRight",
-      });
-    }
-  };
-  
-// Favori Silme
-export const removeFavorite = async (id) => {
-  const token=localStorage.getItem("token");
-
-    if (!token) {
-      throw new Error("Giriş yapmalısınız");
-    }
-  
-   try{
-    const response=await fetch(`${API_BASE_URL}/${id}`,{
-      method:"DELETE",
-      headers:{
-        "Content-Type":"application/json",
-        Authorization:`Bearer ${token}`,
-      },
+  const token = localStorage.getItem("token");
+  if (!token) {
+    notification.info({
+      message: "Giriş Yapın",
+      description: "Favori eklemek için giriş yapmalısınız.",
+      placement: "topRight",
     });
-    if (!response.ok) {
-      throw new Error("Favoriden çıkarma sırasında bir hata oluştu.");
-    }
+    return false; // Başarısız durumu döndür
+  }
 
-    return true; // Favori silme başarılıysa true döndür
+  const userId = getUserIdFromToken(token);
+  if (!userId) {
+    throw new Error("Geçersiz token.");
+  }
+
+  const favoriteData = {
+    product_id: product.id,
+    category_id: product.category_id,
+  };
+
+  // Local storage'ye geçici olarak kaydet
+  localStorage.setItem("pendingFavorite", JSON.stringify(favoriteData));
+
+  try {
+    const response = await fetch(API_BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(favoriteData),
+    });
+
+    if (response.ok) {
+      // İşlem başarılıysa local storage'deki favoriyi temizle
+      localStorage.removeItem("pendingFavorite");
+      notification.success({
+        message: "Favori Eklendi",
+        description: "Ürün favorilere başarıyla eklendi.",
+        placement: "topRight",
+      });
+      return true;
+    } else {
+      const errorData = await response.json();
+      console.error("Favori eklerken hata:", errorData);
+      notification.error({
+        message: "Favori Eklenemedi",
+        description: "Bir hata oluştu, lütfen tekrar deneyin.",
+        placement: "topRight",
+      });
+      return false;
+    }
   } catch (error) {
-    throw new Error(error.message || "Bir hata oluştu.");
+    console.error("Favori eklerken hata:", error);
+    notification.error({
+      message: "Bağlantı Hatası",
+      description: "Sunucuyla bağlantı kurulurken bir hata oluştu.",
+      placement: "topRight",
+    });
+    return false;
   }
 };
+
+// Favori Silme
+export const removeFavorite = async (id) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    notification.error({
+      message: "Hata",
+      description: "Favori silmek için giriş yapmalısınız.",
+      placement: "topRight",
+    });
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      notification.success({
+        message: "Favori Silindi",
+        description: "Ürün favorilerden başarıyla çıkarıldı.",
+        placement: "topRight",
+      });
+      return true;
+    } else {
+      throw new Error("Favoriden çıkarma sırasında bir hata oluştu.");
+    }
+  } catch (error) {
+    console.error("Favori silme hatası:", error);
+    notification.error({
+      message: "Hata",
+      description: "Favori silinirken bir sorun oluştu.",
+      placement: "topRight",
+    });
+    return false;
+  }
+};
+
+
    
 // Favori Bilgilerini Çekme
 export const fetchFavorites = async (setFavoriteProducts) => {
