@@ -5,6 +5,22 @@ spring:
       max-file-size: 2MB
       max-request-size: 2MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: baris.butun15@gmail.com
+    password: jndg xybh wvow uiny
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+
+
   datasource:
     url: jdbc:postgresql://localhost:5432/BitirmeProjesi
     username: barishafize

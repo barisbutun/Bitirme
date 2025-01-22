@@ -41,6 +41,7 @@ public class Orders implements Serializable {
     private StockState stockState = StockState.AVAILABLE;
 
     @Column(name = "payment_state")
+    @Enumerated(EnumType.STRING)
     private PaymentState paymentState;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -48,6 +49,6 @@ public class Orders implements Serializable {
     private User user;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<OrderItem> orderItems;
 }

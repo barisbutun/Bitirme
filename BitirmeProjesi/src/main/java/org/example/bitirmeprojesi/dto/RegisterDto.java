@@ -28,8 +28,6 @@ public class RegisterDto implements Serializable {
     @JsonProperty("password")
     @Size(min = 4, max = 50, message = "Password must be at least 8 characters long")
     private String password;
-    @JsonProperty("email")
-    private String email;
     @JsonProperty("phone")
     private String phone;
     @JsonProperty("address")

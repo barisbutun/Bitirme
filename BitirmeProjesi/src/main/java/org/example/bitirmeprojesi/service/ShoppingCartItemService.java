@@ -8,6 +8,7 @@ import org.example.bitirmeprojesi.entity.ShoppingCartItem;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
+import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
 import org.example.bitirmeprojesi.exception.error.ShoppingCartItemNotFoundException;
 import org.example.bitirmeprojesi.mapper.ShoppingCartItemMapper;
 import org.example.bitirmeprojesi.repository.ProductRepository;
@@ -34,7 +35,7 @@ public class ShoppingCartItemService {
         User user=userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
         Product product=productRepository.findById(shoppingCartItemDto.getProductId())
-                .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
+                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
         shoppingCartItemValidator.validateStockState(product,shoppingCartItemDto.getQuantity());
         ShoppingCartItem shoppingCartItem = shoppingCartItemMapper.toEntity(shoppingCartItemDto);

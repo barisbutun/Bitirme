@@ -37,6 +37,9 @@ public class ProductService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
 
+
+
+
     @Transactional
     public ProductDto create(ProductDto productDto) throws Exception {
         if (productDto.getCategoryId() == null) {

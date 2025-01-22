@@ -112,6 +112,14 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(InvalidVerificationCodeException.class)
+    public ResponseEntity<Object> invalidVerificationCodeExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_VERIFICATION_CODE, HttpStatus.BAD_REQUEST);
+    }
+
+
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message, status));

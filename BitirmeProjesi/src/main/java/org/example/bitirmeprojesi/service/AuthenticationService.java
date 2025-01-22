@@ -1,14 +1,17 @@
 package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.LoginRequestDto;
-import org.example.bitirmeprojesi.dto.LoginResponseDto;
-import org.example.bitirmeprojesi.dto.RegisterDto;
-import org.example.bitirmeprojesi.dto.UserDto;
+import org.example.bitirmeprojesi.dto.*;
+import org.example.bitirmeprojesi.entity.TemproraryUser;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.enums.Role;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
+import org.example.bitirmeprojesi.exception.error.InvalidVerificationCodeException;
 import org.example.bitirmeprojesi.mapper.UserMapper;
+import org.example.bitirmeprojesi.repository.TemproraryUserRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
+import org.example.bitirmeprojesi.util.PasswordGenerator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +28,41 @@ public class AuthenticationService {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
+    private final TemproraryUserRepository temproraryUserRepository;
+    private final MailService mailService;
+
+    public void verifyUser(String email, String code) throws InvalidVerificationCodeException {
+
+        TemproraryUser tempUser = temproraryUserRepository.findByEmailAndCode(email, code);
+
+        if (tempUser == null) {
+            throw new InvalidVerificationCodeException(ErrorMesage.INVALID_VERIFICATION_CODE);
+        }
+
+        if (!tempUser.isVerified()) {
+            tempUser.setVerified(true);
+            temproraryUserRepository.save(tempUser);
+
+            User user = new User();
+            user.setEmail(tempUser.getEmail());
+            user.setRegistered(true);
+            userRepository.save(user);
+
+            temproraryUserRepository.delete(tempUser);
+
+        }
+    }
+    public void resetPassword(UserResetPasswordDto userResetPasswordDto){
+
+
+        User user=userRepository.findByEmail(userResetPasswordDto.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        String newPassword = PasswordGenerator.generateRandomPassword();
+        mailService.sendResetPasswordEmail(userResetPasswordDto.getEmail(),newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+    }
+
 
     public UserDto register(RegisterDto registerDto) {
         String encodedPassword = passwordEncoder.encode(registerDto.getPassword());

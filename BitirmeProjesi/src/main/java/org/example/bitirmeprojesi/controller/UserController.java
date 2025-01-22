@@ -41,6 +41,7 @@ public class UserController {
     }
 
 
+
     @GetMapping("v1/x")
     public String success() {
         return "success";
@@ -51,16 +52,6 @@ public class UserController {
         List<UserDto> userDtos = userService.findAll();
         return ResponseEntity.ok(userDtos);
     }
-
-    /*@GetMapping("/v1/register/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable("id") UUID id) {
-        UserDto userDto = userService.findById(id);
-        if (userDto != null) {
-            return ResponseEntity.ok(userDto);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }*/
 
     @PutMapping("/v1/{id}")
     public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
