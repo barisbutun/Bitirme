@@ -119,6 +119,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_VERIFICATION_CODE, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(CodeNotFoundException.class)
+    public ResponseEntity<Object> codeNotFoundExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CODE_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
+    }
+
 
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {

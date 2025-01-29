@@ -17,4 +17,5 @@ public class ErrorMesage {
     public static final String INVALID_PRODUCT_INFORMATION_ERROR="Product information is not valid";
     public static final String CONFLICT_PRODUCT_AND_CATEGORY="Product does not exist in Category";
     public static final String INVALID_VERIFICATION_CODE="Invalid verification code";
+    public static final String CODE_NOT_FOUND_ERROR="Code does not exist in our systems";
 }

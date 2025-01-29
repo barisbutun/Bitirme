@@ -25,19 +25,10 @@ public class UserDto implements Serializable {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("registered")
-    private boolean registered;
 
     @JsonProperty("password")
     private String password;
 
-    @JsonProperty("email")
-    @NotBlank(message = "Email alanı zorunludur")
-    @Email(message = "Geçerli bir email adresi giriniz")
-    private String email;
-
-    @JsonProperty("role")
-    private Role role;
 
     @JsonProperty("phone")
     private String phone;

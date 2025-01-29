@@ -10,5 +10,7 @@ public interface TemproraryUserRepository extends JpaRepository<TemproraryUser, 
     void deleteByCodeGeneratedAtBefore(LocalDateTime expirationTime);
 
     TemproraryUser findByEmailAndCode(String email, String code);
+
+    TemproraryUser findByCode(String code);
 }
 

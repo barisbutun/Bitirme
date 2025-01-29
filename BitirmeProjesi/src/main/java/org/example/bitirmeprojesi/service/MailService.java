@@ -6,6 +6,7 @@ import org.example.bitirmeprojesi.entity.TemproraryUser;
 import org.example.bitirmeprojesi.mapper.TempororaryUserMapper;
 import org.example.bitirmeprojesi.repository.TemproraryUserRepository;
 import org.example.bitirmeprojesi.util.VerificationCodeGenerator;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;

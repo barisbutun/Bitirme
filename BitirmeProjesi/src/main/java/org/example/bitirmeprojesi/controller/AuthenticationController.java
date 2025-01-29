@@ -6,10 +6,7 @@ import org.example.bitirmeprojesi.service.AuthenticationService;
 import org.example.bitirmeprojesi.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,11 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
 
     @PostMapping("/v1/verify")
-    public ResponseEntity<Void> verifyUser(@RequestBody String email, @RequestBody String code) {
-        authenticationService.verifyUser(email,code);
+    public ResponseEntity<Void> verifyUser( @RequestBody VerifyUserDto verifyUserDto) {
+        authenticationService.verifyUser(verifyUserDto);
         return ResponseEntity.ok().build();
     }
     @PostMapping("v1/resetPassword")
@@ -39,6 +37,18 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         return ResponseEntity.ok(authenticationService.login(loginRequestDto));
     }
+    @PutMapping("/v1/{code}")
+    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto,@PathVariable String code) {
+
+        UserDto updatedUserDto = userService.update(userDto,code);
+
+        if (updatedUserDto != null) {
+            return ResponseEntity.ok(updatedUserDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProductElasticRepository extends ElasticsearchRepository<ProductElastic,Long> {
 
 
-    @Query("{\"multi_match\": {\"query\": \"#{[0]}\", \"fields\": [\"name^2\", \"description\"], \"fuzziness\": \"AUTO\", \"type\": \"bool_prefix\"}}")
+    @Query("{\"multi_match\": {\"query\": \"#{[0]}\", \"fields\": [\"name^2\", \"description\"], \"fuzziness\": \"2\", \"type\": \"bool_prefix\"}}")
     List<ProductElastic> findByAutocomplete(String query);
 
 

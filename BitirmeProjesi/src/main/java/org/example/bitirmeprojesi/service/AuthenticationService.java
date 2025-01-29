@@ -31,9 +31,9 @@ public class AuthenticationService {
     private final TemproraryUserRepository temproraryUserRepository;
     private final MailService mailService;
 
-    public void verifyUser(String email, String code) throws InvalidVerificationCodeException {
+    public void verifyUser(VerifyUserDto verifyUserDto) throws InvalidVerificationCodeException {
 
-        TemproraryUser tempUser = temproraryUserRepository.findByEmailAndCode(email, code);
+        TemproraryUser tempUser = temproraryUserRepository.findByEmailAndCode(verifyUserDto.getEmail(), verifyUserDto.getCode());
 
         if (tempUser == null) {
             throw new InvalidVerificationCodeException(ErrorMesage.INVALID_VERIFICATION_CODE);
@@ -48,7 +48,6 @@ public class AuthenticationService {
             user.setRegistered(true);
             userRepository.save(user);
 
-            temproraryUserRepository.delete(tempUser);
 
         }
     }
@@ -83,6 +82,7 @@ public class AuthenticationService {
 
             User user = (User) auth.getPrincipal();
             String token = tokenService.generateJwt(auth);
+
 
             if (isAdmin(user)) {
                 return new LoginResponseDto(token);

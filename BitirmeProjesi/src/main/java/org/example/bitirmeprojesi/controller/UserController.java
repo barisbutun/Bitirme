@@ -27,21 +27,6 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("https://www.googleapis.com/oauth2/v2/userinfo")
-    public ResponseEntity<String> googleRegister(@RequestBody UserDto userDto) {
-
-        Optional<User> existingUser = userService.findUserByEmail(userDto.getEmail());
-        if (existingUser != null) {
-            return ResponseEntity.badRequest().body("Kullanıcı zaten mevcut.");
-        }
-
-        userService.googleRegister(userDto);
-        return ResponseEntity.ok("Kullanıcı başarıyla kaydedildi.");
-
-    }
-
-
-
     @GetMapping("v1/x")
     public String success() {
         return "success";
@@ -53,20 +38,7 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
 
-    @PutMapping("/v1/{id}")
-    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt= (Jwt) authentication.getPrincipal();
 
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-
-        UserDto updatedUserDto = userService.update(userDto,userId);
-        if (updatedUserDto != null) {
-            return ResponseEntity.ok(updatedUserDto);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
 
     @GetMapping("/v1/profile")
     public ResponseEntity<UserProfileDto> getProfile() {
