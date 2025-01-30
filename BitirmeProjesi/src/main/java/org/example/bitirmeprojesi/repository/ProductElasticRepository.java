@@ -18,4 +18,16 @@ public interface ProductElasticRepository extends ElasticsearchRepository<Produc
     @Query("{\"bool\": {\"should\": [ {\"match\": {\"name\": {\"query\": \"?0\", \"fuzziness\": \"AUTO\"}}}, {\"match\": {\"description\": {\"query\": \"?1\", \"fuzziness\": \"AUTO\"}}} ]}}")
     List<ProductElastic> findByNameOrDescription(String name, String description);
 
+
+    @Query("{ " +
+            "\"bool\": { " +
+            "   \"must\": [ " +
+            "       { \"match\": { \"category\": \"?0\" } }, " +
+            "       { \"match\": { \"name\": \"?1\" } } " +
+            "   ], " +
+            "   \"filter\": [ " +
+            "       { \"range\": { \"price\": { \"gte\": \"?2\", \"lte\": \"?3\" } } } " +
+            "   ] " +
+            "} }")
+    List<ProductElastic> searchByFilters(int category, String name, Double minPrice, Double maxPrice);
 }

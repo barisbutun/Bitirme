@@ -37,13 +37,14 @@ public class OrderController {
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<List<OrdersDto>> findAllByUserId(){
+    public ResponseEntity<List<OrdersDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+                                                           @RequestParam(required = false, defaultValue = "10") int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
 
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-        return ResponseEntity.ok(orderService.findAllByUserId(userId));
+        return ResponseEntity.ok(orderService.findAllByUserId(userId, page, size));
     }
 
 

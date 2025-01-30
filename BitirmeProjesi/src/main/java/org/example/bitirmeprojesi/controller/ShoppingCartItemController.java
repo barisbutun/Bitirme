@@ -43,14 +43,15 @@ public class ShoppingCartItemController {
     }
 
     @GetMapping("/v1/user")
-    private ResponseEntity<List<ShoppingCartItemDto>> findAllByUserId() {
+    private ResponseEntity<List<ShoppingCartItemDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+                                                                      @RequestParam(required = false, defaultValue = "10") int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
 
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
 
-        return ResponseEntity.ok().body(shoppingCartItemService.findAllByUserId(userId));
+        return ResponseEntity.ok().body(shoppingCartItemService.findAllByUserId(userId, page, size));
     }
 
     @GetMapping("/v1/{id}")

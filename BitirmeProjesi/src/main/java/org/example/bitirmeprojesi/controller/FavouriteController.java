@@ -29,11 +29,12 @@ public class FavouriteController {
     }
 
     @GetMapping("/v1/getAllByUserId")
-    public ResponseEntity<List<FavouriteDto>> getlAllByUserId() {
+    public ResponseEntity<List<FavouriteDto>> getlAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+                                                               @RequestParam(required = false, defaultValue = "10") int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-        return ResponseEntity.ok(favouriteService.getlAllByUserId(userId));
+        return ResponseEntity.ok(favouriteService.getlAllByUserId(userId, page, size));
     }
 
 

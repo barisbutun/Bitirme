@@ -26,8 +26,8 @@ public class AdminService {
         return categoryService.create(categoryDto);
     }
 
-    public List<OrdersDto> getAllOrders() {
-        return orderService.findAll();
+    public List<OrdersDto> getAllOrders(int page,int size) {
+        return orderService.findAll(page , size);
     }
 
     public void deleteImage(long id){

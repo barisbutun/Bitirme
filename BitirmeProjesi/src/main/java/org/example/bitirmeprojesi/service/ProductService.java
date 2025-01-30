@@ -16,6 +16,8 @@ import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.example.bitirmeprojesi.repository.ImageRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.validator.ProductValidator;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +43,7 @@ public class ProductService {
 
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDto create(ProductDto productDto) throws Exception {
         if (productDto.getCategoryId() == null) {
             throw new RuntimeException("Category ID is required");
@@ -57,13 +60,14 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-
+    @Cacheable(value = "product", key = "'product_' + #id")
     public ProductDto findById(long id) {
-
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
         return productMapper.toDto(product);
     }
 
+    @Cacheable(value = "products", key = "'page_'+#page+'_size_'+#size")
     public List<ProductDto> findAll(int page, int size) {
 
         Pageable pageable =  PageRequest.of(page, size);
@@ -72,15 +76,17 @@ public class ProductService {
         return productMapper.toDtoList(productPage.getContent());
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDto update(ProductDto productDto, long id) {
-
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
         productMapper.update(productDto, product);
         productRepository.save(product);
         return productMapper.toDto(product);
     }
 
+    @Cacheable(value = "products", key = "'name_'+#name+'_category_'+#category+'_minPrice_'+#minPrice+'_maxPrice_'+#maxPrice")
     public List<ProductDto> filterbyProduct(String name,
                                             String category,
                                             Double minPrice,
@@ -88,6 +94,7 @@ public class ProductService {
         return productMapper.toDtoList(productRepository.findByFilters(name, category, minPrice, maxPrice));
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public void delete(long id) {
         productRepository.deleteById(id);
     }

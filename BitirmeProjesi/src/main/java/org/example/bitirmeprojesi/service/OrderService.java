@@ -11,6 +11,7 @@ import org.example.bitirmeprojesi.entity.ShoppingCartItem;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
+import org.example.bitirmeprojesi.exception.error.OrderNotFoundExceiption;
 import org.example.bitirmeprojesi.mapper.OrderItemMapper;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderItemRepository;
@@ -18,6 +19,12 @@ import org.example.bitirmeprojesi.repository.OrderRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.OrderValidator;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +34,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -39,12 +45,17 @@ public class OrderService {
     private final UserRepository userRepository;
     private final OrderItemService orderItemService;
 
-    public OrdersDto create(OrdersDto ordersDto,UUID userId){
-        User user=userRepository.findById(userId).orElseThrow(() ->new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+    @CacheEvict(value = "orders", key = "#userId")
+    public OrdersDto create(OrdersDto ordersDto, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+
         Orders orders = orderMapper.toEntity(ordersDto);
         orders.setUser(user);
+
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
         orderRepository.save(orders);
+
         Orders finalOrders = orders;
         List<OrderItem> orderItems = shoppingCartItems.stream().map(shoppingCartItem -> {
             OrderItem orderItem = new OrderItem();
@@ -55,7 +66,6 @@ public class OrderService {
             return orderItemService.create(orderItem);
         }).collect(Collectors.toList());
 
-
         orders.setOrderItems(orderItems);
 
         String productNames = orderItems.stream()
@@ -65,45 +75,51 @@ public class OrderService {
         orderValidator.sumPriceCalculating(orders);
         finalOrders.setName(productNames);
         orderItemRepository.saveAll(orderItems);
-        return orderMapper.toDto(orders);
 
+        return orderMapper.toDto(orders);
     }
 
-
-
-
+    @Cacheable(value = "orders", key = "#id")
     public OrdersDto findById(Long id) {
-        Orders orders = orderRepository.findById(id).get();
+        Orders orders = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
         return orderMapper.toDto(orders);
     }
 
     public OrderGetOrderItemsDto getOrderItemsById(Long id) {
-        Orders orders = orderRepository.findById(id).isPresent() ? orderRepository.findById(id).get() : null;
+        Orders orders = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
         return orderMapper.toDtoOrderGetOrderItems(orders);
     }
 
-    public List<OrdersDto> findAll() {
-        List<Orders> ordersList = orderRepository.findAll();
-        return orderMapper.toDtoList(ordersList);
-    }
-
+    @CachePut(value = "orders", key = "#userId")
     public OrdersDto update(OrdersDto ordersDto, long id) {
-        Orders orders = orderRepository.findById(id).get();
+        Orders orders = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
         orderMapper.update(ordersDto, orders);
         orderRepository.save(orders);
         return orderMapper.toDto(orders);
     }
 
-    public void delete(long id) {
-        orderRepository.deleteById(id);
-
+    @Cacheable(value = "orders", key = "#page + '-' + #size")
+    public List<OrdersDto> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Orders> orders = orderRepository.findAll(pageable);
+        return orderMapper.toDtoList(orders.getContent());
     }
 
-    public List<OrdersDto> findAllByUserId(UUID userId) {
+    @CacheEvict(value = "orders", key = "#id")
+    public void delete(long id) {
+        orderRepository.deleteById(id);
+    }
 
+    @Cacheable(value = "orders", key = "#userId + '-' + #page + '-' + #size")
+    public List<OrdersDto> findAllByUserId(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        List<Orders> ordersList = orderRepository.findAllByUserId(user.getId());
-        return orderMapper.toDtoList(ordersList);
+
+        Page<Orders> ordersList = orderRepository.findAllByUserId(user.getId(), pageable);
+        return orderMapper.toDtoList(ordersList.getContent());
     }
 }

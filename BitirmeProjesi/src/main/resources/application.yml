@@ -64,6 +64,7 @@ spring:
         - elasticsearch
         - kibana
         - logstash
+        - redis
 
 
 
@@ -83,6 +84,17 @@ spring:
         key-alias: es01
     username: elastic
     password: 123456B
+  data:
+    redis:
+      host: localhost
+      port: 6379  # Eğer Redis şifreliyse buraya ekleyebilirsin, aksi halde boş bırakabilirsin
+      timeout: 60000 # (ms cinsinden) Redis bağlantısı zaman aşımı süresi
+      lettuce:
+        pool:
+          max-active: 10  # Maksimum aktif bağlantı sayısı
+          max-idle: 5      # Maksimum boşta bekleyen bağlantı sayısı
+          min-idle: 1      # Minimum boşta bekleyen bağlantı sayısı
+          max-wait: 5000
 
 
 

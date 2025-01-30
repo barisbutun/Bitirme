@@ -33,6 +33,13 @@ public class ProductElasticController {
         List<ProductDto> products = productElasticService.findByNameOrDescription(name,description);
         return ResponseEntity.ok(products);
     }
+    @PostMapping("v1/filter")
+    public ResponseEntity<List<ProductDto>> searchByFilters(@RequestParam int  category, @RequestParam String name, @RequestParam Double minPrice, @RequestParam Double maxPrice) {
+
+        List<ProductDto> products = productElasticService.searchByFilters(category, name, minPrice, maxPrice);
+        return ResponseEntity.ok(products);
+    }
+
 
 
 

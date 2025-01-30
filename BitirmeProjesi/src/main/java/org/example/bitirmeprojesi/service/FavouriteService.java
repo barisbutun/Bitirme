@@ -13,6 +13,11 @@ import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.example.bitirmeprojesi.repository.FavouriteRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +33,7 @@ public class FavouriteService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
+    @Cacheable(value = "favourites", key = "#userId")
     public FavouriteDto create(FavouriteDto favouriteDto, UUID userId) {
 
         User user = userRepository.findById(userId)
@@ -39,7 +45,7 @@ public class FavouriteService {
 
 
         if(productRepository.findCategoryIdByProductId(favouriteDto.getProductId())!=favouriteDto.getCategoryId()){
-            throw new ConflictProductAndCategory(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
+            throw new ConflictProductAndCategoryException(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
         }
 
         Favourite favourite = favouriteMapper.toEntity(favouriteDto);
@@ -50,6 +56,8 @@ public class FavouriteService {
 
         return favouriteMapper.toDto(favourite);
     }
+
+    @CacheEvict(value = "favourites", key = "#userId")
     public void delete(Long id) {
         favouriteRepository.deleteById(id);
     }
@@ -59,6 +67,8 @@ public class FavouriteService {
        List<FavouriteDto> favouriteDto=favouriteMapper.toDtoList(favourite);
        return favouriteDto;
     }
+
+    @CacheEvict(value = "favourites", key = "#userId")
     public FavouriteDto update(FavouriteDto favouriteDto,long id){
         Favourite favourite=favouriteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("favourite product not found with id:"+id));
         favouriteMapper.update(favouriteDto,favourite);
@@ -66,15 +76,18 @@ public class FavouriteService {
         return favouriteMapper.toDto(favourite);
     }
 
-    public List<FavouriteDto> getlAllByUserId(UUID userId) {
+    @Cacheable(value = "favourites", key = "#userId")
+    public List<FavouriteDto> getlAllByUserId(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException("Account bulunamadı"));
 
-        List<Favourite> favourites = favouriteRepository.findByUserId(userId);
+        Page<Favourite> favourites = favouriteRepository.findByUserId(userId, pageable);
 
-        return favouriteMapper.toDtoList(favourites);
+        return favouriteMapper.toDtoList((List<Favourite>) favourites);
     }
 
     public FavouriteDto findById(long id) {
-        return favouriteMapper.toDto(favouriteRepository.findById(id).get());
+        return favouriteMapper.toDto(favouriteRepository.findById(id).orElseThrow(() -> new FavouriteNotFoundException(ErrorMesage.FAVOURITE_NOT_FOUND_ERROR)));
     }
 }

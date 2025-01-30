@@ -57,8 +57,9 @@ public class AdminController {
     }
 
     @GetMapping("/v1/orders")
-    public ResponseEntity<List<OrdersDto>> getAllOrders() {
-        List<OrdersDto> orders = adminService.getAllOrders();
+    public ResponseEntity<List<OrdersDto>> getAllOrders(@RequestParam("page") int page,
+                                                        @RequestParam("size") int size) {
+        List<OrdersDto> orders = adminService.getAllOrders(page, size);
         return ResponseEntity.ok(orders);
     }
 

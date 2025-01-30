@@ -15,7 +15,13 @@ import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.ShoppingCartItemValidator;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +36,7 @@ public class ShoppingCartItemService {
     private final ShoppingCartItemValidator shoppingCartItemValidator;
 
     @Transactional
+    @CacheEvict(value = "shoppingCartItems", key = "#userId")
     public ShoppingCartItemDto create(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
 
         User user=userRepository.findById(userId)
@@ -45,23 +52,25 @@ public class ShoppingCartItemService {
         return shoppingCartItemMapper.toDto(savedShoppingCartItem);
 
     }
-
     public ShoppingCartItemDto findById(long id) {
         ShoppingCartItem shoppingCartItem = shoppingCartItemRepository.findById(id).orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
         return shoppingCartItemMapper.toDto(shoppingCartItem);
     }
 
-    public List<ShoppingCartItemDto> findAllByUserId(UUID userId) {
+    @Cacheable(value = "shoppingCartItems", key = "#userId")
+    public List<ShoppingCartItemDto> findAllByUserId(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
-        List<ShoppingCartItem> shoppingCartItems = user.getShoppingCartItems();
-        return shoppingCartItemMapper.toDtoList(shoppingCartItems);
+        Page<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(user.getId(), pageable);
+        return shoppingCartItemMapper.toDtoList( shoppingCartItems.getContent());
     }
-
+    @CacheEvict(value = "shoppingCartItems", key = "#userId")
     public void delete(long id) {
         shoppingCartItemRepository.deleteById(id);
     }
 
+    @CacheEvict(value = "shoppingCartItems", key = "#userId")
     public void deleteAllByUserId(UUID userId) {
         shoppingCartItemRepository.deleteAllByUserId(userId);
     }
