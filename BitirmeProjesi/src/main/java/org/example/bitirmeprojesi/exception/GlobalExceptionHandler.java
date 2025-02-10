@@ -118,6 +118,12 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_VERIFICATION_CODE, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ExistingProductException.class)
+    public ResponseEntity<Object> existingProductExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ?ex.getLocalizedMessage():ErrorMesage.EXİSTİNG_PRODUCT_ERROR,HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(CodeNotFoundException.class)
     public ResponseEntity<Object> codeNotFoundExceptionHandler(Exception ex) {

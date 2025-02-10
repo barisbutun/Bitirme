@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -33,7 +34,7 @@ public class FavouriteService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    @Cacheable(value = "favourites", key = "#userId")
+    @CacheEvict(value = "favourites", key = "#userId", beforeInvocation = false)
     public FavouriteDto create(FavouriteDto favouriteDto, UUID userId) {
 
         User user = userRepository.findById(userId)
@@ -46,6 +47,15 @@ public class FavouriteService {
 
         if(productRepository.findCategoryIdByProductId(favouriteDto.getProductId())!=favouriteDto.getCategoryId()){
             throw new ConflictProductAndCategoryException(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
+        }
+
+        List<Favourite> favourites = favouriteRepository.findByUserId(userId);
+
+        boolean isProductAlreadyFavorited = favourites.stream()
+                .anyMatch(fav -> Objects.equals(fav.getProduct().getId(), favouriteDto.getProductId()));
+
+        if (isProductAlreadyFavorited) {
+            throw new ExistingProductException(ErrorMesage.EXİSTİNG_PRODUCT_ERROR);
         }
 
         Favourite favourite = favouriteMapper.toEntity(favouriteDto);

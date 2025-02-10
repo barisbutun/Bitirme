@@ -10,4 +10,8 @@ import java.util.UUID;
 
 public interface FavouriteRepository extends JpaRepository<Favourite, Long> {
     Page<Favourite> findByUserId(UUID userId, Pageable pageable);
+
+    List<Favourite> findByUserId(UUID userId);
+
+    List<Favourite> findByProductId(Long productId);
 }

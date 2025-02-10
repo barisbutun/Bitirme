@@ -272,7 +272,12 @@ services:
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
     user: root
-
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9600 || exit 1" ]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 networks:
   default:
     name: elastic

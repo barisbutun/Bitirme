@@ -6,7 +6,6 @@ import org.example.bitirmeprojesi.entity.TemproraryUser;
 import org.example.bitirmeprojesi.mapper.TempororaryUserMapper;
 import org.example.bitirmeprojesi.repository.TemproraryUserRepository;
 import org.example.bitirmeprojesi.util.VerificationCodeGenerator;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,18 @@ public class MailService {
     private final TemproraryUserRepository temproraryUserRepository;
     private final TempororaryUserMapper tempororaryUserMapper;
 
+    public void temproraryPassword(String email,String newPassword) {
+        String to = email;
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        String text=createEmailTextTemproraryPassword(newPassword);
+        String subject = createEmailSubjectTemproraryPassword();
+        message.setTo(to);
+        message.setText(text);
+        message.setSubject(subject);
+        mailSender.send(message);
+
+    }
 
 
     public void sendResetPasswordEmail(String email,String newPassword) {
@@ -54,9 +65,16 @@ public class MailService {
 
         mailSender.send(message);
     }
+    private String createEmailTextTemproraryPassword(String newPassword) {
+        return "Merhaba,\n\nGeçiçi şifreniz "+newPassword+"\n\nDeğiştirmeyi unutmayınız.";
+    }
 
     private String createEmailTextVerification(String code) {
         return "Merhaba,\n\nDoğrulama kodunuz: " + code + "\n\nBu kodu kimseyle paylaşmayın.";
+    }
+
+    private String createEmailSubjectTemproraryPassword() {
+        return "Geçici Şifreniz";
     }
 
     private String createEmailTextResetPassword(String newPassword) {
