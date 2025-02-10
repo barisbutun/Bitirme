@@ -34,20 +34,6 @@ public class MailService {
 
     }
 
-    public void temproraryPassword(String email,String newPassword) {
-        String to = email;
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        String text=createEmailTextTemproraryPassword(newPassword);
-        String subject = createEmailSubjectTemproraryPassword();
-        message.setTo(to);
-        message.setText(text);
-        message.setSubject(subject);
-        mailSender.send(message);
-
-    }
-
-
 
     public void sendEmailVerification(TemproraryUserDto temproraryUserDto) {
         TemproraryUser temproraryUser = tempororaryUserMapper.toEntity(temproraryUserDto);
@@ -76,17 +62,9 @@ public class MailService {
     private String createEmailTextResetPassword(String newPassword) {
         return "Merhaba,\n\nSıfırlama kodunuz: "+newPassword+"\n\nBu kodu kimseyle paylaşmayın.";
     }
-    private String createEmailTextTemproraryPassword(String newPassword) {
-        return "Merhaba,\n\nGeçiçi şifreniz "+newPassword+"\n\nDeğiştirmeyi unutmayınız.";
-    }
-
 
     private String createEmailSubjectResetPassword() {
         return "Sıfırlama kodunuz";
-    }
-
-    private String createEmailSubjectTemproraryPassword() {
-        return "Geçici Şifreniz";
     }
 
 

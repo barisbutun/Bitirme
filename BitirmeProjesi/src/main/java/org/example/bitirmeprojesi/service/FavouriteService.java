@@ -21,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,44 +33,29 @@ public class FavouriteService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    @CacheEvict(value = "favourites", key = "#userId", beforeInvocation = false)
+    @Cacheable(value = "favourites", key = "#userId")
     public FavouriteDto create(FavouriteDto favouriteDto, UUID userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserIdNotFoundException(ErrorMesage.USER_ID_NOT_FOUND_ERROR));
 
-        Product product = productRepository.findById(favouriteDto.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        Product product = productRepository.findById(favouriteDto.getProductId()).orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
-        Category category = categoryRepository.findById(favouriteDto.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
+        Category category= categoryRepository.findById(favouriteDto.getCategoryId()).orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
-        Optional<Long> categoryIdOptional = Optional.ofNullable(productRepository.findCategoryIdByProductId(favouriteDto.getProductId()));
-        if (categoryIdOptional.isEmpty() || !categoryIdOptional.get().equals(favouriteDto.getCategoryId())) {
-            System.out.println("Sorgudan gelen category id:" + categoryIdOptional.orElse(null));
-            System.out.println("favorite dto dan gelen category id:" + favouriteDto.getCategoryId());
+
+        if(productRepository.findCategoryIdByProductId(favouriteDto.getProductId())!=favouriteDto.getCategoryId()){
             throw new ConflictProductAndCategoryException(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
         }
 
         Favourite favourite = favouriteMapper.toEntity(favouriteDto);
-        List<Favourite> favourites = favouriteRepository.findByUserId(userId);
-
-        boolean isProductAlreadyFavorited = favourites.stream()
-                .anyMatch(fav -> Objects.equals(fav.getProduct().getId(), favouriteDto.getProductId()));
-
-        if (isProductAlreadyFavorited) {
-            throw new ExistingProductException(ErrorMesage.EXİSTİNG_PRODUCT_ERROR);
-        }
-
-        // Eğer toEntity() User ve Category set etmiyorsa bunları ekleyebilirsin.
         favourite.setProduct(product);
         favourite.setUser(user);
         favourite.setCategory(category);
-
         favourite = favouriteRepository.save(favourite);
+
         return favouriteMapper.toDto(favourite);
     }
-
 
     @CacheEvict(value = "favourites", key = "#userId")
     public void delete(Long id) {

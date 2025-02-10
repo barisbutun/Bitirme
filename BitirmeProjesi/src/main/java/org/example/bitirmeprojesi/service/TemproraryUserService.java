@@ -16,19 +16,6 @@ public class TemproraryUserService {
 
 
     @Scheduled(fixedRate = 60000)
-    public void cleanAllTemporaryUsers() {
-        LocalDateTime now = LocalDateTime.now();
-        temproraryUserRepository.findAll().stream()
-                .filter(user -> user.getCodeGeneratedAt().plusMinutes(60).isBefore(now))
-                .forEach(user -> {
-                    temproraryUserRepository.delete(user);
-                });
-
-
-    }
-
-
-    @Scheduled(fixedRate = 60000)
     public void cleanExpiredTemproraryUsers() {
         LocalDateTime now = LocalDateTime.now();
         temproraryUserRepository.findAll().stream()
