@@ -14,7 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("api/admin")
 @RequiredArgsConstructor
-public class AdminController {
+public class
+AdminController {
 
     private final AdminService adminService;
 

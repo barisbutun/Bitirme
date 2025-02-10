@@ -90,6 +90,8 @@ services:
     ports:
       - ${ES_PORT}:9200
     environment:
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
       - discovery.type=single-node
@@ -109,7 +111,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${ES_MEM_LIMIT}
+          memory: 2g
     ulimits:
       memlock:
         soft: -1
@@ -188,7 +190,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${KB_MEM_LIMIT}
+          memory: 2g
     healthcheck:
       test:
         [
@@ -199,53 +201,6 @@ services:
       timeout: 10s
       retries: 120
 
-  metricbeat01:
-    depends_on:
-      es01:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
-    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
-    user: root
-    volumes:
-      - certs:/usr/share/metricbeat/certs
-      - metricbeatdata01:/usr/share/metricbeat/data
-      - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-      - "/proc:/hostfs/proc:ro"
-      - "/:/hostfs:ro"
-    environment:
-      - ELASTIC_USER=elastic
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
-      - KIBANA_HOSTS=http://kibana:5601
-      - LOGSTASH_HOSTS=http://logstash01:9600
-    command:
-      - --strict.perms=false
-
-  filebeat01:
-    depends_on:
-      es01:
-        condition: service_healthy
-    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
-    user: root
-    volumes:
-      - certs:/usr/share/filebeat/certs
-      - filebeatdata01:/usr/share/filebeat/data
-      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-     
-    environment:
-      - ELASTIC_USER=elastic
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
-      - KIBANA_HOSTS=http://kibana:5601
-      - LOGSTASH_HOSTS=http://logstash01:9600
-    command:
-      - --strict.perms=false
-
   logstash01:
     depends_on:
       es01:
@@ -253,9 +208,9 @@ services:
       kibana:
         condition: service_healthy
       postgres:
-        condition: service_healthy  
+        condition: service_healthy
     ports:
-      - 9600:9600     
+      - 9600:9600
     image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
     volumes:
       - certs:/usr/share/logstash/certs
@@ -272,6 +227,13 @@ services:
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
     user: root
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9600 || exit 1" ]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
 
 networks:
   default:

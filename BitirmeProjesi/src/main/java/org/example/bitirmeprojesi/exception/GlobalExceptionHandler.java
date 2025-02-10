@@ -125,6 +125,11 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CODE_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ExistingProductException.class)
+    public ResponseEntity<Object> existingProductExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ?ex.getLocalizedMessage():ErrorMesage.EXİSTİNG_PRODUCT_ERROR,HttpStatus.BAD_REQUEST);
+    }
 
 
 

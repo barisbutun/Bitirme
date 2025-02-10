@@ -45,6 +45,9 @@ public class AuthenticationService {
 
             User user = new User();
             user.setEmail(tempUser.getEmail());
+            String temproraryPassword=PasswordGenerator.generateRandomPassword();
+            mailService.temproraryPassword(verifyUserDto.getEmail(), temproraryPassword);
+            user.setPassword(passwordEncoder.encode(temproraryPassword));
             user.setRegistered(true);
             userRepository.save(user);
 

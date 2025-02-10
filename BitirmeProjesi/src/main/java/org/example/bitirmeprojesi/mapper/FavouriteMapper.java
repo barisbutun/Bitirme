@@ -2,9 +2,11 @@ package org.example.bitirmeprojesi.mapper;
 
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.entity.Favourite;
+import org.example.bitirmeprojesi.entity.User;
 import org.mapstruct.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
