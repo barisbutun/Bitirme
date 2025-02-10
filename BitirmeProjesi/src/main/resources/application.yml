@@ -58,7 +58,7 @@ spring:
   docker:
     compose:
       enabled: true
-      file: C:\Users\Baris\OneDrive - ktun.edu.tr\Masaustu\SpringBoot\Bitirme Projesi\Bitirme\BitirmeProjesi\Docker_Elasticsearch_Kibana_Logstash_Postgre\docker-compose.yml
+      file: C:\Users\ASUS\Documents\Github\Bitirme\BitirmeProjesi\Docker_Elasticsearch_Kibana_Logstash_Postgre\docker-compose.yml
       services:
         - postgres
         - elasticsearch
@@ -76,12 +76,12 @@ spring:
       uris: https://localhost:9200
       ssl:
         enabled: true
-        key-store: C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/keystore.p12
+        key-store: C:\Users\ASUS\Documents\Github\Bitirme\BitirmeProjesi\src\main\resources\keystore.p12
         key-store-password: 123456B
-        trust-store: C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/truststore.jks
+        trust-store: C:\Users\ASUS\Documents\Github\Bitirme\BitirmeProjesi\src\main\resources\truststore.jks
         trust-store-password: 123456B
         key-store-type: PKCS12
-        key-alias: es01
+        key-alias: es01-node
     username: elastic
     password: 123456B
   data:
