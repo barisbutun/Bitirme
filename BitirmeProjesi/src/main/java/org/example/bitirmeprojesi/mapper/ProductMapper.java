@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.mapper;
 
 import org.example.bitirmeprojesi.dto.ProductDto;
+import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.entity.Product;
 import org.mapstruct.*;
 
@@ -14,11 +15,14 @@ import java.util.List;
 )
 public interface ProductMapper {
 
+    @Mapping(source="category.id", target="categoryId")
     ProductDto toDto(final Product product);
 
+    @Mapping(source="categoryId", target="category.id")
     Product toEntity(final ProductDto productDto);
 
     List<ProductDto> toDtoList(final List<Product> productList);
+
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(ProductDto productDto, @MappingTarget Product product);

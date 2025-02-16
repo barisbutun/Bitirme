@@ -60,7 +60,6 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    @Cacheable(value = "product", key = "'product_' + #id")
     public ProductDto findById(long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));

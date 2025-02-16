@@ -94,7 +94,9 @@ public class FavouriteService {
 
         Page<Favourite> favourites = favouriteRepository.findByUserId(userId, pageable);
 
-        return favouriteMapper.toDtoList((List<Favourite>) favourites);
+        List<Favourite> favouriteList = favourites.getContent();
+
+        return favouriteMapper.toDtoList(favouriteList);
     }
 
     public FavouriteDto findById(long id) {
