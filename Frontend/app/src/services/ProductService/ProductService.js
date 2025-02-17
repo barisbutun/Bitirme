@@ -10,15 +10,21 @@ export const fetchProducts = async () => {
         "Content-Type": "application/json",
       },
     });
- 
+  
     if (!response.ok) {
       throw new Error("Ürün bilgileri alınamadı");
     }
 
     const products = await response.json();
-    // console.log("API'den gelen ürün verisi:", products);
-    return products;
-  } catch (error) {
+    console.log("API'den gelen ürün verisi:", products);
+  // categoryId'yi category_id'ye dönüştür
+  const formattedProducts = products.map(product => ({
+    ...product,
+    category_id: product.categoryId // Backend'den gelen categoryId'yi frontend'in beklediği formata dönüştür
+  }));
+  
+  return formattedProducts;
+} catch (error) {
     console.error("fetchProducts Error:", error);
     throw error;
   }

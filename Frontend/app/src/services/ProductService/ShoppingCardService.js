@@ -6,16 +6,20 @@ const API_BASE_URL = "http://localhost:8082/api/shoppingCartItem/v1";
 export const addToCart = async (productData) => {
   try {
     const token = getToken();
-    const userId = getUserIdFromToken();
+    // const userId = getUserIdFromToken();
 
-    if (!token || !userId) {
-      throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
+    // if (!token || !userId) {
+    //   throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
+    // }
+
+    // if (!productData.productId || !productData.quantity) {
+    //   throw new Error("Geçersiz ürün bilgisi.");
+    // }
+
+    if (!token) {
+      throw new Error("Kullanıcı girişi yapılmamış");
     }
-
-    if (productData.quantity <= 0) {
-      throw new Error("Adet 1 veya daha büyük olmalıdır.");
-    }
-
+   
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -98,30 +102,28 @@ export const clearCartByUserId = async () => {
 // Sepetteki tüm ürünleri getirme
 export const getCartByUserId = async () => {
   const token = getToken();
-  const userId = getUserIdFromToken();
-
-  if (!token || !userId) {
-    throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
+  if (!token) {
+    throw new Error("Kullanıcı girişi yapılmamış");
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/user`, { // Backend'e sadece token ile gidiyoruz
-      method: "GET",
+    const response = await fetch(`${API_BASE_URL}/user`, {
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // Token ile kimlik doğrulaması
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Sepet verisini alma hatası!");
+      throw new Error(errorData.message || "Sepet verisi alınamadı");
     }
 
-    const data = await response.json(); // Sepet verisini JSON formatında al
-    return data; // Sepet verilerini döndür
+    const data = await response.json();
+    console.log("Backend'den gelen sepet verisi:", data);
+    return data;
   } catch (error) {
-    console.error("Sepet verisi alma hatası:", error);
+    console.error("Sepet verisi alınamadı:", error);
     throw error;
   }
 };

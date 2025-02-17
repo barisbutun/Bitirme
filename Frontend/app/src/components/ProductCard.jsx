@@ -9,7 +9,7 @@ import {
   addFavorite,
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
-
+import { isAuthenticated, getToken } from "../utils/auth";
 function ProductCard({
   id,
   name,
@@ -22,8 +22,6 @@ function ProductCard({
 }) {
   const navigate = useNavigate();
 
-  const isLoggedIn = () => Boolean(localStorage.getItem("token"));
-
   const [isFavorite, setIsFavorite] = useState(() => {
     const savedFavorites = localStorage.getItem("favorites");
     const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
@@ -31,28 +29,35 @@ function ProductCard({
   });
 
   const addToCartHandler = async () => {
-    if (!isLoggedIn()) {
-      notification.info({
-        message: "Giriş Yapın",
-        description: "Sepete ürün eklemek için giriş yapmalısınız.",
-        placement: "topRight",
-      });
-      navigate("/Login");
-      return;
-    }
-
-    const productData = {
-      id,
-      quantity,
-    };
-
     try {
-      await addToCart(productData);
-      notification.success({
-        message: "Sepete Eklendi",
-        description: "Ürün başarıyla sepete eklendi.",
-        placement: "topRight",
-      });
+      const token = getToken();
+      console.log("Token mevcut mu:", !!token);
+
+      if (!token) {
+        notification.info({
+          message: "Giriş Yapın",
+          description: "Sepete ürün eklemek için giriş yapmalısınız.",
+          placement: "topRight",
+        });
+        navigate("/Login");
+        return;
+      }
+
+      const productData = {
+        product_id: id,
+        quantity: 1,
+      };
+
+      console.log("Sepete eklenecek veri:", productData);
+
+      const response = await addToCart(productData);
+      if (response) {
+        notification.success({
+          message: "Sepete Eklendi",
+          description: "Ürün başarıyla sepete eklendi.",
+          placement: "topRight",
+        });
+      }
     } catch (error) {
       notification.error({
         message: "Hata",
@@ -63,23 +68,23 @@ function ProductCard({
   };
 
   const toggleFavoriteHandler = async () => {
-    console.log("product data for favorite:", {
-      id,
-      name,
-      price,
-      image,
-      stock_state,
-      category_id,
-    });
     try {
+      if (!category_id) {
+        console.error("Category ID is missing:", { id, category_id });
+        showNotification("error", "Hata", "Kategori bilgisi eksik.");
+        return;
+      }
+
       const favoriteData = {
         id,
+        category_id,
         name,
         price,
         image,
         stock_state,
-        category_id, // Eksiksiz gönderiliyor
       };
+
+      console.log("favori eklenecek veri:", favoriteData);
 
       if (isFavorite) {
         const success = await removeFavorite(id);
@@ -92,7 +97,10 @@ function ProductCard({
           );
         }
       } else {
-        const success = await addFavorite(favoriteData);
+        const success = await addFavorite({
+          id: favoriteData.id,
+          category_id: favoriteData.category_id,
+        });
         if (success) {
           setIsFavorite(true);
           showNotification(

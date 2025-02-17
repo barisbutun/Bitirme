@@ -33,6 +33,7 @@ const SignUp = () => {
   const [address, setUseraddress] = useState("");
   const [phone, setUserphone] = useState("");
   const [message, setMessage] = useState("");
+  const [kode, setKode] = useState("");
   const navigate = useNavigate();
 
   // const registerUser = async (e) => {

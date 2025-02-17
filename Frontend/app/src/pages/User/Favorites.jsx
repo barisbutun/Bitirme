@@ -17,10 +17,13 @@ const Favorites = () => {
     fetchFavorites((data) => {
       const formattedData = data.map((item) => ({
         id: item.id || null, // Favori ID
-        name: item.product?.name || "Ürün Adı Yok", // Product Name
-        price: item.product?.price || 0, // Product Price
-        stock: item.product?.stock || "Bilinmiyor", // Stock
-        image1: item.product?.image1 || "default-image-url.jpg", // Image URL
+        name: item.product?.name || "Ürün Adı Yok", // Ürün Adı
+        price: item.product?.price ?? "Bilinmiyor", // Fiyat
+        stockState: item.product?.stock_state || "Bilinmiyor", // Stok Durumu (Enum olabilir)
+        categoryId: item.product?.category_id || "Kategori Yok", // Kategori ID
+        description: item.product?.description || "Açıklama yok", // Açıklama
+        quantity: item.product?.quantity ?? 0, // Adet
+        image: item.product?.imageUrls?.[0] || "/assets/default-product.jpg", // İlk resim veya varsayılan
       }));
       setFavoriteProducts(formattedData);
     });

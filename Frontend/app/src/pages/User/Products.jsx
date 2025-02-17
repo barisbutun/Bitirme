@@ -28,7 +28,7 @@ const Products = () => {
         const productsWithImages = await Promise.all(
           productsData.map(async (product) => {
             const images = await fetchProductImages(product.id);
-            return { ...product, images };
+            return { ...product, images, category_id: product.categoryId };
           })
         );
 

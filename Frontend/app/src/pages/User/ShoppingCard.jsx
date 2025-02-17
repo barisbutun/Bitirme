@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Layout, Table, notification } from "antd";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/ShoppingCard.css";
-import { useNavigate } from "react-router-dom";
+import { getUserIdFromToken, isAuthenticated } from "../../utils/auth";
 import {
   removeFromCart as removeFromCartService,
   getCartByUserId,
@@ -14,39 +15,56 @@ const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  // Sepet verisini backend'den alıyoruz
   useEffect(() => {
     const fetchCartData = async () => {
       try {
-        const userId = 1; // Kullanıcı ID'si, genellikle oturumdan alınır
-        const cartItems = await getCartByUserId(userId); // Servisten sepet verisini alıyoruz
-        setData(cartItems); // Veriyi state'e kaydediyoruz
+        if (!isAuthenticated()) {
+          notification.warning({
+            message: "Giriş Gerekli",
+            description: "Lütfen önce giriş yapın.",
+            placement: "topRight",
+          });
+          navigate("/login");
+          return;
+        }
+        const userId = getUserIdFromToken();
+        if (!userId) {
+          throw new Error("Kullanıcı bilgisi alınamadı");
+        }
+        setLoading(true);
+        const cartItems = await getCartByUserId(userId);
+        console.log("Backend'den gelen sepet verisi:", cartItems);
+        setData(cartItems);
       } catch (error) {
         console.error("Sepet verisi alınamadı:", error);
+        notification.error({
+          message: "Hata",
+          description: "Sepet verisi alınamadı: " + error.message,
+          placement: "topRight",
+        });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCartData();
-  }, []);
+  }, [navigate]);
 
   const handleOrder = () => {
-    navigate("/Orders"); // Sepeti onaylamak için "Orders" sayfasına yönlendiriyoruz
+    navigate("/Orders");
   };
 
   const handleRemoveFromCart = async (productId) => {
     try {
-      // Ürünü API'den silme işlemi
       await removeFromCartService(productId);
-
-      // Sepetten ürünü çıkarıyoruz
       const updatedCart = data.filter((item) => item.id !== productId);
       setData(updatedCart);
 
-      // Kullanıcıyı bilgilendiriyoruz
       notification.warning({
         message: "Sepetten Çıkarıldı",
-        description: "Ürün başarıyla sepette çıkarıldı!",
+        description: "Ürün başarıyla sepetten çıkarıldı!",
         placement: "topRight",
       });
     } catch (error) {
@@ -60,38 +78,36 @@ const ShoppingCard = () => {
 
   const columns = [
     {
-      title: "Ürün Resmi", // Product Image
-      dataIndex: "image", // image alanını kullanıyoruz
+      title: "Ürün Resmi",
+      dataIndex: ["product", "image1"],
       key: "image",
-      render: (image) => <img className="image" src={image} alt="Ürün Resmi" />, // Resmi gösteriyoruz
+      render: (image) => <img className="image" src={image} alt="Ürün Resmi" />,
     },
     {
-      title: "Ürün id", // Product Name
-      dataIndex: "id", // name alanını kullanıyoruz
-      key: "id",
+      title: "Ürün Adı",
+      dataIndex: ["product", "name"],
+      key: "name",
     },
     {
-      title: "Açıklama", // Description
-      dataIndex: "description", // description alanı mevcutsa bunu kullanabilirsiniz
-      key: "description",
-      render: (text) => text || "Açıklama yok", // Eğer açıklama yoksa "Açıklama yok" yazdır
+      title: "Miktar",
+      dataIndex: "quantity",
+      key: "quantity",
     },
     {
-      title: "Fiyat", // Price
-      dataIndex: "price", // price alanını kullanıyoruz
+      title: "Fiyat",
+      dataIndex: ["product", "price"],
       key: "price",
-      render: (price) => `${price.toFixed(2)} TL`, // Fiyatı TL cinsinden gösteriyoruz
+      render: (price) => `${price?.toFixed(2)} TL`,
     },
     {
-      title: "Stok Durumu", // Stock Status
-      dataIndex: "stock", // stock alanını kullanıyoruz
-      key: "stock",
-    },
-    {
-      title: "İşlem", // Action
+      title: "İşlem",
       key: "action",
-      render: (text, record) => (
-        <Button type="primary" onClick={() => handleRemoveFromCart(record.id)}>
+      render: (_, record) => (
+        <Button
+          type="primary"
+          danger
+          onClick={() => handleRemoveFromCart(record.id)}
+        >
           Sepetten Çıkar
         </Button>
       ),
@@ -107,7 +123,8 @@ const ShoppingCard = () => {
           className="shopping-card-table"
           columns={columns}
           dataSource={data}
-          rowKey={(record) => record.id} // Verilerin benzersizliğini sağlıyoruz
+          rowKey={(record) => record.id}
+          loading={loading}
           expandable={{
             expandedRowRender: (record) => (
               <Table
@@ -137,6 +154,7 @@ const ShoppingCard = () => {
                 className="SiparisButon"
                 type="primary"
                 onClick={handleOrder}
+                disabled={data.length === 0}
               >
                 Sepeti Onayla
               </Button>

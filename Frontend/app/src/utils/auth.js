@@ -18,8 +18,10 @@ export const decodeToken = (token) => {
   return [];  // Token yoksa null döndürülür
 };
 
+// token'dan userId'yi almak için fonksiyon
+
 export const getUserIdFromToken = () => { 
-  const token = localStorage.getItem("token");  // Token'ı localStorage'dan alıyoruz
+  const token = getToken();  // Token'ı localStorage'dan alıyoruz
   if (!token) {
     console.warn("Token bulunamadı.");  
     return null;
@@ -28,11 +30,34 @@ export const getUserIdFromToken = () => {
   try {
     const decodedToken = jwtDecode(token);
     // console.log("Çözümlenmiş Token:", decodedToken);  
-    // console.log("Kullanıcı ID:", decodedToken.userId);  
-    return decodedToken.userId;  // UserId'yi döndürüyoruz
+    // console.log("Kullanıcı ID:", decodedToken.userId);
+    const userId = decodedToken.userId || decodeToken.sub;
+    console.log("Kullanıcı ID:", userId);
+    return userId;  // UserId'yi döndürüyoruz
   } catch (error) {
     console.error("Token decode hatası:", error.message);  
     return null;
+  }
+};
+
+// Kullanıcının giriş yapmış olup olmadığını kontrol eden fonksiyon
+export const isAuthenticated = () => {
+  const token = getToken();
+  if (!token) {
+    console.log("Token bulunamadı");
+    return false;
+  }
+
+  try {
+    const decodedToken = jwtDecode(token);
+    console.log("Decoded token:", decodedToken); // Debug için
+    const currentTime = Date.now() / 1000;
+    const isValid = decodedToken.exp > currentTime;
+    console.log("Token geçerli mi:", isValid); // Debug için
+    return isValid;
+  } catch (error) {
+    console.error("Token doğrulama hatası:", error);
+    return false;
   }
 };
 

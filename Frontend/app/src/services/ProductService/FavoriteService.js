@@ -6,7 +6,7 @@ const API_BASE_URL = "http://localhost:8082/api/favourite/v1";
 // Favori Ekleme
 export const addFavorite = async (product) => {
   const token = localStorage.getItem("token");
-  if (!token) {
+  if (!token) { 
     notification.info({
       message: "Giriş Yapın",
       description: "Favori eklemek için giriş yapmalısınız.",
@@ -19,14 +19,25 @@ export const addFavorite = async (product) => {
   if (!userId) {
     throw new Error("Geçersiz token.");
   }
-
+// Hem categoryId hem de category_id'yi kontrol et
+const categoryId = product.categoryId || product.category_id;
+  
+if (!categoryId) {
+  console.error('Category ID eksik:', product);
+  notification.error({
+    message: "Hata",
+    description: "Kategori bilgisi eksik.",
+    placement: "topRight",
+  });
+  return false;
+}
   const favoriteData = {
     product_id: product.id,
-    category_id: product.category_id,
+    category_id: categoryId,
+
   };
 
-  // Local storage'ye geçici olarak kaydet
-  localStorage.setItem("pendingFavorite", JSON.stringify(favoriteData));
+  console.log('Backende gönderilen veri:', favoriteData);
 
   try {
     const response = await fetch(API_BASE_URL, {
