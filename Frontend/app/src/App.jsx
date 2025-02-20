@@ -65,7 +65,12 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: false,
+        v7_relativeSplatPath: false,
+      }}
+    >
       <Routes>
         {/* İlk sayfa (Homepage) */}
         <Route path="/" element={<Homepage />} />

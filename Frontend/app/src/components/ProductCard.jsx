@@ -19,6 +19,7 @@ function ProductCard({
   stock_state, // 'AVAILABLE' or 'UNAVAILABLE'
   description,
   category_id,
+  categoryId,
 }) {
   const navigate = useNavigate();
 
@@ -69,22 +70,18 @@ function ProductCard({
 
   const toggleFavoriteHandler = async () => {
     try {
-      if (!category_id) {
-        console.error("Category ID is missing:", { id, category_id });
+      // Hem categoryId hem de category_id'yi kontrol et
+      const effectiveCategoryId = category_id || categoryId;
+
+      if (!effectiveCategoryId) {
+        console.error("Category ID is missing:", {
+          id,
+          category_id,
+          categoryId,
+        });
         showNotification("error", "Hata", "Kategori bilgisi eksik.");
         return;
       }
-
-      const favoriteData = {
-        id,
-        category_id,
-        name,
-        price,
-        image,
-        stock_state,
-      };
-
-      console.log("favori eklenecek veri:", favoriteData);
 
       if (isFavorite) {
         const success = await removeFavorite(id);
@@ -98,8 +95,8 @@ function ProductCard({
         }
       } else {
         const success = await addFavorite({
-          id: favoriteData.id,
-          category_id: favoriteData.category_id,
+          id: id,
+          categoryId: effectiveCategoryId,
         });
         if (success) {
           setIsFavorite(true);

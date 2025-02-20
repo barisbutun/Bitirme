@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8082/api/admin/v1/users';
 // Kullanıcıları alma (filtreleme)
 export const getAllUsers = async () => {
     const token = getToken();
+    try {
     const response = await fetch(API_URL, {
       method: 'GET',
       headers: {
@@ -18,10 +19,13 @@ export const getAllUsers = async () => {
     }
   
     const data = await response.json();
-  
-    // Gelen veriyi filtrele
-    const filteredUsers = data.filter(user => user.role === "USER");
-    return filteredUsers;
+    // console.log('serviceden gelen veriler',data);
+    return data;
+   }catch(error){
+    console.error('service error:',error);
+    throw error;
+   } 
+
   };
   
   

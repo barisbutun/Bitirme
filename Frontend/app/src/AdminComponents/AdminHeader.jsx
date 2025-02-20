@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Layout, theme, Input, Button } from "antd";
 import "../css/Header.css";
 import { logout } from "../services/UserService/AuthService";

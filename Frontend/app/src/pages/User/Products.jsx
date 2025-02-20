@@ -23,12 +23,20 @@ const Products = () => {
         setLoading(true);
 
         const productsData = await fetchProducts();
+        console.log("API'den gelen ham veri:", productsData); // Debug log 1
 
         // Resimleri ekle
         const productsWithImages = await Promise.all(
           productsData.map(async (product) => {
             const images = await fetchProductImages(product.id);
-            return { ...product, images, category_id: product.categoryId };
+            const transformedProduct = {
+              ...product,
+              images,
+              category_id: product.categoryId || product.category_id,
+              categoryId: product.categoryId || product.category_id, // Her iki formatı da koruyalım
+            };
+            console.log("Dönüştürülmüş ürün:", transformedProduct); // Debug log 2
+            return transformedProduct;
           })
         );
 
@@ -78,6 +86,7 @@ const Products = () => {
                 quantity={product.quantity}
                 stock_state={product.stock_state}
                 category_id={product.category_id}
+                categoryId={product.categoryId}
               />
             ))
           ) : (
