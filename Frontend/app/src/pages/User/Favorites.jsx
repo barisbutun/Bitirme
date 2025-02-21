@@ -15,19 +15,35 @@ const Favorites = () => {
 
   useEffect(() => {
     fetchFavorites((data) => {
+      console.log("Ham favori verisi:", data); // Debug için
       const formattedData = data.map((item) => ({
-        id: item.id || null, // Favori ID
-        name: item.product?.name || "Ürün Adı Yok", // Ürün Adı
-        price: item.product?.price ?? "Bilinmiyor", // Fiyat
-        stockState: item.product?.stock_state || "Bilinmiyor", // Stok Durumu (Enum olabilir)
-        categoryId: item.product?.category_id || "Kategori Yok", // Kategori ID
-        description: item.product?.description || "Açıklama yok", // Açıklama
-        quantity: item.product?.quantity ?? 0, // Adet
-        image: item.product?.imageUrls?.[0] || "/assets/default-product.jpg", // İlk resim veya varsayılan
+        id: item.product_id || null, // Favori ID
+        category_id: item.productResponse?.category_id || "Kategori Yok", // Kategori ID
+        // name: item.productResponse?.name || "Ürün Adı Yok", // Ürün Adı
+        // price: item.productResponse?.price ?? "Bilinmiyor", // Fiyat
+        // stockState: item.productResponse?.stock_state || "Bilinmiyor", // Stok Durumu (Enum olabilir)
+        // description: item.productResponse?.description || "Açıklama yok", // Açıklama
+        // quantity: item.productResponse?.quantity ?? 0, // Adet
+        // image:
+        //   item.productResponse?.imageUrls?.[0] || "/assets/default-product.jpg", // İlk resim veya varsayılan
       }));
+      console.log("Formatlanmış veri:", formattedData); // Debug için
       setFavoriteProducts(formattedData);
     });
   }, []);
+
+  const handleRemoveFavorite = async (productId) => {
+    console.log("Silinecek ürün ID:", productId);
+    if (!productId) {
+      console.error("Geçersiz ürün ID'si");
+      return;
+    }
+    const success = await removeFavorite(productId);
+    if (success) {
+      // Favori listesini güncelle
+      fetchFavorites(setFavoriteProducts);
+    }
+  };
 
   const columns = [
     {
@@ -65,7 +81,8 @@ const Favorites = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => removeFavorite(record.id, setFavoriteProducts)}
+          onClick={() => handleRemoveFavorite(record.id)}
+          disabled={!record.id}
         >
           Favoriden Çıkar
         </Button>

@@ -23,7 +23,7 @@ const Products = () => {
         setLoading(true);
 
         const productsData = await fetchProducts();
-        console.log("API'den gelen ham veri:", productsData); // Debug log 1
+        console.log("products.jsx'deki -API'den gelen ham veri:", productsData); // Debug log 1
 
         // Resimleri ekle
         const productsWithImages = await Promise.all(
@@ -35,11 +35,14 @@ const Products = () => {
               category_id: product.categoryId || product.category_id,
               categoryId: product.categoryId || product.category_id, // Her iki formatı da koruyalım
             };
-            console.log("Dönüştürülmüş ürün:", transformedProduct); // Debug log 2
+            console.log(
+              "Products.jsx - Dönüştürülmüş ürün:",
+              transformedProduct
+            ); // Debug log 2
             return transformedProduct;
           })
         );
-
+        console.log("Products.jsx - Final ürün listesi:", productsWithImages); // Debug log 3
         setProducts(productsWithImages);
         setFilteredProducts(productsWithImages);
       } catch (error) {

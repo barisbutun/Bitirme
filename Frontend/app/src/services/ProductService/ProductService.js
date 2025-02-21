@@ -16,14 +16,13 @@ export const fetchProducts = async () => {
     }
 
     const products = await response.json();
-    // console.log("API'den gelen ürün verisi:", products);// api den gelen verileri kontrol etmek için
+    console.log("API'den gelen ürün verisi:", products);// api den gelen verileri kontrol etmek için
   // categoryId'yi category_id'ye dönüştür
   const formattedProducts = products.map(product => ({
     ...product,
-    category_id: product.categoryId ,// Backend'den gelen categoryId'yi frontend'in beklediği formata dönüştür
-    categoryId: product.categoryId
+    category_id: product.category_id ,// Backend'den gelen categoryId'yi frontend'in beklediği formata dönüştür
   }));
-  
+  console.log("Format sonrası ürünler:", formattedProducts); // Debug log 2
   return formattedProducts;
 } catch (error) {
     console.error("fetchProducts Error:", error);

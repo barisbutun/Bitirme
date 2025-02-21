@@ -1,7 +1,7 @@
 import { notification } from "antd";
 import { getUserIdFromToken } from "../../utils/auth";
 
-const API_BASE_URL = "http://localhost:8082/api/favourite/v1";
+const API_BASE_URL = "http://localhost:8082/api/favourite";
 
 // Favori Ekleme
 export const addFavorite = async (product) => {
@@ -40,7 +40,7 @@ if (!categoryId) {
   console.log('Backende gönderilen veri:', favoriteData);
 
   try {
-    const response = await fetch(API_BASE_URL, {
+    const response = await fetch(`${API_BASE_URL}/v1/getAllByUserId`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ if (!categoryId) {
 };
 
 // Favori Silme
-export const removeFavorite = async (id) => {
+export const removeFavorite = async (productId) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -91,9 +91,16 @@ export const removeFavorite = async (id) => {
     });
     return false;
   }
-
+  if (!productId) {
+    notification.error({
+      message: "Hata",
+      description: "Geçersiz ürün ID'si",
+      placement: "topRight",
+    });
+    return false;
+  }
   try {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +142,7 @@ export const fetchFavorites = async (setFavoriteProducts) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/getAllUser`, {
+    const response = await fetch(`${API_BASE_URL}/v1/getAllByUserId`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

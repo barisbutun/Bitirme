@@ -21,6 +21,11 @@ function ProductCard({
   category_id,
   categoryId,
 }) {
+  console.log("ProductCard props:", {
+    id,
+    category_id,
+  });
+
   const navigate = useNavigate();
 
   const [isFavorite, setIsFavorite] = useState(() => {
@@ -70,18 +75,13 @@ function ProductCard({
 
   const toggleFavoriteHandler = async () => {
     try {
-      // Hem categoryId hem de category_id'yi kontrol et
       const effectiveCategoryId = category_id || categoryId;
 
-      if (!effectiveCategoryId) {
-        console.error("Category ID is missing:", {
-          id,
-          category_id,
-          categoryId,
-        });
-        showNotification("error", "Hata", "Kategori bilgisi eksik.");
-        return;
-      }
+      console.log("toggleFavoriteHandler - category bilgileri:", {
+        category_id,
+        categoryId,
+        effectiveCategoryId,
+      });
 
       if (isFavorite) {
         const success = await removeFavorite(id);
