@@ -22,7 +22,7 @@ public class FavouriteController {
     private final FavouriteService favouriteService;
 
     @PostMapping("/v1")
-    public ResponseEntity<FavouriteDto> create(@RequestBody FavouriteDto favouriteDto) {
+    public ResponseEntity<List<FavouriteDto>> create(@RequestBody FavouriteDto favouriteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
@@ -46,7 +46,11 @@ public class FavouriteController {
 
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        favouriteService.delete(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+
+        favouriteService.delete(userId,id);
         return ResponseEntity.noContent().build();
     }
 

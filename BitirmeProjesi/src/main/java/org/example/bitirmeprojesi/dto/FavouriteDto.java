@@ -25,4 +25,11 @@ public class FavouriteDto implements Serializable {
     private long productId;
     @JsonProperty("category_id")
     private long categoryId;
+
+    @JsonProperty("price")
+    double price;
+
+    @JsonProperty("name")
+    String name;
+
 }

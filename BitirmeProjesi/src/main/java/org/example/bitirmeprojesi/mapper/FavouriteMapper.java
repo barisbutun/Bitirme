@@ -14,10 +14,14 @@ public interface FavouriteMapper {
 
     @Mapping(source = "productId", target = "product.id")
     @Mapping(source = "categoryId", target = "category.id")
+    @Mapping(source = "price", target = "product.price")
+    @Mapping(source = "name", target = "product.name")
     Favourite toEntity(FavouriteDto favouriteDto);
 
     @Mapping(source = "product.id", target = "productId")
     @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "product.price", target = "price")
+    @Mapping(source = "product.name", target = "name")
     FavouriteDto toDto(Favourite favourite);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

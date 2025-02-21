@@ -14,6 +14,7 @@ import org.example.bitirmeprojesi.repository.FavouriteRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,18 +36,18 @@ public class FavouriteService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    @CacheEvict(value = "favourites", key = "#userId", beforeInvocation = false)
-    public FavouriteDto create(FavouriteDto favouriteDto, UUID userId) {
+    public List<FavouriteDto> create(FavouriteDto favouriteDto, UUID userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserIdNotFoundException(ErrorMesage.USER_ID_NOT_FOUND_ERROR));
 
-        Product product = productRepository.findById(favouriteDto.getProductId()).orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        Product product = productRepository.findById(favouriteDto.getProductId())
+                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
-        Category category= categoryRepository.findById(favouriteDto.getCategoryId()).orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
+        Category category = categoryRepository.findById(favouriteDto.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
-
-        if(productRepository.findCategoryIdByProductId(favouriteDto.getProductId())!=favouriteDto.getCategoryId()){
+        if (!Objects.equals(productRepository.findCategoryIdByProductId(favouriteDto.getProductId()), favouriteDto.getCategoryId())) {
             throw new ConflictProductAndCategoryException(ErrorMesage.CONFLICT_PRODUCT_AND_CATEGORY);
         }
 
@@ -62,14 +64,21 @@ public class FavouriteService {
         favourite.setProduct(product);
         favourite.setUser(user);
         favourite.setCategory(category);
-        favourite = favouriteRepository.save(favourite);
+        favouriteRepository.save(favourite);
 
-        return favouriteMapper.toDto(favourite);
+        return favouriteRepository.findByUserId(userId)
+                .stream()
+                .map(favouriteMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    @CacheEvict(value = "favourites", key = "#userId")
-    public void delete(Long id) {
-        favouriteRepository.deleteById(id);
+    public void delete(UUID userId, Long id) {
+        Favourite favourite = favouriteRepository.findByUserId(userId).stream()
+                .filter(f -> f.getId()==id)
+                .findFirst()
+                .orElseThrow(() -> new FavouriteNotFoundException(ErrorMesage.FAVOURITE_NOT_FOUND_ERROR));
+
+        favouriteRepository.deleteById(favourite.getId()); // Önce varlığı doğrula, sonra sil.
     }
 
     public List<FavouriteDto> findAll(){
@@ -78,7 +87,6 @@ public class FavouriteService {
        return favouriteDto;
     }
 
-    @CacheEvict(value = "favourites", key = "#userId")
     public FavouriteDto update(FavouriteDto favouriteDto,long id){
         Favourite favourite=favouriteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("favourite product not found with id:"+id));
         favouriteMapper.update(favouriteDto,favourite);
@@ -86,11 +94,11 @@ public class FavouriteService {
         return favouriteMapper.toDto(favourite);
     }
 
-    @Cacheable(value = "favourites", key = "#userId")
+
     public List<FavouriteDto> getlAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException("Account bulunamadı"));
+        userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
         Page<Favourite> favourites = favouriteRepository.findByUserId(userId, pageable);
 

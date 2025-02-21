@@ -25,4 +25,8 @@ public class ShoppingCartItemDto implements Serializable {
     private long productId;
     @JsonProperty("quantity")
     private Integer quantity;
+    @JsonProperty("price")
+    private double price;
+    @JsonProperty("name")
+    private String name;
 }

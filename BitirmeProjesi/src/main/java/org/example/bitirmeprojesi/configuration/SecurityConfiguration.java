@@ -135,10 +135,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Collections.singletonList("http://192.168.90.16:3000"));
         config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-        config.setAllowedOrigins(Collections.singletonList("http://localhost:9600"));
-        config.setAllowedOrigins(Collections.singletonList("http://192.168.1.113:3000"));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH"));
 

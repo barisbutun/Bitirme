@@ -45,7 +45,6 @@ public class OrderService {
     private final UserRepository userRepository;
     private final OrderItemService orderItemService;
 
-    @CacheEvict(value = "orders", key = "#userId")
     public OrdersDto create(OrdersDto ordersDto, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
@@ -79,7 +78,6 @@ public class OrderService {
         return orderMapper.toDto(orders);
     }
 
-    @Cacheable(value = "orders", key = "#id")
     public OrdersDto findById(Long id) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
@@ -92,7 +90,6 @@ public class OrderService {
         return orderMapper.toDtoOrderGetOrderItems(orders);
     }
 
-    @CachePut(value = "orders", key = "#userId")
     public OrdersDto update(OrdersDto ordersDto, long id) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
@@ -101,19 +98,16 @@ public class OrderService {
         return orderMapper.toDto(orders);
     }
 
-    @Cacheable(value = "orders", key = "#page + '-' + #size")
     public List<OrdersDto> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Orders> orders = orderRepository.findAll(pageable);
         return orderMapper.toDtoList(orders.getContent());
     }
 
-    @CacheEvict(value = "orders", key = "#id")
     public void delete(long id) {
         orderRepository.deleteById(id);
     }
 
-    @Cacheable(value = "orders", key = "#userId + '-' + #page + '-' + #size")
     public List<OrdersDto> findAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)

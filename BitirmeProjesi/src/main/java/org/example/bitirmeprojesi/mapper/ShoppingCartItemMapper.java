@@ -14,9 +14,13 @@ public interface ShoppingCartItemMapper {
 
 
     @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.price", target = "price")
+    @Mapping(source = "product.name", target = "name")
     ShoppingCartItemDto toDto(ShoppingCartItem shoppingCartItem);
 
     @Mapping(source = "productId", target = "product.id")
+    @Mapping(source = "price", target = "product.price")
+    @Mapping(source = "name", target = "product.name")
     ShoppingCartItem toEntity(ShoppingCartItemDto shoppingCartItemDto);
 
 

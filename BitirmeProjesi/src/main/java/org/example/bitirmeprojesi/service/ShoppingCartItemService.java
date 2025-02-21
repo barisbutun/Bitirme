@@ -36,7 +36,6 @@ public class ShoppingCartItemService {
     private final ShoppingCartItemValidator shoppingCartItemValidator;
 
     @Transactional
-    @CacheEvict(value = "shoppingCartItems", key = "#userId")
     public ShoppingCartItemDto create(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
 
         User user=userRepository.findById(userId)
@@ -57,7 +56,6 @@ public class ShoppingCartItemService {
         return shoppingCartItemMapper.toDto(shoppingCartItem);
     }
 
-    @Cacheable(value = "shoppingCartItems", key = "#userId")
     public List<ShoppingCartItemDto> findAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
@@ -65,12 +63,11 @@ public class ShoppingCartItemService {
         Page<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(user.getId(), pageable);
         return shoppingCartItemMapper.toDtoList( shoppingCartItems.getContent());
     }
-    @CacheEvict(value = "shoppingCartItems", key = "#userId")
+
     public void delete(long id) {
         shoppingCartItemRepository.deleteById(id);
     }
 
-    @CacheEvict(value = "shoppingCartItems", key = "#userId")
     public void deleteAllByUserId(UUID userId) {
         shoppingCartItemRepository.deleteAllByUserId(userId);
     }
