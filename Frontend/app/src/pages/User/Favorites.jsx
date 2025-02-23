@@ -8,40 +8,57 @@ import {
   fetchFavorites,
   removeFavorite,
 } from "../../services/ProductService/FavoriteService";
+import { fetchProductImages } from "../../services/ProductService/ProductService";
 
 const Favorites = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadFavorites = async () => {
+    try {
+      setLoading(true);
+      const favorites = await fetchFavorites();
+      console.log("Ham favori verisi:", favorites);
+
+      // Her favori için resim bilgisini çek
+      const favoritesWithImages = await Promise.all(
+        favorites.map(async (favorite) => {
+          const images = await fetchProductImages(favorite.product_id);
+          return {
+            id: favorite.product_id,
+            category_id: favorite.category_id,
+            name: favorite.name,
+            price: favorite.price,
+            image1: images?.[0] || null,
+            stock: "AVAILABLE", // Backend'den stok bilgisi geliyorsa burası güncellenebilir
+          };
+        })
+      );
+
+      console.log("Resimlerle birlikte favoriler:", favoritesWithImages);
+      setFavoriteProducts(favoritesWithImages);
+    } catch (error) {
+      console.error("Favoriler yüklenirken hata:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchFavorites((data) => {
-      console.log("Ham favori verisi:", data); // Debug için
-      const formattedData = data.map((item) => ({
-        id: item.product_id || null, // Favori ID
-        category_id: item.productResponse?.category_id || "Kategori Yok", // Kategori ID
-        // name: item.productResponse?.name || "Ürün Adı Yok", // Ürün Adı
-        // price: item.productResponse?.price ?? "Bilinmiyor", // Fiyat
-        // stockState: item.productResponse?.stock_state || "Bilinmiyor", // Stok Durumu (Enum olabilir)
-        // description: item.productResponse?.description || "Açıklama yok", // Açıklama
-        // quantity: item.productResponse?.quantity ?? 0, // Adet
-        // image:
-        //   item.productResponse?.imageUrls?.[0] || "/assets/default-product.jpg", // İlk resim veya varsayılan
-      }));
-      console.log("Formatlanmış veri:", formattedData); // Debug için
-      setFavoriteProducts(formattedData);
-    });
+    loadFavorites();
   }, []);
 
-  const handleRemoveFavorite = async (productId) => {
-    console.log("Silinecek ürün ID:", productId);
+  const handleRemoveFavorite = async (record) => {
+    console.log("Silinecek ürün ID:", record);
+    const productId = record.id;
     if (!productId) {
       console.error("Geçersiz ürün ID'si");
       return;
     }
     const success = await removeFavorite(productId);
     if (success) {
-      // Favori listesini güncelle
-      fetchFavorites(setFavoriteProducts);
+      await loadFavorites();
     }
   };
 
@@ -81,8 +98,8 @@ const Favorites = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleRemoveFavorite(record.id)}
-          disabled={!record.id}
+          danger
+          onClick={() => handleRemoveFavorite(record)}
         >
           Favoriden Çıkar
         </Button>
@@ -98,9 +115,10 @@ const Favorites = () => {
         <div className="favorites-page">
           <h2>Favori Ürünlerim</h2>
           <Table
+            loading={loading}
             columns={columns}
             dataSource={favoriteProducts}
-            rowKey={(record) => record.id || Math.random()} // Eğer ID yoksa random key kullanır
+            rowKey={(record) => record.id || Math.random()}
             pagination={{ pageSize: 5 }}
           />
         </div>

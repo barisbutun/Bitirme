@@ -10,19 +10,23 @@ import {
   fetchProducts,
   fetchProductImages,
 } from "../../services/ProductService/ProductService";
+import { fetchFavorites } from "../../services/ProductService/FavoriteService";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [favorites, setFavorites] = useState([]);
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
-
-        const productsData = await fetchProducts();
+        // Ürünleri ve favorileri paralel olarak çek
+        const [productsData] = await Promise.all([
+          fetchProducts(),
+          fetchFavorites(setFavorites),
+        ]);
         console.log("products.jsx'deki -API'den gelen ham veri:", productsData); // Debug log 1
 
         // Resimleri ekle
@@ -90,6 +94,7 @@ const Products = () => {
                 stock_state={product.stock_state}
                 category_id={product.category_id}
                 categoryId={product.categoryId}
+                favorites={favorites}
               />
             ))
           ) : (

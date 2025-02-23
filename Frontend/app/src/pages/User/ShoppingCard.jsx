@@ -7,7 +7,7 @@ import Footer from "../../components/Footer";
 import "../User/UserCss/ShoppingCard.css";
 import { getUserIdFromToken, isAuthenticated } from "../../utils/auth";
 import {
-  removeFromCart as removeFromCartService,
+  removeFromCart,
   getCartByUserId,
 } from "../../services/ProductService/ShoppingCardService";
 
@@ -17,60 +17,79 @@ const ShoppingCard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCartData = async () => {
-      try {
-        if (!isAuthenticated()) {
-          notification.warning({
-            message: "Giriş Gerekli",
-            description: "Lütfen önce giriş yapın.",
-            placement: "topRight",
-          });
-          navigate("/login");
-          return;
-        }
-        const userId = getUserIdFromToken();
-        if (!userId) {
-          throw new Error("Kullanıcı bilgisi alınamadı");
-        }
-        setLoading(true);
-        const cartItems = await getCartByUserId(userId);
-        console.log("Backend'den gelen sepet verisi:", cartItems);
-        setData(cartItems);
-      } catch (error) {
-        console.error("Sepet verisi alınamadı:", error);
-        notification.error({
-          message: "Hata",
-          description: "Sepet verisi alınamadı: " + error.message,
+  // Sepet verilerini getiren fonksiyon
+  const loadCartItems = async () => {
+    try {
+      if (!isAuthenticated()) {
+        notification.warning({
+          message: "Giriş Gerekli",
+          description: "Lütfen önce giriş yapın.",
           placement: "topRight",
         });
-      } finally {
-        setLoading(false);
+        navigate("/login");
+        return;
       }
-    };
 
-    fetchCartData();
+      const userId = getUserIdFromToken();
+      if (!userId) {
+        throw new Error("Kullanıcı bilgisi alınamadı");
+      }
+
+      setLoading(true);
+      const cartItems = await getCartByUserId(userId);
+      console.log("Backend'den gelen sepet verisi:", cartItems);
+      setData(cartItems);
+    } catch (error) {
+      console.error("Sepet verisi alınamadı:", error);
+      notification.error({
+        message: "Hata",
+        description: "Sepet verisi alınamadı: " + error.message,
+        placement: "topRight",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCartItems();
   }, [navigate]);
 
   const handleOrder = () => {
     navigate("/Orders");
   };
 
-  const handleRemoveFromCart = async (productId) => {
+  // Sepetten ürün çıkarma işlemi
+  const handleRemoveFromCart = async (itemId) => {
     try {
-      await removeFromCartService(productId);
-      const updatedCart = data.filter((item) => item.id !== productId);
-      setData(updatedCart);
+      if (!itemId) {
+        notification.error({
+          message: "Hata",
+          description: "Geçersiz ürün ID'si",
+          placement: "topRight",
+        });
+        return;
+      }
 
-      notification.warning({
-        message: "Sepetten Çıkarıldı",
-        description: "Ürün başarıyla sepetten çıkarıldı!",
+      // ID'yi sayıya çevir
+      const cartItemId = parseInt(itemId, 10);
+
+      console.log("Silinecek ürün ID:", cartItemId);
+
+      await removeFromCart(cartItemId);
+
+      notification.success({
+        message: "Başarılı",
+        description: "Ürün sepetten çıkarıldı",
         placement: "topRight",
       });
+
+      // Sepeti yenile
+      loadCartItems();
     } catch (error) {
       notification.error({
         message: "Hata",
-        description: "Sepetten çıkarma işlemi başarısız oldu.",
+        description: "Ürün sepetten çıkarılamadı",
         placement: "topRight",
       });
     }

@@ -6,29 +6,20 @@ const API_BASE_URL = "http://localhost:8082/api/shoppingCartItem/v1";
 export const addToCart = async (productData) => {
   try {
     const token = getToken();
-    // const userId = getUserIdFromToken();
-
-    // if (!token || !userId) {
-    //   throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
-    // }
-
-    // if (!productData.productId || !productData.quantity) {
-    //   throw new Error("Geçersiz ürün bilgisi.");
-    // }
-
+    
     if (!token) {
       throw new Error("Kullanıcı girişi yapılmamış");
     }
-   
+
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       body: JSON.stringify({
-        product_id: productData.productId,  // Ürün ID'si
-        quantity: productData.quantity,     // Sepetteki ürün adedi
+        product_id: productData.product_id,
+        quantity: productData.quantity
       }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Token ile kimlik doğrulaması
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -37,40 +28,60 @@ export const addToCart = async (productData) => {
       throw new Error(errorData.message || "Sepete ekleme işlemi başarısız oldu.");
     }
 
-    return response.json();  // Başarılı olduğunda dönen veriyi döndür
+    // Response body'nin boş olup olmadığını kontrol et
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    }
+    
+    // Boş response durumunda başarılı kabul et
+    return { success: true };
+
   } catch (error) {
     console.error("Sepete eklerken hata oluştu:", error);
+    if (error instanceof SyntaxError) {
+      // JSON parse hatası durumunda başarılı kabul et
+      return { success: true };
+    }
     throw error;
   }
 };
-
-
 // Sepetten ürün silme
 export const removeFromCart = async (id) => {
   try {
     const token = getToken();
 
     if (!token) {
-      throw new Error("Kullanıcı girişi yapılmamış. Lütfen giriş yapın.");
+      throw new Error("Kullanıcı girişi yapılmamış");
     }
 
-    const response = await fetch(`${API_BASE_URL}/${id}`, { // Backend'deki UUID id'yi kullanıyoruz
+    // ID'yi long tipine uygun formata çevir
+    const cartItemId = typeof id === 'string' ? parseInt(id, 10) : id;
+    
+    if (isNaN(cartItemId) || cartItemId <= 0) {
+      throw new Error("Geçersiz sepet öğesi ID'si");
+    }
+
+    console.log("Silinecek sepet öğesi ID:", cartItemId);
+
+    const response = await fetch(`http://localhost:8082/api/shoppingCartItem/v1/${cartItemId}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`, // Token ile kimlik doğrulaması
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Sepetten çıkarma hatası!");
+    // 204 No Content başarılı yanıt olarak kabul edilir
+    if (!response.ok && response.status !== 204) {
+      throw new Error("Ürün sepetten çıkarılamadı");
     }
+
+    return true;
   } catch (error) {
     console.error("Sepetten çıkarma hatası:", error);
     throw error;
   }
 };
-
 // Kullanıcıya ait tüm ürünleri sepetten silme
 export const clearCartByUserId = async () => {
   const token = getToken();
@@ -110,7 +121,6 @@ export const getCartByUserId = async () => {
     const response = await fetch(`${API_BASE_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
     });
 

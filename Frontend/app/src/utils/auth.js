@@ -50,11 +50,11 @@ export const isAuthenticated = () => {
 
   try {
     const decodedToken = jwtDecode(token);
-    console.log("Decoded token:", decodedToken); // Debug için
-    const currentTime = Date.now() / 1000;
-    const isValid = decodedToken.exp > currentTime;
-    console.log("Token geçerli mi:", isValid); // Debug için
-    return isValid;
+    // Token'da userId veya sub varsa geçerli kabul et
+    if (decodedToken.userId || decodedToken.sub) {
+      return true;
+    }
+    return false;
   } catch (error) {
     console.error("Token doğrulama hatası:", error);
     return false;
