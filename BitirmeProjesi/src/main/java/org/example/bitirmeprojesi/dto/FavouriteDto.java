@@ -19,7 +19,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor(force = true)
 public class FavouriteDto implements Serializable {
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id;
     @JsonProperty("product_id")
     private long productId;
