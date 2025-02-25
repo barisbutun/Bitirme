@@ -64,8 +64,12 @@ public class ShoppingCartItemService {
         return shoppingCartItemMapper.toDtoList( shoppingCartItems.getContent());
     }
 
-    public void delete(long id) {
-        shoppingCartItemRepository.deleteById(id);
+    public void delete(UUID userId,Long id) {
+
+        ShoppingCartItem shoppingCartItem =
+                shoppingCartItemRepository.findByUserId(userId).
+                        stream().filter(shoppingCartItem1 -> shoppingCartItem1.getId() == id).findFirst().orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
+        shoppingCartItemRepository.deleteById(shoppingCartItem.getId());
     }
 
     public void deleteAllByUserId(UUID userId) {

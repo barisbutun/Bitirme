@@ -20,7 +20,7 @@ import java.util.UUID;
 @Setter
 public class ShoppingCartItemDto implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long id;
+    private Long id;
     @JsonProperty("product_id")
     private long productId;
     @JsonProperty("quantity")

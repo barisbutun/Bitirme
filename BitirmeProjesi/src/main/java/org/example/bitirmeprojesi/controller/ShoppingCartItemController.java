@@ -37,8 +37,13 @@ public class ShoppingCartItemController {
 
 
     @DeleteMapping("/v1/{id}")
-    private ResponseEntity<Void> delete(long id) {
-        shoppingCartItemService.delete(id);
+    private ResponseEntity<Void> delete(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        shoppingCartItemService.delete(userId,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
