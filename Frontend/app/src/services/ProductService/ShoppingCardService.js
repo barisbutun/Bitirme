@@ -1,5 +1,5 @@
 import { getUserIdFromToken, getToken } from "../../utils/auth";
-
+import { fetchProductImages } from "../ProductService/ProductService";
 const API_BASE_URL = "http://localhost:8082/api/shoppingCartItem/v1";
 
 // Sepete ürün ekleme
@@ -110,7 +110,10 @@ export const clearCartByUserId = async () => {
   }
 };
 
+
+
 // Sepetteki tüm ürünleri getirme
+
 export const getCartByUserId = async () => {
   const token = getToken();
   if (!token) {
@@ -120,6 +123,7 @@ export const getCartByUserId = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/user`, {
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -129,11 +133,48 @@ export const getCartByUserId = async () => {
       throw new Error(errorData.message || "Sepet verisi alınamadı");
     }
 
-    const data = await response.json();
-    console.log("Backend'den gelen sepet verisi:", data);
-    return data;
+    const cartItems = await response.json();
+    console.log("Backend'den gelen ham sepet verisi:", cartItems);
+
+    // Her bir sepet öğesi için ürün bilgilerini düzenle
+    const cartItemsWithImages = await Promise.all(
+      cartItems.map(async (item) => {
+        try {
+          // Ürün resmini al
+          const images = await fetchProductImages(item.product_id);
+          
+          // Ürün bilgilerini düzenle
+          return {
+            id: item.id,
+            quantity: item.quantity,
+            product: {
+              id: item.product_id,
+              name: item.name,
+              price: item.price,
+              images: images || []
+            }
+          };
+        } catch (error) {
+          console.error(`Ürün ${item.product_id} için resim alınamadı:`, error);
+          return {
+            id: item.id,
+            quantity: item.quantity,
+            product: {
+              id: item.product_id,
+              name: item.name,
+              price: item.price,
+              images: []
+            }
+          };
+        }
+      })
+    );
+
+    console.log("Resimlerle birlikte sepet verisi:", cartItemsWithImages);
+    return cartItemsWithImages;
   } catch (error) {
     console.error("Sepet verisi alınamadı:", error);
     throw error;
   }
 };
+

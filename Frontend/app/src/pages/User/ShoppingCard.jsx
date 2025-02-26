@@ -98,9 +98,19 @@ const ShoppingCard = () => {
   const columns = [
     {
       title: "Ürün Resmi",
-      dataIndex: ["product", "image1"],
+      dataIndex: ["product", "images"],
       key: "image",
-      render: (image) => <img className="image" src={image} alt="Ürün Resmi" />,
+      render: (images) => (
+        <img
+          className="image"
+          src={images && images.length > 0 ? images[0] : ""}
+          alt="Ürün Resmi"
+          onError={(e) => {
+            console.log("Resim yüklenemedi");
+            e.target.style.display = "none";
+          }}
+        />
+      ),
     },
     {
       title: "Ürün Adı",

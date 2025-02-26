@@ -3,8 +3,7 @@ import { getUserIdFromToken } from "../../utils/auth";
 import { fetchProductImages } from "./ProductService";
 
 const API_BASE_URL = "http://localhost:8082/api/favourite";
-
-// Favori Bilgilerini Çekme
+// Favori listeleme
 export const fetchFavorites = async () => {
   const token = localStorage.getItem("token");
   const userId = getUserIdFromToken(token);
@@ -28,33 +27,80 @@ export const fetchFavorites = async () => {
     }
 
     const favoriteProducts = await response.json();
-    console.log("Backend'den dönen favoriler:", favoriteProducts);
+    console.log("Backend'den dönen ham veri:", favoriteProducts);
 
-    // Her favori ürün için resim bilgisini çek
     const favoritesWithImages = await Promise.all(
       favoriteProducts.map(async (favorite) => {
         try {
           const images = await fetchProductImages(favorite.product_id);
           return {
-            ...favorite,
-            favoriteId: favorite.id, // Favori ID'sini ayrı bir field olarak saklayalım
+            favorite_id: favorite.id, // Backend'den gelen favori ID'si
+            product_id: favorite.product_id,
+            category_id: favorite.category_id,
+            price: favorite.price,
+            name: favorite.name,
             image1: images?.[0] || null,
           };
         } catch (error) {
           console.error(`Ürün ${favorite.product_id} için resim çekilemedi:`, error);
           return {
-            ...favorite,
+            favorite_id: favorite.id,
+            product_id: favorite.product_id,
+            category_id: favorite.category_id,
+            price: favorite.price,
+            name: favorite.name,
             image1: null,
           };
         }
       })
     );
 
-    console.log("Resimlerle birlikte favoriler:", favoritesWithImages);
+    console.log("İşlenmiş favoriler:", favoritesWithImages);
     return favoritesWithImages;
   } catch (error) {
     console.error("Favori ürünler çekilirken hata oluştu:", error);
     return [];
+  }
+};
+
+// Favori silme fonksiyonu
+export const removeFavorite = async (favorite_id) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    console.log("Silinecek favori ID:", favorite_id);
+    const response = await fetch(`${API_BASE_URL}/v1/${favorite_id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 204) {
+      notification.success({
+        message: "Başarılı",
+        description: "Ürün favorilerden kaldırıldı.",
+        placement: "topRight",
+      });
+      return true;
+    } else {
+      const errorData = await response.json();
+      notification.error({
+        message: "Hata",
+        description: errorData.message || "Favori silinirken bir hata oluştu.",
+        placement: "topRight",
+      });
+      return false;
+    }
+  } catch (error) {
+    console.error("Favori silme hatası:", error);
+    notification.error({
+      message: "Hata",
+      description: "Favori silinirken bir hata oluştu.",
+      placement: "topRight",
+    });
+    return false;
   }
 };
 
@@ -125,65 +171,3 @@ export const addFavorite = async (product) => {
   }
 };
 
-// Favori Silme
-export const removeFavorite = async (productId) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    notification.error({
-      message: "Hata",
-      description: "Favori silmek için giriş yapmalısınız.",
-      placement: "topRight",
-    });
-    return false;
-  }
-
-  if (!productId) {
-    notification.error({
-      message: "Hata",
-      description: "Geçerli bir ürün ID'si bulunamadı.",
-      placement: "topRight",
-    });
-    return false;
-  }
-
-  try {
-    console.log("Silinecek ürün ID:", productId);
-
-    const response = await fetch(
-      `${API_BASE_URL}/v1/${Number(productId)}?page=1&size=10`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.status === 204) {
-      notification.success({
-        message: "Favori Silindi",
-        description: "Ürün favorilerden başarıyla çıkarıldı.",
-        placement: "topRight",
-      });
-      return true;
-    } else {
-      const errorData = await response.json();
-      console.error("Backend hatası:", errorData);
-      
-      notification.error({
-        message: "Hata",
-        description: errorData.message || "Favori silinirken bir sorun oluştu.",
-        placement: "topRight",
-      });
-      return false;
-    }
-  } catch (error) {
-    console.error("Favori silme hatası:", error);
-    notification.error({
-      message: "Hata",
-      description: "Favori silinirken bir sorun oluştu.",
-      placement: "topRight",
-    });
-    return false;
-  }
-};

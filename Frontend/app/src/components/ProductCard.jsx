@@ -20,7 +20,8 @@ function ProductCard({
   description,
   category_id,
   categoryId,
-  favorites = [],
+  favorite_id,
+  favorite = [],
   onFavoriteChange,
 }) {
   console.log("ProductCard props:", {
@@ -32,7 +33,7 @@ function ProductCard({
 
   const [isFavorite, setIsFavorite] = useState(() => {
     // Favori durumunu backend'den gelen veriye göre kontrol et
-    return favorites.some((fav) => fav.product_id === id);
+    return favorite.some((fav) => fav.product_id === id);
   });
 
   const addToCartHandler = async () => {
@@ -79,13 +80,17 @@ function ProductCard({
 
       let success;
       if (isFavorite) {
-        success = await removeFavorite(id);
-        if (success) {
-          setIsFavorite(false);
+        // Favori ID'sini bulmak için favorites array'ini kullan
+        const favorite = favorite.find((f) => f.product_id === id);
+        if (favorite) {
+          success = await removeFavorite(favorite.id); // Favori ID'sini gönder
+          if (success) {
+            setIsFavorite(false);
+          }
         }
       } else {
         success = await addFavorite({
-          id: id,
+          favorite_id: favorite_id,
           categoryId: effectiveCategoryId,
           price: price,
           name: name,
@@ -95,7 +100,6 @@ function ProductCard({
         }
       }
 
-      // Başarılı işlem sonrası callback'i çağır
       if (success && onFavoriteChange) {
         onFavoriteChange();
       }

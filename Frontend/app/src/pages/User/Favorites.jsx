@@ -19,14 +19,14 @@ const Favorites = () => {
     try {
       setLoading(true);
       const favorites = await fetchFavorites();
-      console.log("Ham favori verisi:", favorites);
 
       // Her favori için resim bilgisini çek
       const favoritesWithImages = await Promise.all(
         favorites.map(async (favorite) => {
           const images = await fetchProductImages(favorite.product_id);
           return {
-            id: favorite.product_id,
+            favorite_id: favorite.favorite_id,
+            product_id: favorite.product_id,
             category_id: favorite.category_id,
             name: favorite.name,
             price: favorite.price,
@@ -50,15 +50,20 @@ const Favorites = () => {
   }, []);
 
   const handleRemoveFavorite = async (record) => {
-    console.log("Silinecek ürün ID:", record);
-    const productId = record.id;
-    if (!productId) {
-      console.error("Geçersiz ürün ID'si");
+    console.log("Silinecek favori kaydı:", record);
+
+    if (!record.favorite_id) {
+      console.error("Favori ID'si bulunamadı:", record);
       return;
     }
-    const success = await removeFavorite(productId);
-    if (success) {
-      await loadFavorites();
+
+    try {
+      const success = await removeFavorite(record.favorite_id);
+      if (success) {
+        await loadFavorites();
+      }
+    } catch (error) {
+      console.error("Favori silme hatası:", error);
     }
   };
 
@@ -118,7 +123,7 @@ const Favorites = () => {
             loading={loading}
             columns={columns}
             dataSource={favoriteProducts}
-            rowKey={(record) => record.id || Math.random()}
+            rowKey={(record) => record.favorite_id || Math.random()}
             pagination={{ pageSize: 5 }}
           />
         </div>

@@ -32,7 +32,7 @@ export const getUserIdFromToken = () => {
     // console.log("Çözümlenmiş Token:", decodedToken);  
     // console.log("Kullanıcı ID:", decodedToken.userId);
     const userId = decodedToken.userId || decodeToken.sub;
-    console.log("Kullanıcı ID:", userId);
+    // console.log("Kullanıcı ID:", userId);
     return userId;  // UserId'yi döndürüyoruz
   } catch (error) {
     console.error("Token decode hatası:", error.message);  
