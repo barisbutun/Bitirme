@@ -55,6 +55,15 @@ public class ShoppingCartItemController {
         return ResponseEntity.ok().body(shoppingCartItemService.findAllByUserId(userId, page, size));
     }
 
+
+    @PutMapping("/v1/{id}")
+    private ResponseEntity<ShoppingCartItemDto> update(@PathVariable Long id,@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        return ResponseEntity.ok().body(shoppingCartItemService.update(shoppingCartItemDto,id,userId));
+    }
+
     @GetMapping("/v1/{id}")
     private ResponseEntity<ShoppingCartItemDto> findById(long id) {
         return ResponseEntity.ok().body(shoppingCartItemService.findById(id));
