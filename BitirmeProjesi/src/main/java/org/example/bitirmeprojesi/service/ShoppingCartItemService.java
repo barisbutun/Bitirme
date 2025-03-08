@@ -11,6 +11,7 @@ import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
 import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
 import org.example.bitirmeprojesi.exception.error.ShoppingCartItemNotFoundException;
 import org.example.bitirmeprojesi.mapper.ShoppingCartItemMapper;
+import org.example.bitirmeprojesi.repository.OrderItemRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
@@ -34,6 +35,7 @@ public class ShoppingCartItemService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ShoppingCartItemValidator shoppingCartItemValidator;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
     public ShoppingCartItemDto create(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
@@ -69,12 +71,31 @@ public class ShoppingCartItemService {
         ShoppingCartItem shoppingCartItem =
                 shoppingCartItemRepository.findByUserId(userId).
                         stream().filter(shoppingCartItem1 -> shoppingCartItem1.getId() == id).findFirst().orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
+
+        orderItemRepository.detachShoppingCartItem(shoppingCartItem.getId());
         shoppingCartItemRepository.deleteById(shoppingCartItem.getId());
     }
+    public ShoppingCartItemDto update(ShoppingCartItemDto shoppingCartItemDto, Long id,UUID userId) {
 
-    public void deleteAllByUserId(UUID userId) {
-        shoppingCartItemRepository.deleteAllByUserId(userId);
+        ShoppingCartItem shoppingCartItem = shoppingCartItemRepository.findById(id)
+                .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
+
+        shoppingCartItemValidator.validateShoppingState(shoppingCartItemDto, userId);
+        shoppingCartItemValidator.validateStockState(shoppingCartItem.getProduct(), shoppingCartItemDto.getQuantity());
+
+        shoppingCartItemMapper.update(shoppingCartItemDto, shoppingCartItem);
+        return shoppingCartItemMapper.toDto(shoppingCartItemRepository.save(shoppingCartItem));
     }
 
+
+    @Transactional
+    public void deleteAllByUserId(UUID userId) {
+
+        List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
+        shoppingCartItems.forEach(shoppingCartItem ->
+                orderItemRepository.detachShoppingCartItem(shoppingCartItem.getId())
+        );
+
+        shoppingCartItemRepository.deleteAll(shoppingCartItems);}
 
 }

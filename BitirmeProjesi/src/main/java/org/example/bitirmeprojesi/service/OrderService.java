@@ -62,6 +62,7 @@ public class OrderService {
             orderItem.setShoppingCartItem(shoppingCartItem);
             orderItem.setUser(shoppingCartItem.getUser());
             orderItem.setOrder(finalOrders);
+            orderItem.setQuantity(shoppingCartItem.getQuantity());
             return orderItemService.create(orderItem);
         }).collect(Collectors.toList());
 

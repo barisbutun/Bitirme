@@ -24,7 +24,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class OrdersDto implements Serializable {
-    @JsonIgnore
     Long id;
 
     @JsonProperty("description")
@@ -46,6 +45,4 @@ public class OrdersDto implements Serializable {
     @JsonIgnore
     private UUID userId;
 
-    @JsonProperty("payment_state")
-    PaymentState paymentState;
 }

@@ -38,12 +38,12 @@ public class OrderItem {
     private User user;
 
 
-    @OneToOne(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
-        @JoinColumns({
-                @JoinColumn(name = "shopping_cart_item_id", referencedColumnName = "id"),
-                @JoinColumn(name = "shopping_cart_item_quantity", referencedColumnName = "quantity")
-        })
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "shopping_cart_item_id")
     private ShoppingCartItem shoppingCartItem;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
 
 
