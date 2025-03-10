@@ -1,60 +1,159 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Table, Drawer, Button, Typography, Descriptions } from "antd";
+import {
+  Layout,
+  Table,
+  Drawer,
+  Button,
+  Typography,
+  Descriptions,
+  notification,
+  Space,
+} from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import "../User/UserCss/Orders.css";
+import { getToken } from "../../utils/auth";
 
 const Orders = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false); //Admin kontrolü için
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Kullanıcı-Admin Kontrolü
-    const adminStatus = localStorage.getItem("isAdmin") === "true";
-    setIsAdmin(adminStatus);
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("http://localhost:8082/api/order/v1", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
 
-    fetch("/Orders.json")
-      .then((response) => response.json())
-      .then((data) => setOrders(data))
-      .catch((error) =>
-        console.error("Sipariş verileri alınırken hata oluştu:", error)
-      );
+        if (!response.ok) {
+          throw new Error("Siparişler alınamadı");
+        }
+
+        const data = await response.json();
+        console.log("Siparişler:", data);
+
+        // Eğer API'den dönen veri ID içermiyorsa, düzeltme yapalım
+        const formattedOrders = data.map((order, index) => ({
+          ...order,
+          key: order.id || index, // ID yoksa key olarak index kullan
+        }));
+
+        setOrders(formattedOrders);
+      } catch (error) {
+        console.error("Sipariş verileri alınamadı:", error);
+        notification.error({
+          message: "Hata",
+          description: "Sipariş verileri alınamadı.",
+          placement: "topRight",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
-  const showOrderDetails = (order) => {
-    setSelectedOrder(order);
-    setDrawerVisible(true);
+  const handleCheckout = (id) => {
+    if (!id) {
+      notification.error({
+        message: "Hata",
+        description: "Sipariş ID'si geçersiz!",
+      });
+      return;
+    }
+    navigate(`/Payment?orderId=${id}`);
   };
 
-  const handleCheckout = (orderId) => {
-    navigate(`/Payment?orderId=${orderId}`);
+  const viewOrderDetails = async (id) => {
+    if (!id) {
+      notification.error({
+        message: "Hata",
+        description: "Sipariş ID'si bulunamadı!",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8082/api/order/v1/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Sipariş detayları alınamadı");
+      }
+
+      const orderDetails = await response.json();
+      console.log("Sipariş Detayları:", orderDetails);
+
+      setSelectedOrder(orderDetails);
+      setDrawerVisible(true);
+    } catch (error) {
+      console.error("Sipariş detayları alınamadı:", error);
+      notification.error({
+        message: "Hata",
+        description: "Sipariş detayları alınırken bir hata oluştu.",
+        placement: "topRight",
+      });
+    }
   };
 
   const columns = [
-    ...(isAdmin
-      ? [{ title: "Sipariş ID", dataIndex: "orderId", key: "orderId" }]
-      : []),
-    { title: "Tarih", dataIndex: "date", key: "date" },
-    { title: "Toplam Tutar", dataIndex: "total", key: "total" },
-    { title: "Durum", dataIndex: "status", key: "status" },
     {
-      title: "Detaylar",
+      title: "Sipariş ID",
+      dataIndex: "id",
+      key: "id",
+      render: (text) => text || "Bilinmiyor",
+    },
+    {
+      title: "Açıklama",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Toplam Fiyat",
+      dataIndex: "sum_price",
+      key: "sum_price",
+    },
+    {
+      title: "Durum",
+      dataIndex: "payment_state",
+      key: "payment_state",
+    },
+    {
+      title: "İşlemler",
       key: "action",
       render: (_, record) => (
-        <>
-          <Button type="link" onClick={() => showOrderDetails(record)}>
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => viewOrderDetails(record.id)}
+            disabled={!record.id}
+          >
             Görüntüle
           </Button>
-          <Button type="primary" onClick={() => handleCheckout(record.orderId)}>
+          <Button
+            type="primary"
+            onClick={() => handleCheckout(record.id)}
+            disabled={!record.id}
+          >
             Sipariş Et
           </Button>
-        </>
+        </Space>
       ),
     },
   ];
@@ -70,7 +169,9 @@ const Orders = () => {
           <Table
             columns={columns}
             dataSource={orders}
+            rowKey={(record) => record.key}
             pagination={false}
+            loading={loading}
             className="order-table"
           />
         </div>
@@ -83,30 +184,34 @@ const Orders = () => {
         title="Sipariş Detayları"
         placement="right"
         onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
+        open={isDrawerVisible}
         width={400}
       >
         {selectedOrder && (
           <Descriptions bordered column={1}>
             <Descriptions.Item label="Sipariş ID">
-              {selectedOrder.orderId}
+              {selectedOrder.id || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Tarih">
-              {selectedOrder.date}
+              {selectedOrder.date || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Toplam Tutar">
-              {selectedOrder.total}
+              {selectedOrder.total || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Durum">
-              {selectedOrder.status}
+              {selectedOrder.status || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Ürünler">
               <ul>
-                {selectedOrder.products.map((product, index) => (
-                  <li key={index}>
-                    {product.name} - {product.price} TL
-                  </li>
-                ))}
+                {selectedOrder.products && selectedOrder.products.length > 0 ? (
+                  selectedOrder.products.map((product, index) => (
+                    <li key={product.id || index}>
+                      {product.name} - {product.price} TL
+                    </li>
+                  ))
+                ) : (
+                  <li>Ürün bilgisi bulunamadı</li>
+                )}
               </ul>
             </Descriptions.Item>
           </Descriptions>

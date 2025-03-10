@@ -94,6 +94,7 @@ function ProductCard({
           categoryId: effectiveCategoryId,
           price: price,
           name: name,
+          id: id,
         });
         if (success) {
           setIsFavorite(true);

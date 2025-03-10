@@ -5,17 +5,25 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/ShoppingCard.css";
-import { getUserIdFromToken, isAuthenticated } from "../../utils/auth";
+import {
+  getUserIdFromToken,
+  isAuthenticated,
+  getToken,
+} from "../../utils/auth";
 import {
   removeFromCart,
   getCartByUserId,
+  clearCartByUserId,
+  getProductDetails,
+  updateCartItemQuantity,
 } from "../../services/ProductService/ShoppingCardService";
 
 const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState([]);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [expandedRowData, setExpandedRowData] = useState(null); // Detaylar için yeni state
+  const navigate = useNavigate();
 
   // Sepet verilerini getiren fonksiyon
   const loadCartItems = async () => {
@@ -55,8 +63,66 @@ const ShoppingCard = () => {
     loadCartItems();
   }, [navigate]);
 
-  const handleOrder = () => {
-    navigate("/Orders");
+  const handleOrder = async () => {
+    try {
+      const userId = getUserIdFromToken();
+      if (!userId) {
+        notification.warning({
+          message: "Giriş Gerekli",
+          description: "Lütfen önce giriş yapın.",
+          placement: "topRight",
+        });
+        navigate("/login");
+        return;
+      }
+
+      // Sipariş verilerini oluştur
+      const orderData = {
+        description: "Sipariş Açıklaması", // İsteğe bağlı açıklama
+        name: "Sipariş Adı", // İsteğe bağlı sipariş adı
+        sale_date: new Date().toISOString().slice(0, 19).replace("T", " "), // Şu anki tarih ve saat
+        sum_price: data
+          .reduce(
+            (total, item) => total + item.product.price * item.quantity,
+            0
+          )
+          .toFixed(2), // Toplam fiyat
+        stock_state: "AVAILABLE",
+        payment_state: "SUCCESS", // Stok durumu
+      };
+
+      // Siparişi oluştur
+      const response = await fetch("http://localhost:8082/api/order/v1", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify(orderData), // JSON formatında gönderiyoruz
+      });
+
+      if (!response.ok) {
+        throw new Error("Sipariş oluşturulamadı");
+      }
+
+      // Sepeti temizle
+      await clearCartByUserId();
+
+      notification.success({
+        message: "Sipariş Başarılı",
+        description: "Siparişiniz başarıyla oluşturuldu.",
+        placement: "topRight",
+      });
+
+      // Siparişler sayfasına yönlendir
+      navigate("/Orders");
+    } catch (error) {
+      notification.error({
+        message: "Hata",
+        description: error.message || "Sipariş oluşturulurken bir hata oluştu.",
+        placement: "topRight",
+      });
+    }
   };
 
   // Sepetten ürün çıkarma işlemi
@@ -95,6 +161,56 @@ const ShoppingCard = () => {
     }
   };
 
+  const handleQuantityChange = async (itemId, change) => {
+    try {
+      // Mevcut ürünün miktarını bul
+      const item = data.find((product) => product.id === itemId);
+      if (!item) {
+        notification.error({
+          message: "Hata",
+          description: "Ürün bulunamadı",
+          placement: "topRight",
+        });
+        return;
+      }
+
+      // Yeni miktarı hesapla
+      const newQuantity = item.quantity + change;
+      if (newQuantity < 1) {
+        notification.error({
+          message: "Hata",
+          description: "Miktar en az 1 olmalıdır",
+          placement: "topRight",
+        });
+        return;
+      }
+
+      // API çağrısı yaparak miktarı güncelle
+      await updateCartItemQuantity(itemId, newQuantity);
+
+      notification.success({
+        message: "Başarılı",
+        description: "Ürün miktarı güncellendi",
+        placement: "topRight",
+      });
+
+      // Sepeti yenile
+      loadCartItems();
+    } catch (error) {
+      notification.error({
+        message: "Hata",
+        description: "Miktar güncellenemedi: " + error.message,
+        placement: "topRight",
+      });
+    }
+  };
+
+  const handleExpandRow = async (record) => {
+    // Ürün detaylarını almak için API çağrısı yap
+    const details = await getProductDetails(record.id);
+    setExpandedRowData(details);
+  };
+
   const columns = [
     {
       title: "Ürün Resmi",
@@ -121,6 +237,13 @@ const ShoppingCard = () => {
       title: "Miktar",
       dataIndex: "quantity",
       key: "quantity",
+      render: (quantity, record) => (
+        <div>
+          <Button onClick={() => handleQuantityChange(record.id, -1)}>-</Button>
+          <span>{quantity}</span>
+          <Button onClick={() => handleQuantityChange(record.id, 1)}>+</Button>
+        </div>
+      ),
     },
     {
       title: "Fiyat",
@@ -155,26 +278,20 @@ const ShoppingCard = () => {
           rowKey={(record) => record.id}
           loading={loading}
           expandable={{
-            expandedRowRender: (record) => (
-              <Table
-                className="orderItem"
-                dataSource={record.orderDetails}
-                columns={[
-                  {
-                    title: "Ürün Adı",
-                    dataIndex: "productName",
-                    key: "productName",
-                  },
-                  { title: "Adet", dataIndex: "quantity", key: "quantity" },
-                  {
-                    title: "Birim Fiyatı",
-                    dataIndex: "unitPrice",
-                    key: "unitPrice",
-                  },
-                ]}
-                pagination={false}
-              />
-            ),
+            expandedRowRender: (record) => {
+              handleExpandRow(record);
+              return (
+                <div>
+                  {expandedRowData && (
+                    <div>
+                      <h3>Ürün Detayları</h3>
+                      <p>{expandedRowData.description}</p>
+                      {/* Diğer detayları burada gösterin */}
+                    </div>
+                  )}
+                </div>
+              );
+            },
             rowExpandable: (record) => record.name !== "Not Expandable",
           }}
           footer={() => (

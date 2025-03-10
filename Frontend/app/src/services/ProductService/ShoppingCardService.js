@@ -178,3 +178,45 @@ export const getCartByUserId = async () => {
   }
 };
 
+//Ürün detaylarını getiren fonksiyon
+export const getProductDetails = async (id) => {
+  const token = getToken();
+  if (!token) {
+    throw new Error("Kullanıcı girişi yapılmamış");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Ürün detayları alınamadı.");
+  }
+
+  return await response.json();
+};
+
+// Yeni fonksiyon: updateCartItemQuantity
+export const updateCartItemQuantity = async (itemId, quantity) => {
+  const token = getToken();
+  if (!token) {
+    throw new Error("Kullanıcı girişi yapılmamış");
+  }
+
+  const response = await fetch(`http://localhost:8082/api/shoppingCartItem/v1/${itemId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ quantity }), // Yeni miktarı gönder
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Ürün miktarı güncellenemedi.");
+  }
+};
