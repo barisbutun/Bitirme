@@ -33,7 +33,7 @@ public class ShoppingCartItemValidator {
         }
     }
 
-    public void validateShoppingState(ShoppingCartItemDto shoppingCartItemDto, UUID userId) {
+    public void validateShoppingState(ShoppingCartItemDto shoppingCartItemDto, UUID userId,Long id) {
 
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
 
@@ -42,9 +42,8 @@ public class ShoppingCartItemValidator {
             throw new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR);
         }
 
-        // Güncellenmek istenen ürün sepette var mı?
         boolean exists = shoppingCartItems.stream()
-                .anyMatch(item -> item.getId() == shoppingCartItemDto.getId());
+                .anyMatch(item -> item.getId() == id);
 
         if (!exists) {
             throw new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR);

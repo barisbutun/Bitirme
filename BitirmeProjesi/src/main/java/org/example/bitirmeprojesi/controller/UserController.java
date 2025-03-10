@@ -27,10 +27,6 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("v1/x")
-    public String success() {
-        return "success";
-    }
 
     @GetMapping("/v1")
     public ResponseEntity<List<UserDto>> findAll() {
@@ -65,8 +61,6 @@ public class UserController {
 
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
 
-        System.out.println(userId);
-
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
@@ -77,7 +71,6 @@ public class UserController {
     public ResponseEntity<UserPatchDto> patch (@RequestBody UserPatchDto userPatchDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt= (Jwt) authentication.getPrincipal();
-
         UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
 
     UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, userId);
