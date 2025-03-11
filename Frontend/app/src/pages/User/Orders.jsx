@@ -48,7 +48,8 @@ const Orders = () => {
           key: order.id || index, // ID yoksa key olarak index kullan
         }));
 
-        setOrders(formattedOrders);
+        // Siparişleri en yeni sipariş en başta olacak şekilde ters çevir
+        setOrders(formattedOrders.reverse());
       } catch (error) {
         console.error("Sipariş verileri alınamadı:", error);
         notification.error({
@@ -76,6 +77,7 @@ const Orders = () => {
   };
 
   const viewOrderDetails = async (id) => {
+    console.log("Görüntüle butonuna tıklanan sipariş ID'si:", id);
     if (!id) {
       notification.error({
         message: "Hata",
@@ -121,7 +123,7 @@ const Orders = () => {
     },
     {
       title: "Açıklama",
-      dataIndex: "description",
+      dataIndex: "name",
       key: "description",
     },
     {
@@ -193,20 +195,26 @@ const Orders = () => {
               {selectedOrder.id || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Tarih">
-              {selectedOrder.date || "Bilinmiyor"}
+              {selectedOrder.sale_date || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Toplam Tutar">
-              {selectedOrder.total || "Bilinmiyor"}
+              {selectedOrder.sum_price || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Durum">
-              {selectedOrder.status || "Bilinmiyor"}
+              {selectedOrder.payment_state || "Bilinmiyor"}
             </Descriptions.Item>
             <Descriptions.Item label="Ürünler">
               <ul>
                 {selectedOrder.products && selectedOrder.products.length > 0 ? (
                   selectedOrder.products.map((product, index) => (
                     <li key={product.id || index}>
-                      {product.name} - {product.price} TL
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        style={{ width: "50px", marginRight: "10px" }}
+                      />
+                      {product.name} - {product.price} TL (Adet:{" "}
+                      {product.quantity})
                     </li>
                   ))
                 ) : (

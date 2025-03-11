@@ -179,13 +179,13 @@ export const getCartByUserId = async () => {
 };
 
 //Ürün detaylarını getiren fonksiyon
-export const getProductDetails = async (id) => {
+export const getProductDetails = async (productId) => {
   const token = getToken();
   if (!token) {
     throw new Error("Kullanıcı girişi yapılmamış");
   }
 
-  const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+  const response = await fetch(``, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

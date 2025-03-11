@@ -206,11 +206,18 @@ const ShoppingCard = () => {
   };
 
   const handleExpandRow = async (record) => {
-    // Ürün detaylarını almak için API çağrısı yap
-    const details = await getProductDetails(record.id);
-    setExpandedRowData(details);
+    console.log("Genişletilen kayıt:", record); // Hata ayıklama için
+    if (record.product && record.product.id) {
+      const details = await getProductDetails(record.product.id); // Doğru ID'yi geçin
+      setExpandedRowData(details);
+    } else {
+      notification.error({
+        message: "Hata",
+        description: "Ürün ID'si bulunamadı!",
+        placement: "topRight",
+      });
+    }
   };
-
   const columns = [
     {
       title: "Ürün Resmi",
