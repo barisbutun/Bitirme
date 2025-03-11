@@ -16,12 +16,12 @@ public class AnalyzeReportController {
     private final AnalyzeReportService analyzeReportService;
 
     @PostMapping("/v1")
-    public ResponseEntity<AnalyzeReportDto> create(AnalyzeReportDto analyzeReportDto) {
+    public ResponseEntity<AnalyzeReportDto> create(@RequestBody AnalyzeReportDto analyzeReportDto) {
         return ResponseEntity.ok(analyzeReportService.create(analyzeReportDto));
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<AnalyzeReportDto> findById(Long id) {
+    public ResponseEntity<AnalyzeReportDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(analyzeReportService.findById(id));
     }
 
@@ -31,12 +31,12 @@ public class AnalyzeReportController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<AnalyzeReportDto> update(AnalyzeReportDto analyzeReportDto, long id) {
+    public ResponseEntity<AnalyzeReportDto> update(@RequestBody AnalyzeReportDto analyzeReportDto,@PathVariable Long id) {
         return ResponseEntity.ok(analyzeReportService.update(analyzeReportDto, id));
     }
 
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         analyzeReportService.delete(id);
         return ResponseEntity.noContent().build();
     }

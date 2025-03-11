@@ -3,12 +3,12 @@ package org.example.bitirmeprojesi.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
+import org.example.bitirmeprojesi.dto.OrderItemDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
+import org.example.bitirmeprojesi.service.OrderItemService;
 import org.example.bitirmeprojesi.service.OrderService;
+import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,45 +21,46 @@ public class OrderController {
 
 
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @PostMapping("/v1")
     public ResponseEntity<OrdersDto> create( @RequestBody OrdersDto ordersDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt= (Jwt) authentication.getPrincipal();
-
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(orderService.create(ordersDto, userId));
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<OrdersDto> findById(Long id) {
+    public ResponseEntity<OrdersDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.findById(id));
     }
 
     @GetMapping("/v1")
     public ResponseEntity<List<OrdersDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
                                                            @RequestParam(required = false, defaultValue = "10") int size) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(orderService.findAllByUserId(userId, page, size));
     }
 
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<OrdersDto> update(@RequestBody OrdersDto ordersDto, long id) {
+    public ResponseEntity<OrdersDto> update(@RequestBody OrdersDto ordersDto, @PathVariable Long id) {
         return ResponseEntity.ok(orderService.update(ordersDto, id));
     }
 
     @GetMapping("/v1/orderItems/{id}")
-    public ResponseEntity<OrderGetOrderItemsDto> getOrderItemsById(Long id) {
+    public ResponseEntity<OrderGetOrderItemsDto> getOrderItemsById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderItemsById(id));
     }
 
+    @GetMapping("/v1/orderItems/{id}")
+    public ResponseEntity<List<OrderItemDto>> getOrderItemsByUserId(@PathVariable Long id) {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(orderItemService.findByOrderId(userId, id));
+    }
+
+
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }

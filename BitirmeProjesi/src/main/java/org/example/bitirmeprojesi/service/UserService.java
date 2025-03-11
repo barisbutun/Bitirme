@@ -87,8 +87,8 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public UserProfileDto getUserProfile(String email) {
-        return userMapper.toDtoProfile(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email)));
+    public UserProfileDto getUserProfile(UUID userId) {
+        return userMapper.toDtoProfile(userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR)));
     }
 }
 

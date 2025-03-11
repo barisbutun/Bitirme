@@ -4,6 +4,7 @@ package org.example.bitirmeprojesi.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.service.FavouriteService;
+import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,18 +24,14 @@ public class FavouriteController {
 
     @PostMapping("/v1")
     public ResponseEntity<List<FavouriteDto>> create(@RequestBody FavouriteDto favouriteDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(favouriteService.create(favouriteDto, userId));
     }
 
     @GetMapping("/v1/getAllByUserId")
     public ResponseEntity<List<FavouriteDto>> getlAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
                                                               @RequestParam(required = false, defaultValue = "10") int size) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(favouriteService.getlAllByUserId(userId, page, size));
     }
 
@@ -46,10 +43,7 @@ public class FavouriteController {
 
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-
+        UUID userId = JwtUtil.getUserIdFromToken();
         favouriteService.delete(userId,id);
         return ResponseEntity.noContent().build();
     }

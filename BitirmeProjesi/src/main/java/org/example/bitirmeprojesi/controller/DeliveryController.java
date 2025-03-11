@@ -21,7 +21,7 @@ public class DeliveryController {
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<DeliveryDto> findById(UUID id) {
+    public ResponseEntity<DeliveryDto> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(deliveryService.findById(id));
     }
 
@@ -31,13 +31,13 @@ public class DeliveryController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseEntity<DeliveryDto> update(DeliveryDto deliveryDto, UUID id) {
+    public ResponseEntity<DeliveryDto> update(@RequestBody DeliveryDto deliveryDto,@PathVariable UUID id) {
 
         return ResponseEntity.ok(deliveryService.update(deliveryDto, id));
     }
 
     @DeleteMapping("/v1/{id}")
-    public ResponseEntity<Void> delete(UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         deliveryService.delete(id);
         return ResponseEntity.ok().build();
     }

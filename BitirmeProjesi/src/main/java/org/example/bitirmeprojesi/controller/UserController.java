@@ -7,6 +7,7 @@ import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.dto.UserProfileDto;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.service.UserService;
+import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -38,29 +39,14 @@ public class UserController {
 
     @GetMapping("/v1/profile")
     public ResponseEntity<UserProfileDto> getProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-
-        String email = jwt.getClaimAsString("sub");
-
-        if (email == null) {
-            throw new RuntimeException("User email not found in JWT");
-        }
-
-        UserProfileDto userProfileDto = userService.getUserProfile(email);
+        UUID userId = JwtUtil.getUserIdFromToken();
+        UserProfileDto userProfileDto = userService.getUserProfile(userId);
         return ResponseEntity.ok(userProfileDto);
     }
 
     @DeleteMapping("/v1")
     public ResponseEntity<Void> delete() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
-
+        UUID userId = JwtUtil.getUserIdFromToken();
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
@@ -69,11 +55,9 @@ public class UserController {
 
     @PatchMapping("/v1")
     public ResponseEntity<UserPatchDto> patch (@RequestBody UserPatchDto userPatchDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt= (Jwt) authentication.getPrincipal();
-        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+        UUID userId = JwtUtil.getUserIdFromToken();
 
-    UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, userId);
+        UserPatchDto updatedUserDto = userService.updateUserPartially(userPatchDto, userId);
         if (updatedUserDto != null) {
             return ResponseEntity.ok(updatedUserDto);
         } else {
