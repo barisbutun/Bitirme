@@ -12,23 +12,29 @@ import ProductDetails from "../pages/User/ProductDetails";
 import Favorites from "../pages/User/Favorites";
 import Payment from "../pages/User/Payment";
 
-const UserRoutes = () => {
+const UserRoutes = ({ setLoading }) => {
   return (
     <Routes>
       {/* Varsayılan rota (Homepage) */}
-      <Route index element={<Homepage />} />
+      <Route index element={<Homepage setLoading={setLoading} />} />
 
       {/* Kullanıcı rotaları */}
-      <Route path="Profile" element={<Profile />} />
-      <Route path="Login" element={<Login />} />
-      <Route path="SignUp" element={<SignUp />} />
-      <Route path="Products" element={<Products />} />
-      <Route path="Delivery" element={<Delivery />} />
-      <Route path="ShoppingCard" element={<ShoppingCard />} />
+      <Route path="Profile" element={<Profile setLoading={setLoading} />} />
+      <Route path="Login" element={<Login setLoading={setLoading} />} />
+      <Route path="SignUp" element={<SignUp setLoading={setLoading} />} />
+      <Route path="Products" element={<Products setLoading={setLoading} />} />
+      <Route path="Delivery" element={<Delivery setLoading={setLoading} />} />
+      <Route
+        path="ShoppingCard"
+        element={<ShoppingCard setLoading={setLoading} />}
+      />
       <Route path="Orders" element={<Orders />} />
-      <Route path="ProductDetails/:id" element={<ProductDetails />} />
-      <Route path="Favorites" element={<Favorites />} />
-      <Route path="Payment" element={<Payment />} />
+      <Route
+        path="ProductDetails/:id"
+        element={<ProductDetails setLoading={setLoading} />}
+      />
+      <Route path="Favorites" element={<Favorites setLoading={setLoading} />} />
+      <Route path="Payment" element={<Payment setLoading={setLoading} />} />
     </Routes>
   );
 };

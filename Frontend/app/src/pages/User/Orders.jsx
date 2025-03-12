@@ -87,13 +87,16 @@ const Orders = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8082/api/order/v1/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      const response = await fetch(
+        ` http://localhost:8082/api/product/v1/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Sipariş detayları alınamadı");

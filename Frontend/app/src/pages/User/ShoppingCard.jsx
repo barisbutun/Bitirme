@@ -21,7 +21,7 @@ import {
 const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [expandedRowData, setExpandedRowData] = useState(null); // Detaylar için yeni state
   const navigate = useNavigate();
 

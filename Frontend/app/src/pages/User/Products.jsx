@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout } from "antd";
+import { Layout, Spin } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -11,17 +11,16 @@ import {
   fetchProductImages,
 } from "../../services/ProductService/ProductService";
 import { fetchFavorites } from "../../services/ProductService/FavoriteService";
-const Products = () => {
+const Products = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
   useEffect(() => {
     const fetchAllProducts = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         // Ürünleri ve favorileri paralel olarak çek
         const [productsData] = await Promise.all([
           fetchProducts(),
@@ -59,7 +58,6 @@ const Products = () => {
     fetchAllProducts();
   }, []);
 
-  if (loading) return <div>Yükleniyor...</div>;
   if (error) return <div>Hata: {error}</div>;
 
   const handleApplyFilter = (category) => {
@@ -98,7 +96,7 @@ const Products = () => {
               />
             ))
           ) : (
-            <p>Filtreleme kriterlerine uyan ürün bulunamadı.</p>
+            <p></p>
           )}
         </div>
         <Footer />

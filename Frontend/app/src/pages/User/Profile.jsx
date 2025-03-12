@@ -3,17 +3,18 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ProfileSettings from "../../components/ProfileSettings";
-import { Layout, Avatar, Card, Descriptions, Tabs, message } from "antd";
+import { Layout, Avatar, Card, Descriptions, Tabs, message, Spin } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import "../User/UserCss/Profile.css";
 
-const Profile = () => {
+const Profile = ({ setLoading }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token"); // JWT token'ı al
         if (!token) {
@@ -43,11 +44,14 @@ const Profile = () => {
       } catch (error) {
         console.error("Profil verisi alınırken hata oluştu:", error);
         setError("Profil bilgileri alınırken hata oluştu.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserProfile();
   }, []);
+
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />

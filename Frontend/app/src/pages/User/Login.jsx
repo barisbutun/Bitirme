@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Checkbox, Col, Row, Typography } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Col,
+  Row,
+  Typography,
+  Spin,
+} from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "../User/UserCss/Login.css";
@@ -8,7 +17,7 @@ import { login, googleLogin } from "../../services/UserService/AuthService";
 // import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { decodeToken } from "../../utils/auth";
 
-const LoginForm = () => {
+const LoginForm = ({ setLoading }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -16,33 +25,17 @@ const LoginForm = () => {
   const [userCaptcha, setUserCaptcha] = useState("");
   const [error, setError] = useState("");
 
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     await login(email, password);
-  //     const token = localStorage.getItem("token");
-  //     const roles = decodeToken(token);
-
-  //     if (roles.includes("admin")) {
-  //       navigate("/admin");
-  //     } else if (roles.includes("user")) {
-  //       navigate("/user");
-  //     } else {
-  //       setError("Geçersiz kullanıcı rolü");
-  //     }
-  //   } catch (err) {
-  //     setError(err.message || "Giriş sırasında hata oluştu");
-  //   }
-  // };
-  //  ###############################################
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const user = await login(email, password);
       console.log("Giriş başarılı:", user);
       navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
     } catch (error) {
       setError(error.message || "Giriş sırasında bir hata oluştu");
+    } finally {
+      setLoading(false);
     }
   };
   // ###############################################
@@ -173,7 +166,7 @@ const LoginForm = () => {
           </Button>
         </Form.Item>
         <Form.Item>
-          <Link to={"/SignUp"}> Hesabınız yok mu?</Link>
+          <Link to={"/user/SignUp"}> Hesabınız yok mu?</Link>
         </Form.Item>
         {/* <Form.Item>
           <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">

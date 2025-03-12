@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout } from "antd";
+import { Layout, Spin } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -10,16 +10,15 @@ import {
   fetchProducts,
   fetchProductImages,
 } from "../../services/ProductService/ProductService";
-const Homepage = () => {
+const Homepage = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   useEffect(() => {
     const fetchAllProducts = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const productsData = await fetchProducts();
 
         // Resimleri ekle
@@ -42,7 +41,6 @@ const Homepage = () => {
     fetchAllProducts();
   }, []);
 
-  if (loading) return <div>Yükleniyor...</div>;
   if (error) return <div>Hata: {error}</div>;
 
   const handleApplyFilter = (category) => {
@@ -79,7 +77,7 @@ const Homepage = () => {
               />
             ))
           ) : (
-            <p>Filtreleme kriterlerine uyan ürün bulunamadı.</p>
+            <p></p>
           )}
         </div>
         <Footer />

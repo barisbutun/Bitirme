@@ -71,10 +71,10 @@ export const login = async (email, password) => {
 
 
 // Kayıt işlemi
-export const Register = async (username, name, email, password, address, phone) => {
+export const Register = async (userName, name, email, password, address, phone) => {
   try {
     const userDetails = {
-      username: username,
+      user_name: userName,
       name: name,
       email: email,
       password: password,
