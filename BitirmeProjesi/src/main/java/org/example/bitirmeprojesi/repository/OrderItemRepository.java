@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.bitirmeprojesi.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,8 +17,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     List<OrderItem> findByOrderId(Long orderId);
 
+    @Transactional
     @Modifying
-    @Query("UPDATE OrderItem o SET o.shoppingCartItem = NULL WHERE o.shoppingCartItem.id = :itemId")
+    @Query("UPDATE OrderItem o SET o.shoppingCartItem = NULL WHERE o.shoppingCartItem = (SELECT s FROM ShoppingCartItem s WHERE s.id = :itemId)")
     void detachShoppingCartItem(@Param("itemId") Long itemId);
 
     OrderItem findByShoppingCartItemIdAndShoppingCartItemQuantity(long id, int quantity);
