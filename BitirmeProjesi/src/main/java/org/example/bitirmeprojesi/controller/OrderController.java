@@ -52,7 +52,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderItemsById(id));
     }
 
-    @GetMapping("/v1/orderItems/{id}")
+    @GetMapping("/v1/orderItem/{id}")
     public ResponseEntity<List<OrderItemDto>> getOrderItemsByUserId(@PathVariable Long id) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(orderItemService.findByOrderId(userId, id));
