@@ -18,6 +18,16 @@ public class JwtUtil {
         return UUID.fromString(jwt.getClaimAsString("userId"));
 
     }
+    public static String getToken(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
+            throw new IllegalStateException("Jwt not found exception");
+        }
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        return jwt.getTokenValue();
+    }
+
 
 
 }

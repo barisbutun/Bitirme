@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 import org.example.bitirmeprojesi.dto.QuestionDto;
+import org.example.bitirmeprojesi.util.JwtUtil;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,19 +30,16 @@ public class ChatBotService {
 
     public String sendMessage(QuestionDto questionDto) throws JsonProcessingException {
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("sender", "user");
+        requestBody.put("sender", JwtUtil.getUserIdFromToken().toString());
         requestBody.put("message", questionDto.getQuestion());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonBody = objectMapper.writeValueAsString(requestBody);
 
-        HttpHeaders headers = getHttpHeaders();
-        headers.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
-
+        HttpHeaders headers = getHttpHeaders(jsonBody);
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(RASA_API_URL, entity, String.class);
-
-        System.out.println("Response body:"+extractMessage(response.getBody()));
+        
         return extractMessage(response.getBody());
     }
 
@@ -62,9 +60,12 @@ public class ChatBotService {
 
 
 
-    private static HttpHeaders getHttpHeaders() {
+    private static HttpHeaders getHttpHeaders(String jsonBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
+        headers.setBearerAuth(JwtUtil.getToken());
+
         return headers;
     }
 
