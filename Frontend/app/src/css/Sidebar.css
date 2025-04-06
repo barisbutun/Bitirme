@@ -1,7 +1,12 @@
 .demo-logo-vertical {
     height: 32px;
     margin: 16px;
-    background: rgba(255, 255, 255, 0.2);
+    background:#46494e;
   }
+
+.ant-menu-submenu-popup {
+    background-color: #46494e !important; /* Match the sidebar background */
+    color: #fff; /* Ensure text is visible */
+}
+
   
- 

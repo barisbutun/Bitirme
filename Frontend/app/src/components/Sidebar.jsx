@@ -78,6 +78,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
   return (
     <Sider
+      style={{ background: "#46494e" }}
       className="sidebar"
       collapsible
       collapsed={collapsed}
@@ -85,12 +86,19 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       breakpoint="lg"
       collapsedWidth="0"
     >
-      <div className="demo-logo-vertical" />
+      <div className="demo-logo-vertical" style={{ background: "#fd702d" }} />
       <Menu
-        theme="dark"
         mode="inline"
         defaultSelectedKeys={["1"]}
         items={items}
+        style={{
+          backgroundColor: "#46494e",
+          color: "#fff", // Yazı rengi
+          fontSize: "16px", // Yazı boyutu
+          fontWeight: "500", // Yazı kalınlığı
+          borderRight: "none", // Sağ kenar çizgisi
+        }}
+        theme="dark"
       />
     </Sider>
   );
