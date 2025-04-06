@@ -16,17 +16,17 @@ public interface FavouriteMapper {
     @Mapping(source = "categoryId", target = "category.id")
     @Mapping(source = "price", target = "product.price")
     @Mapping(source = "name", target = "product.name")
-    Favourite toEntity(FavouriteDto favouriteDto);
+    Favourite toEntity(final FavouriteDto favouriteDto);
 
     @Mapping(source = "product.id", target = "productId")
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "product.price", target = "price")
     @Mapping(source = "product.name", target = "name")
-    FavouriteDto toDto(Favourite favourite);
+    FavouriteDto toDto(final Favourite favourite);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Favourite update(FavouriteDto favouriteDto, @MappingTarget Favourite favourite);
+    Favourite update(final FavouriteDto favouriteDto, @MappingTarget final  Favourite favourite);
 
-    List<FavouriteDto> toDtoList(List<Favourite> favourite);
+    List<FavouriteDto> toDtoList(final List<Favourite> favourite);
 
 }

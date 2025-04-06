@@ -93,10 +93,16 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateFavourite(favouriteDto, id));
     }
 
-    @GetMapping("/v1/findAll")
+    @GetMapping("/v1/favourites/findAll")
     public ResponseEntity<List<FavouriteDto>> findAllFavourites() {
         return ResponseEntity.ok(adminService.getAllFavourites());
     }
+
+    @GetMapping("/v1/reviews/findall")
+    public ResponseEntity<List<ReviewDto>> findAllReviews() {
+        return ResponseEntity.ok(adminService.findAllReviews());
+    }
+
 
 }
 

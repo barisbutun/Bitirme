@@ -25,7 +25,7 @@ public class ProductElasticController {
         return ResponseEntity.ok(products);
     }
     @PostMapping("/v1/searchByNameOrDescription")
-    public ResponseEntity<List<ProductDto>> searchByNameOrDescription(Map<String, String> searchQuery) {
+    public ResponseEntity<List<ProductDto>> searchByNameOrDescription(@RequestBody Map<String, String> searchQuery) {
 
        String name=searchQuery.get("name");
        String description=searchQuery.get("description");

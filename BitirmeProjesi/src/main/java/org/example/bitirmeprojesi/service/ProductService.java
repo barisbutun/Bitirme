@@ -10,17 +10,17 @@ import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.CategoryNotFoundException;
 import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
-import org.example.bitirmeprojesi.mapper.CategoryMapper;
 import org.example.bitirmeprojesi.mapper.ProductMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
-import org.example.bitirmeprojesi.repository.ImageRepository;
 import org.example.bitirmeprojesi.repository.ProductRepository;
+import org.example.bitirmeprojesi.repository.ReviewRepository;
 import org.example.bitirmeprojesi.validator.ProductValidator;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,11 +33,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
     private final ProductValidator productValidator;
-    private final ImageRepository imageRepository;
-    private final ImageService imageService;
+    private final ReviewRepository reviewRepository;
 
 
 
@@ -59,6 +57,27 @@ public class ProductService {
         log.info("Product created: {}", product);
         return productMapper.toDto(product);
     }
+
+    public List<ProductDto> getTopRatedProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("averageRating")));
+        Page<Product> products = productRepository.findAllRatedProducts(pageable);
+        List<Product> productsList= products.getContent();
+
+        return productMapper.toDtoList(productsList);
+    }
+
+    public int getReviewCountForProduct(Long productId) {
+        return reviewRepository.countByProductId(productId);
+    }
+
+    public List<ProductDto> getRatedProductsOnly(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> products = productRepository.findAllRatedProducts(pageable);
+        List<Product> productsList= products.getContent();
+
+        return productMapper.toDtoList(productsList);
+    }
+
 
     public ProductDto findById(long id) {
         Product product = productRepository.findById(id)

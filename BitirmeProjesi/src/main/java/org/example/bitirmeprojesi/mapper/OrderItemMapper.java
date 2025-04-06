@@ -10,5 +10,5 @@ import org.mapstruct.*;
 public interface OrderItemMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    OrderItem toOrderItem(ShoppingCartItem shoppingCartItem);
+    OrderItem toOrderItem(final ShoppingCartItem shoppingCartItem);
 }

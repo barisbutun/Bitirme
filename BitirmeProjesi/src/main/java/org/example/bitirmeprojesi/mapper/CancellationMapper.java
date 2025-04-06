@@ -19,7 +19,7 @@ public interface CancellationMapper {
     List<CancellationDto> toDtoList(final List<Cancellation> cancellationList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(CancellationDto cancellationDto, @MappingTarget Cancellation cancellation);
+    void update(final CancellationDto cancellationDto, @MappingTarget final Cancellation cancellation);
 
 
 }

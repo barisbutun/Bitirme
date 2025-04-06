@@ -79,6 +79,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/shoppingCartItem/v1").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
                     auth.requestMatchers("/api/chatbot/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/api/review/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.anyRequest().permitAll();
                 });
         http.oauth2ResourceServer(

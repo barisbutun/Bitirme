@@ -37,7 +37,7 @@ public class ShoppingCartItemValidator {
 
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
 
-        // Eğer alışveriş sepeti boşsa, hata fırlat
+        // Eğer alışveriş sepeti boşsa, hata fırla
         if (shoppingCartItems.isEmpty()) {
             throw new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR);
         }

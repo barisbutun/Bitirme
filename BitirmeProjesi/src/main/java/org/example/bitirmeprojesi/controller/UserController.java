@@ -6,6 +6,7 @@ import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.dto.UserProfileDto;
 import org.example.bitirmeprojesi.entity.User;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.service.UserService;
 import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.http.HttpStatus;

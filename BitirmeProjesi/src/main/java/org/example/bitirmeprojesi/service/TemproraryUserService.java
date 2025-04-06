@@ -19,7 +19,7 @@ public class TemproraryUserService {
     public void cleanExpiredTemproraryUsers() {
         LocalDateTime now = LocalDateTime.now();
         temproraryUserRepository.findAll().stream()
-                .filter(user -> !user.isVerified() && user.getCodeGeneratedAt().plusMinutes(5).isBefore(now))
+                .filter(user ->  user.getCodeGeneratedAt().plusMinutes(6).isBefore(now))
                 .forEach(user -> {
                     temproraryUserRepository.delete(user);
                 });

@@ -3,18 +3,16 @@ package org.example.bitirmeprojesi.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-
 import org.example.bitirmeprojesi.dto.QuestionDto;
 import org.example.bitirmeprojesi.util.JwtUtil;
-import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.json.JSONException;
-import org.json.JSONArray;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -29,9 +27,15 @@ public class ChatBotService {
 
 
     public String sendMessage(QuestionDto questionDto) throws JsonProcessingException {
-        Map<String, String> requestBody = new HashMap<>();
+        String token = JwtUtil.getToken();
+
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("sender", JwtUtil.getUserIdFromToken().toString());
         requestBody.put("message", questionDto.getQuestion());
+
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Authorization", "Bearer " + token);
+        requestBody.put("metadata", metadata);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonBody = objectMapper.writeValueAsString(requestBody);
@@ -39,7 +43,8 @@ public class ChatBotService {
         HttpHeaders headers = getHttpHeaders(jsonBody);
         HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(RASA_API_URL, entity, String.class);
-        
+
+
         return extractMessage(response.getBody());
     }
 

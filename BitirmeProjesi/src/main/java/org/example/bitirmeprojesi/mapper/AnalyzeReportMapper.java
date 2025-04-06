@@ -19,6 +19,6 @@ public interface AnalyzeReportMapper {
     List<AnalyzeReportDto> toDtoList(final List<AnalyzeReport> AnalyzeReportList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(AnalyzeReportDto analyzeReportDto, @MappingTarget AnalyzeReport analyzeReport);
+    void update(final AnalyzeReportDto analyzeReportDto, @MappingTarget final AnalyzeReport analyzeReport);
 
 }

@@ -21,13 +21,13 @@ public interface OrderMapper {
 
     OrderGetOrderItemsDto toDtoOrderGetOrderItems(final Orders orders);
 
-    Orders toEntity(OrderGetOrderItemsDto ordersDto);
+    Orders toEntity(final OrderGetOrderItemsDto ordersDto);
 
     OrderItem toOrderItem(final OrderItemDto orderItemDto);
 
-    OrderItemDto toOrderItemDto(OrderItem orderItem);
+    OrderItemDto toOrderItemDto(final OrderItem orderItem);
 
-    List<OrderItemDto> toOrderItemDtoList(List<OrderItem> orderItems);
+    List<OrderItemDto> toOrderItemDtoList(final List<OrderItem>  orderItems);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(final OrdersDto ordersDto, @MappingTarget final Orders orders);

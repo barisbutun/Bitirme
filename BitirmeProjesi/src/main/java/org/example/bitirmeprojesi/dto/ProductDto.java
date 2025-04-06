@@ -39,6 +39,9 @@ public class ProductDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private double averageRating;
+
     @JsonProperty("category_id")
     private Long categoryId;
 

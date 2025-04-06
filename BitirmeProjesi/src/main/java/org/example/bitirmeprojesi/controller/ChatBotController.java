@@ -9,16 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/chatbot")
+@RequestMapping("/api/chatbot")
 @RequiredArgsConstructor
 public class ChatBotController {
 
     private final ChatBotService chatBotService;
-
-    @GetMapping("/v1/answers")
-    public ResponseEntity<String> answer(@RequestBody AnswerDto answerDto) {
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/v1/question")
     public ResponseEntity<String> question(@RequestBody QuestionDto questionDto) throws Exception {

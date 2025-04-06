@@ -52,6 +52,9 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    @Column(name = "average_rating")
+    private double averageRating=0.0;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ShoppingCartItem> shoppingCartItem;

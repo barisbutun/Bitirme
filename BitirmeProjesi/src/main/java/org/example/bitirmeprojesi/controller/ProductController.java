@@ -3,8 +3,8 @@ package org.example.bitirmeprojesi.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.service.ProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +16,34 @@ public class ProductController {
 
     private final ProductService productService;
 
-
-
-
     @GetMapping("/v1/{id}")
     public ResponseEntity<ProductDto> findById(@PathVariable final Long id) {
         ProductDto product = productService.findById(id);
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<ProductDto>> getTopRatedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<ProductDto> topRatedProducts = productService.getTopRatedProducts(page, size);
+        return ResponseEntity.ok(topRatedProducts);
+    }
+
+    @GetMapping("/rated-only")
+    public ResponseEntity<List<ProductDto>> getRatedProductsOnly(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<ProductDto> ratedProducts = productService.getRatedProductsOnly(page, size);
+        return ResponseEntity.ok(ratedProducts);
+    }
+
+
+    @GetMapping("/{productId}/reviews/count")
+    public ResponseEntity<Integer> getReviewCount(@PathVariable Long productId) {
+        int reviewCount = productService.getReviewCountForProduct(productId);
+        return ResponseEntity.ok(reviewCount);
+    }
 
     @GetMapping("/v1/home")
     public ResponseEntity<List<ProductDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,
