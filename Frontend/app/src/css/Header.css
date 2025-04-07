@@ -22,8 +22,8 @@
     align-items: center;
   }
   .toggle-button {
-    font-size: 0px; /* İkonun boyutunu ayarlayabilirsiniz */
+    font-size: 16px; /* Set a reasonable font size for the icon */
     text-align: center;
-    padding: 10px 0; /* Boşluğu ayarlayın */
-    background-color: #46494e;
+    padding: 10px 0; /* Adjust padding as needed */
+   
   }

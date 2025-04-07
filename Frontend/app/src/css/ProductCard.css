@@ -23,6 +23,7 @@
 
  .InceleButon{
   margin-left:5px;
+  background-color: #fd702d;
  }
  .image-container {
   width: 100%;
@@ -68,14 +69,14 @@
   padding: 6px 12px;
   margin-top: 10px;
   border-radius: 4px;
-  background-color: #007BFF; /* Use brand colors */
+  background-color: #fd702d; /* Use brand colors */
   color: white;
   border: none;
   cursor: pointer;
 }
 
 .product-buttons button:hover {
-  background-color: #0056b3; /* Darker on hover */
+  background-color: #d34b0b; /* Darker on hover */
 }
 
  .favorite-button {

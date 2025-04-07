@@ -86,7 +86,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       breakpoint="lg"
       collapsedWidth="0"
     >
-      <div className="demo-logo-vertical" style={{ background: "#fd702d" }} />
+      <div className="demo-logo-vertical" style={{ background: "" }} />
       <Menu
         mode="inline"
         defaultSelectedKeys={["1"]}

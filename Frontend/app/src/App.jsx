@@ -11,6 +11,7 @@ import Login from "./pages/User/Login";
 import Homepage from "./pages/User/Homepage";
 import { decodeToken } from "./utils/auth";
 import { Spin, ConfigProvider } from "antd";
+import Chatbot from "./components/Chatbot";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -98,6 +99,9 @@ const App = () => {
           {/* Bilinmeyen rotalar için */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 999 }}>
+          <Chatbot />
+        </div>
       </Router>
     </ConfigProvider>
   );
