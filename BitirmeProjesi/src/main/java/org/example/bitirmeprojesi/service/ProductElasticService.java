@@ -32,16 +32,13 @@ public class ProductElasticService {
         return ProductDto;
     }
 
-    public List<ProductDto> searchByFilters(int category, String name, Double minPrice, Double maxPrice) {
-
-        int categoryFilter = (category != 0) ? category : 0;
-        String nameFilter = (name != null) ? name : "";
+    public List<ProductDto> searchByFilters(Integer category, String name, Double minPrice, Double maxPrice) {
+        Integer categoryFilter = (category != null && category != 0) ? category : null;
+        String nameFilter = (name != null && !name.trim().isEmpty()) ? name : null;
         Double minPriceFilter = (minPrice != null) ? minPrice : 0.0;
         Double maxPriceFilter = (maxPrice != null) ? maxPrice : Double.MAX_VALUE;
-
         List<ProductElastic> productElastics = productElasticRepository.searchByFilters(categoryFilter, nameFilter, minPriceFilter, maxPriceFilter);
         return productMapper.toDtoList(productElastics);
-
     }
 
 

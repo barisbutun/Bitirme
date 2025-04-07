@@ -23,8 +23,6 @@ import java.util.UUID;
 public class ShoppingCartItemValidator {
 
 
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     public void validateStockState(final Product product, final int requestedQuantity) {

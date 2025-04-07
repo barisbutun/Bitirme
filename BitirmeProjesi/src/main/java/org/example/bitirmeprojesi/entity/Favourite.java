@@ -21,24 +21,14 @@ public class Favourite implements Serializable {
 
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            @JoinColumn(name = "user_name", referencedColumnName = "name")
-    })
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "product_id", referencedColumnName = "id"),
-            @JoinColumn(name = "product_name", referencedColumnName = "name")
-    })
+    @JoinColumn(name = "product_id")
     private Product product;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "category_id", referencedColumnName = "id"),
-            @JoinColumn(name = "category_name", referencedColumnName = "name")
-    })
+    @JoinColumn(name = "category_id")
     private Category category;
 }

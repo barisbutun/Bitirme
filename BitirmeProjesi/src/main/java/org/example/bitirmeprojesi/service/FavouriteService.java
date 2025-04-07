@@ -75,7 +75,7 @@ public class FavouriteService {
                 .findFirst()
                 .orElseThrow(() -> new FavouriteNotFoundException(ErrorMesage.FAVOURITE_NOT_FOUND_ERROR));
 
-        favouriteRepository.deleteById(favourite.getId()); // Önce varlığı doğrula, sonra sil.
+        favouriteRepository.deleteById(favourite.getId());
     }
 
     public List<FavouriteDto> findAll(){

@@ -21,7 +21,7 @@ public interface ProductElasticRepository extends ElasticsearchRepository<Produc
 
     @Query("{ " +
             "\"bool\": { " +
-            "   \"must\": [ " +
+            "   \"should\": [ " +
             "       { \"match\": { \"category\": \"?0\" } }, " +
             "       { \"match\": { \"name\": \"?1\" } } " +
             "   ], " +
@@ -29,5 +29,5 @@ public interface ProductElasticRepository extends ElasticsearchRepository<Produc
             "       { \"range\": { \"price\": { \"gte\": \"?2\", \"lte\": \"?3\" } } } " +
             "   ] " +
             "} }")
-    List<ProductElastic> searchByFilters(int category, String name, Double minPrice, Double maxPrice);
+    List<ProductElastic> searchByFilters(Integer category, String name, Double minPrice, Double maxPrice);
 }
