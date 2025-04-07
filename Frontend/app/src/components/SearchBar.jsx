@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Input, List, Spin } from "antd";
 import { debounce } from "lodash";
+import { useNavigate } from "react-router-dom"; // yönlendirme için
 import "../css/SearchBar.css";
+
 const { Search } = Input;
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchResults = debounce(async (searchQuery) => {
     if (!searchQuery) {
@@ -43,6 +46,13 @@ const SearchBar = () => {
     fetchResults(value);
   };
 
+  const handleItemClick = (id) => {
+    console.log("Seçilen ürün ID:", id); // kontrol için
+    setQuery(""); // arama kutusunu temizle
+    setResults([]); // sonuç listesini kapat
+    navigate(`/user/ProductDetails/${id}`); // ürün detay sayfasına yönlendir
+  };
+
   return (
     <div className="search-container">
       <Search
@@ -61,10 +71,27 @@ const SearchBar = () => {
           bordered
           dataSource={results}
           renderItem={(item) => (
-            <List.Item>
-              <div>
-                <strong>{item.name}</strong>
-                <p style={{ margin: 0 }}>{item.description}</p>
+            <List.Item
+              onClick={() => handleItemClick(item.id)}
+              style={{ cursor: "pointer" }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {item.image && (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    style={{
+                      width: 50,
+                      height: 50,
+                      objectFit: "cover",
+                      marginRight: 10,
+                    }}
+                  />
+                )}
+                <div>
+                  <strong>{item.name}</strong>
+                  <p style={{ margin: 0 }}>{item.description}</p>
+                </div>
               </div>
             </List.Item>
           )}

@@ -47,3 +47,11 @@ export const fetchProductImages = async (productId) => {
     throw error;
   }
 };
+
+export const fetchProductById=async(id)=>{
+  const response=await fetch(`http://localhost:8082/api/product/v1/${id}`);
+  if(!response.ok){
+    throw new Error("ürün getirilemedi");
+  }
+  return await response.json();
+}

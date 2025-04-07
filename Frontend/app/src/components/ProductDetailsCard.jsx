@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { Card, Button, Rate, Row, Col, Image, notification } from "antd";
-import { HeartFilled, HeartOutlined } from "@ant-design/icons"; // Ant Design ikonları
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import "../css/ProductDetailsCard.css";
 import { addToCart } from "../services/ProductService/ShoppingCardService";
 import {
@@ -9,10 +8,8 @@ import {
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
 
-const ProductDetailsCard = () => {
-  const location = useLocation();
-  const product = location.state?.product;
-
+const ProductDetailsCard = ({ product, images }) => {
+  // Prop olarak 'product' ve 'images' alıyoruz
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Ürün bilgisi geldiğinde favori durumunu güncelle
@@ -23,10 +20,6 @@ const ProductDetailsCard = () => {
       );
     }
   }, [product]);
-
-  if (!product) {
-    return <p>Ürün bulunamadı!</p>;
-  }
 
   const toggleFavoriteHandler = async () => {
     try {
@@ -92,11 +85,12 @@ const ProductDetailsCard = () => {
     <Card className="product-details-card">
       <Row gutter={16}>
         <Col span={10}>
-          <Image className="zoom-image" width={400} src={product.image} />
+          <Image className="zoom-image" width={400} src={images[0]} />{" "}
+          {/* resim listesi eğer varsa */}
         </Col>
         <Col span={14}>
           <h2 className="product-details-title">{product.name}</h2>
-          <Rate defaultValue={product.rating} />
+          <Rate defaultValue={product.averageRating || 0} />
           <p className="product-details-price">{product.price} TL</p>
           <Button type="primary" size="large" onClick={addToCartHandler}>
             Sepete Ekle
@@ -104,11 +98,7 @@ const ProductDetailsCard = () => {
           <button
             className={`favoriteButton ${isFavorite ? "active" : ""}`}
             onClick={toggleFavoriteHandler}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             {isFavorite ? (
               <HeartFilled style={{ color: "red", fontSize: "24px" }} />

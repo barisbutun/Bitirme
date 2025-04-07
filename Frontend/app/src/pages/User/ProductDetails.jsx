@@ -7,7 +7,7 @@ import ProductDetailsCard from "../../components/ProductDetailsCard";
 import "../User/UserCss/ProductDetails.css";
 import { useParams } from "react-router-dom";
 import {
-  fetchProducts,
+  fetchProductById,
   fetchProductImages,
 } from "../../services/ProductService/ProductService";
 
@@ -16,45 +16,29 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const { id } = useParams(); // URL parametrelerinden id'yi alıyoruz
-
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!id) return; // Eğer id yoksa işlem yapma
+      if (!id) return;
       try {
-        // Ürünleri çekiyoruz
-        const products = await fetchProducts();
-        console.log("Fetched products:", products); // API'den gelen ürünleri kontrol et
+        const selectedProduct = await fetchProductById(id);
+        setProduct(selectedProduct);
+        console.log("Gelen ürün:", selectedProduct);
+        const productImages = await fetchProductImages(id);
 
-        // id'ye göre ürünü buluyoruz
-        const selectedProduct = products.find(
-          (product) => product.id === parseInt(id, 10)
+        const imageUrls = productImages.map((image) =>
+          image.startsWith("data:image")
+            ? image
+            : `data:image/jpeg;base64,${image}`
         );
 
-        if (selectedProduct) {
-          setProduct(selectedProduct);
-
-          // Ürün resmi verilerini alıyoruz
-          const productImages = await fetchProductImages(selectedProduct.id);
-          console.log("Fetched images:", productImages); // Resimleri kontrol et
-
-          // Eğer resimler Base64 formatında geldiyse doğru şekilde kullan
-          const imageUrls = productImages.map((image) => {
-            return image.startsWith("data:image")
-              ? image
-              : `data:image/jpeg;base64,${image}`;
-          });
-
-          setImages(imageUrls); // Base64 resimlerini state'e set ediyoruz
-        } else {
-          console.error("Ürün bulunamadı");
-        }
+        setImages(imageUrls);
       } catch (error) {
-        console.error("Veriler alınırken hata oluştu:", error);
+        console.error("Ürün detayları alınırken hata:", error);
       }
     };
 
     fetchProductDetails();
-  }, [id]); // id değiştiğinde tekrar çalışacak
+  }, [id]);
 
   return (
     <Layout>
@@ -66,7 +50,7 @@ const ProductDetails = () => {
           {product ? (
             <ProductDetailsCard product={product} images={images} />
           ) : (
-            <p>Ürün yükleniyor...</p> // Ürün gelene kadar yükleniyor mesajı
+            <p>Ürün yükleniyor...</p>
           )}
         </div>
 
