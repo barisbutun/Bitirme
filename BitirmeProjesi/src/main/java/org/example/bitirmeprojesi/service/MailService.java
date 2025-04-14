@@ -51,9 +51,18 @@ public class MailService {
     }
 
     public void sendEmailVerification(TemproraryUserDto dto) throws MessagingException {
-        if (userRepository.existsByEmail(dto.getEmail()) || temproraryUserRepository.existsByEmail(dto.getEmail())) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new ExistByEmailException(ErrorMesage.EXIST_BY_EMAIL_ERROR);
         }
+
+        if(temproraryUserRepository.existsByEmail(dto.getEmail())){
+
+            TemproraryUser temproraryUser=temproraryUserRepository.findByEmail(dto.getEmail());
+            temproraryUser.setCode(VerificationCodeGenerator.generateCode());
+            temproraryUserRepository.save(temproraryUser);
+        }
+
+
 
         String code = VerificationCodeGenerator.generateCode();
 
