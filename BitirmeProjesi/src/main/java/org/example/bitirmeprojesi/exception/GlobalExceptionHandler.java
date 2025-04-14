@@ -146,6 +146,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_REVIEW_INFORMATION_ERROR, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ExistByEmailException.class)
+    public ResponseEntity<Object> existByEmailExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.EXIST_BY_EMAIL_ERROR, HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message, status));
     }

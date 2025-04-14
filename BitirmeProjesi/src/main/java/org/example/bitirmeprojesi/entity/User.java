@@ -34,9 +34,6 @@ public class User implements Serializable, UserDetails {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "user_name", unique = true)
-    private String userName;
-
     @ToString.Exclude
     private boolean registered = true;
 

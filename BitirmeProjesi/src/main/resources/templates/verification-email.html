@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 100px;
+            top: 80px;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0  auto;
+            background-color: #ffffff;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            background-color: #fd702d;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            color: white;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .verification-code {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #fd702d;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            color: #888;
+            border-radius: 10px 10px 10px 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h2>{{header}}</h2>
+    </div>
+    <div class="content">
+        <p>Merhaba,</p>
+        <p>{{sentence}}</p>
+        <div class="verification-code">{{code}}</div>
+        <p>{{sentence2}}</p>
+        <p>Eğer bu işlemi siz yapmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
+
+    </div>
+    <div class="footer">
+        <p>Bu e-posta, Fashion Design tarafından gönderilmiştir. Sorularınız için bizimle iletişime geçebilirsiniz.</p>
+    </div>
+</div>
+</body>
+</html>

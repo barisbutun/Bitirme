@@ -21,4 +21,5 @@ public class ErrorMesage {
     public static final String EXİSTİNG_PRODUCT_ERROR="Product exist in this system";
     public static final String REVIEW_NOT_FOUND_ERROR="Review does not exist in our systems";
     public static final String INVALID_REVIEW_INFORMATION_ERROR="You have already reviewed this product";
+    public static final String EXIST_BY_EMAIL_ERROR="Email already exist in our system";
 }

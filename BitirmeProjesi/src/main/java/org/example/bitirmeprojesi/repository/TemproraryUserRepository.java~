@@ -11,8 +11,6 @@ public interface TemproraryUserRepository extends JpaRepository<TemproraryUser, 
 
     TemproraryUser findByEmailAndCode(String email, String code);
 
-    boolean existsByEmail(String email);
-
     TemproraryUser findByCode(String code);
 }
 
