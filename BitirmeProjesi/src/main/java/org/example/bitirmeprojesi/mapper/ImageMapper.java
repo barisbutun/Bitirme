@@ -5,7 +5,6 @@ import org.example.bitirmeprojesi.entity.Image;
 import org.mapstruct.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,

@@ -3,7 +3,6 @@ package org.example.bitirmeprojesi.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.service.ProductService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

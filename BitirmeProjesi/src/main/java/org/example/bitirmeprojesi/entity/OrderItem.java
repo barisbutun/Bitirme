@@ -33,8 +33,8 @@ public class OrderItem {
     private Orders order;
 
 
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
 

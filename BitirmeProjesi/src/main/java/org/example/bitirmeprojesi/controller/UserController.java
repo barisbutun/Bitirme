@@ -5,20 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.dto.UserProfileDto;
-import org.example.bitirmeprojesi.entity.User;
-import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.service.UserService;
 import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController

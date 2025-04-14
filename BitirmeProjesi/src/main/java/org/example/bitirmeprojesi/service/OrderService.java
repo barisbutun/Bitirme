@@ -1,7 +1,6 @@
 package org.example.bitirmeprojesi.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
@@ -19,16 +18,12 @@ import org.example.bitirmeprojesi.repository.OrderRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.OrderValidator;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,6 +54,7 @@ public class OrderService {
         List<OrderItem> orderItems = shoppingCartItems.stream().map(shoppingCartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(shoppingCartItem.getProduct());
+            orderItem.setCategory(shoppingCartItem.getProduct().getCategory());
             orderItem.setShoppingCartItem(shoppingCartItem);
             orderItem.setUser(shoppingCartItem.getUser());
             orderItem.setOrder(finalOrders);

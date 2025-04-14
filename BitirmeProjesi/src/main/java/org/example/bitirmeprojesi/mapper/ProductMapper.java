@@ -1,7 +1,6 @@
 package org.example.bitirmeprojesi.mapper;
 
 import org.example.bitirmeprojesi.dto.ProductDto;
-import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.entity.Product;
 import org.mapstruct.*;
 

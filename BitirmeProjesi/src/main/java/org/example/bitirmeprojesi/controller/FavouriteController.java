@@ -5,11 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.service.FavouriteService;
 import org.example.bitirmeprojesi.util.JwtUtil;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
