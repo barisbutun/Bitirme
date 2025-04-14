@@ -168,6 +168,10 @@ const LoginForm = ({ setLoading }) => {
         <Form.Item>
           <Link to={"/user/EmailVerification"}> Hesabınız yok mu?</Link>
         </Form.Item>
+        <Form.Item>
+          <Link to={"/user/ResetPassword"}> Şifrenizi mi unuttunuz?</Link>
+        </Form.Item>
+
         {/* <Form.Item>
           <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">
             <GoogleLogin

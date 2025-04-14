@@ -41,7 +41,10 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       icon: <LoginOutlined />,
       label: "Giriş/Kayıt",
       children: [
-        { key: "31", label: <Link to="/user/SignUp">Kayıt Ol</Link> },
+        {
+          key: "31",
+          label: <Link to="/user/EmailVerification">Kayıt Ol</Link>,
+        },
         { key: "32", label: <Link to="/Login">Giriş</Link> },
         {
           key: "13",

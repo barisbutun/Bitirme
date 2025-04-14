@@ -32,7 +32,10 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
       icon: <UserOutlined />,
       label: <Link to="/">Giriş Yap</Link>,
       children: [
-        { key: "11", label: <Link to="/user/SignUp">Kayıt Ol</Link> },
+        {
+          key: "11",
+          label: <Link to="/user/EmailVerification">Kayıt Ol</Link>,
+        },
         { key: "12", label: <Link to="/Login">Giriş Yap</Link> },
         {
           key: "13",
