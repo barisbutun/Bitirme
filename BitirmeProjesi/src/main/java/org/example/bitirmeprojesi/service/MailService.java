@@ -56,28 +56,42 @@ public class MailService {
         }
 
         if(temproraryUserRepository.existsByEmail(dto.getEmail())){
-
+            String code = VerificationCodeGenerator.generateCode();
             TemproraryUser temproraryUser=temproraryUserRepository.findByEmail(dto.getEmail());
-            temproraryUser.setCode(VerificationCodeGenerator.generateCode());
+            temproraryUser.setCode(code);
             temproraryUserRepository.save(temproraryUser);
+
+            EmailContent content = new EmailContent(
+                    "Hesap Doğrulama - Fashion Design",
+                    "E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın.",
+                    "Bu doğrulama kodu 6 dakika için geçerlidir.",
+                    "Hesabınızı Doğrulayın"
+            );
+
+            sendHtmlEmail(dto.getEmail(), code, content);
+
+        }
+
+        else{
+            String code = VerificationCodeGenerator.generateCode();
+
+            TemproraryUser user = tempororaryUserMapper.toEntity(dto);
+            user.setCode(code);
+            temproraryUserRepository.save(user);
+
+            EmailContent content = new EmailContent(
+                    "Hesap Doğrulama - Fashion Design",
+                    "E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın.",
+                    "Bu doğrulama kodu 6 dakika için geçerlidir.",
+                    "Hesabınızı Doğrulayın"
+            );
+
+            sendHtmlEmail(dto.getEmail(), code, content);
         }
 
 
 
-        String code = VerificationCodeGenerator.generateCode();
 
-        TemproraryUser user = tempororaryUserMapper.toEntity(dto);
-        user.setCode(code);
-        temproraryUserRepository.save(user);
-
-        EmailContent content = new EmailContent(
-                "Hesap Doğrulama - Fashion Design",
-                "E-posta adresinizi doğrulamak için aşağıdaki kodu kullanın.",
-                "Bu doğrulama kodu 6 dakika için geçerlidir.",
-                "Hesabınızı Doğrulayın"
-        );
-
-        sendHtmlEmail(dto.getEmail(), code, content);
     }
 
     private void sendHtmlEmail(String email, String code, EmailContent content) {
