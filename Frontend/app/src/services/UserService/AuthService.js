@@ -142,3 +142,27 @@ export const googleLogin = async (token) => {
     throw error;
   }
 };
+
+
+export const VerifyRegister = async (userDetails, code) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${code}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Kayıt başarısız");
+    }
+
+    const updatedUser = await response.json();
+    return updatedUser;
+  } catch (error) {
+    console.error("Register sırasında hata:", error);
+    throw error;
+  }
+};

@@ -11,6 +11,7 @@ import Orders from "../pages/User/Orders";
 import ProductDetails from "../pages/User/ProductDetails";
 import Favorites from "../pages/User/Favorites";
 import Payment from "../pages/User/Payment";
+import EmailVerification from "../pages/User/EmailVerification";
 
 const UserRoutes = ({ setLoading }) => {
   return (
@@ -21,6 +22,10 @@ const UserRoutes = ({ setLoading }) => {
       {/* Kullanıcı rotaları */}
       <Route path="Profile" element={<Profile setLoading={setLoading} />} />
       <Route path="Login" element={<Login setLoading={setLoading} />} />
+      <Route
+        path="EmailVerification"
+        element={<EmailVerification setLoading={setLoading} />}
+      />
       <Route path="SignUp" element={<SignUp setLoading={setLoading} />} />
       <Route path="Products" element={<Products setLoading={setLoading} />} />
       <Route path="Delivery" element={<Delivery setLoading={setLoading} />} />

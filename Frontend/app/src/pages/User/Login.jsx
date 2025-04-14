@@ -166,7 +166,7 @@ const LoginForm = ({ setLoading }) => {
           </Button>
         </Form.Item>
         <Form.Item>
-          <Link to={"/user/SignUp"}> Hesabınız yok mu?</Link>
+          <Link to={"/user/EmailVerification"}> Hesabınız yok mu?</Link>
         </Form.Item>
         {/* <Form.Item>
           <GoogleOAuthProvider clientId="686213888927-jahnrgm8590h9hkobg59efdvqiljkrtv.apps.googleusercontent.com ">

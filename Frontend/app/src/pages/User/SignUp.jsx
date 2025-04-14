@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Button, Checkbox, Form, Input, Select, Spin } from "antd";
+import { Button, Checkbox, Form, Input, Select, Spin, message } from "antd";
 import "../User/UserCss/SignUp.css";
 import { useNavigate } from "react-router-dom";
-import { Register } from "../../services/UserService/AuthService";
+import {
+  Register,
+  VerifyRegister,
+} from "../../services/UserService/AuthService";
 
 const { Option } = Select;
 
@@ -27,37 +30,61 @@ const tailFormItemLayout = {
 const SignUp = ({ setLoading }) => {
   const [form] = Form.useForm();
   const [name, setName] = useState("");
-  const [userName, setUsername] = useState("");
   const [email, setUseremail] = useState("");
   const [password, setUserpassword] = useState("");
   const [address, setUseraddress] = useState("");
   const [phone, setUserphone] = useState("");
-  const [message, setMessage] = useState("");
-  // const [kode, setKode] = useState("");
+  const [errormessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const registerUser = async () => {
-    setLoading(true);
+  // const registerUser = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await Register(
+  //       name,
+  //       email,
+  //       password,
+  //       address,
+  //       phone,
+  //       navigate
+  //     );
+  //     if (response) {
+  //       setMessage(" Kayıt başarılı:");
+  //       navigate("/user/Login");
+  //     } else {
+  //       setMessage("Kayıt başarısız: {$data.message}");
+  //     }
+  //   } catch (error) {
+  //     setMessage("Kayıt sırasında hata oluştu:");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleRegister = async () => {
     try {
-      const response = await Register(
-        userName,
+      const code = localStorage.getItem("verificationCode");
+      const verifiedEmail = localStorage.getItem("verifiedEmail");
+
+      if (!code || !verifiedEmail) {
+        message.error("Doğrulama kodu veya email bulunamadı.");
+        return;
+      }
+
+      const userDetails = {
         name,
-        email,
+        email: verifiedEmail, // localStorage'den alınan email
         password,
         address,
         phone,
-        navigate
-      );
-      if (response) {
-        setMessage(" Kayıt başarılı:");
-        navigate("/user/Login");
-      } else {
-        setMessage("Kayıt başarısız: {$data.message}");
-      }
+      };
+
+      const registeredUser = await VerifyRegister(userDetails, code);
+      message.success("Kayıt başarılı!");
+      localStorage.removeItem("verificationCode");
+      localStorage.removeItem("verifiedEmail");
+      navigate("/user/Login");
     } catch (error) {
-      setMessage("Kayıt sırasında hata oluştu:");
-    } finally {
-      setLoading(false);
+      message.error(error.message || "Kayıt başarısız.");
     }
   };
 
@@ -79,6 +106,7 @@ const SignUp = ({ setLoading }) => {
           initialValues={{ prefix: "90" }}
           className="form-container"
           scrollToFirstError
+          onFinish={handleRegister}
         >
           <Form.Item
             name="name"
@@ -99,26 +127,7 @@ const SignUp = ({ setLoading }) => {
             />
           </Form.Item>
 
-          <Form.Item
-            name="username"
-            label="Kullanıcı İsmi"
-            rules={[
-              {
-                required: true,
-                message: "Lütfen isminizi giriniz.",
-                whitespace: true,
-              },
-            ]}
-            className="form-label"
-          >
-            <Input
-              className="form-input"
-              value={userName}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item
+          {/* <Form.Item
             name="email"
             label="E-posta"
             rules={[
@@ -131,7 +140,7 @@ const SignUp = ({ setLoading }) => {
               value={email}
               onChange={(e) => setUseremail(e.target.value)}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="password"
@@ -210,17 +219,12 @@ const SignUp = ({ setLoading }) => {
             {...tailFormItemLayout}
           >
             <Checkbox>
-              Sözleşmeyi okudum <a href="">kabul ediyorum</a>
+              <a href=""> Sözleşmeyi</a> okudum kabul ediyorum.
             </Checkbox>
           </Form.Item>
 
           <Form.Item {...tailFormItemLayout} className="submit-button">
-            <Button
-              className="KayitButon"
-              type="primary"
-              htmlType="submit"
-              onClick={registerUser}
-            >
+            <Button className="KayitButon" type="primary" htmlType="submit">
               Kayıt Ol
             </Button>
           </Form.Item>

@@ -1,5 +1,5 @@
 import { getUserIdFromToken, getToken } from "../utils/auth";
-const API_BASE_URL = "http://localhost:8082/api/chatbot/v1"; // kendi backend URL'ini koyabilirsin
+const API_BASE_URL = "http://localhost:8082/api/chatbot/v1"; 
 
 // Kullanıcıdan mesajı gönderir, bot cevabını alır
 export const sendMessageToBot = async (message) => {
@@ -9,8 +9,7 @@ export const sendMessageToBot = async (message) => {
         if (!token) {
           throw new Error("Kullanıcı girişi yapılmamış");
         }
-    
-  
+      
     const response = await fetch(`${API_BASE_URL}/question`, {
       method: "POST",
       headers: {
@@ -32,7 +31,7 @@ export const sendMessageToBot = async (message) => {
   }
 };
 
-// (Eğer gelecekte bir cevap listesi istenirse kullanılabilir)
+//  cevap listesi için
 export const fetchChatHistory = async () => {
   // Şimdilik boş döndürüyoruz
   return [];

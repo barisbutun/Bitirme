@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout } from "antd";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../../AdminComponents/AdminHeader";
 import Footer from "../../components/Footer";
 // import "../User/UserCss/Homepage.css";
 import "../Admin/AdminCss/AdminPage.css";
@@ -27,9 +27,7 @@ const Homepage = () => {
     <Layout>
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="homepage-layout">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
-          <FilterComponent onApplyFilter={handleApplyFilter} />
-        </Header>
+        <AdminHeader />
         <div className="admincontent">
           <iframe
             src="http://localhost:5601/app/dashboards#/view/25f8a8f0-4deb-4276-aaed-ea24277d0c88?embed=true&_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-1y%2Fd%2Cto%3Anow))&hide-filter-bar=true"
