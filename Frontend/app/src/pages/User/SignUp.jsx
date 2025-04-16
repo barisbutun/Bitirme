@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Checkbox, Form, Input, Select, Spin, message } from "antd";
 import "../User/UserCss/SignUp.css";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import {
   Register,
   VerifyRegister,
 } from "../../services/UserService/AuthService";
-
+import AgreementCheckbox from "../../components/AgreementCheckbox";
 const { Option } = Select;
 
 const formItemLayout = {
@@ -35,7 +35,39 @@ const SignUp = ({ setLoading }) => {
   const [address, setUseraddress] = useState("");
   const [phone, setUserphone] = useState("");
   const [errormessage, setErrorMessage] = useState("");
+  const [remainingTime, setRemainingTime] = useState(6 * 60);
+
   const navigate = useNavigate();
+
+  const getColor = () => {
+    if (remainingTime > 240) return "#52c41a"; // yeşil
+    if (remainingTime > 120) return "#faad14"; // turuncu
+    return "#f5222d"; // kırmızı
+  };
+
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setRemainingTime((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(countdown);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    const timeout = setTimeout(() => {
+      message.warning(
+        "Doğrulama kodunun süresi doldu. Lütfen yeniden e-posta doğrulaması yapın."
+      );
+      navigate("/user/EmailVerification");
+    }, 6 * 60 * 1000);
+
+    return () => {
+      clearInterval(countdown);
+      clearTimeout(timeout);
+    };
+  }, []);
 
   // const registerUser = async () => {
   //   setLoading(true);
@@ -61,6 +93,19 @@ const SignUp = ({ setLoading }) => {
   //   }
   // };
   const handleRegister = async () => {
+    if (remainingTime <= 0) {
+      message.warning(
+        "Doğrulama süresi doldu. Lütfen tekrar e-posta doğrulaması yapın."
+      );
+      navigate("/user/EmailVerification");
+      return;
+    }
+
+    if (!name || !address || !phone || !password) {
+      message.error("Tüm alanları doldurduğunuzdan emin olun.");
+      return;
+    }
+
     try {
       const code = localStorage.getItem("verificationCode");
       const verifiedEmail = localStorage.getItem("verifiedEmail");
@@ -72,7 +117,7 @@ const SignUp = ({ setLoading }) => {
 
       const userDetails = {
         name,
-        email: verifiedEmail, // localStorage'den alınan email
+        email: verifiedEmail,
         password,
         address,
         phone,
@@ -82,9 +127,25 @@ const SignUp = ({ setLoading }) => {
       message.success("Kayıt başarılı!");
       localStorage.removeItem("verificationCode");
       localStorage.removeItem("verifiedEmail");
-      navigate("/user/Login");
+      navigate("/Login");
     } catch (error) {
-      message.error(error.message || "Kayıt başarısız.");
+      const errorMsg = error?.response?.data?.message || error.message || "";
+
+      if (
+        errorMsg.toLowerCase().includes("expired") ||
+        errorMsg.toLowerCase().includes("geçersiz") ||
+        errorMsg.toLowerCase().includes("invalid") ||
+        errorMsg.toLowerCase().includes("expired code")
+      ) {
+        message.error(
+          "Doğrulama kodunuzun süresi dolmuş. Lütfen tekrar e-posta doğrulaması yapınız."
+        );
+      } else {
+        message.error("Kayıt gerçekleştirilemedi. Lütfen tekrar deneyin.");
+      }
+      setTimeout(() => {
+        navigate("/user/EmailVerification");
+      }, 1000);
     }
   };
 
@@ -218,9 +279,15 @@ const SignUp = ({ setLoading }) => {
             ]}
             {...tailFormItemLayout}
           >
-            <Checkbox>
-              <a href=""> Sözleşmeyi</a> okudum kabul ediyorum.
-            </Checkbox>
+            <Form.Item
+              name="agreement"
+              valuePropName="checked"
+              rules={[
+                { required: true, message: "Sözleşmeyi kabul etmelisiniz!" },
+              ]}
+            >
+              <AgreementCheckbox />
+            </Form.Item>
           </Form.Item>
 
           <Form.Item {...tailFormItemLayout} className="submit-button">
@@ -229,6 +296,38 @@ const SignUp = ({ setLoading }) => {
             </Button>
           </Form.Item>
         </Form>
+        {/* Sayaç ve progress bar */}
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div
+            style={{
+              fontSize: "18px",
+              fontWeight: "bold",
+              color: getColor(),
+            }}
+          >
+            Kalan Süre: {Math.floor(remainingTime / 60)}:
+            {String(remainingTime % 60).padStart(2, "0")}
+          </div>
+          <div style={{ marginTop: "8px", width: "30%", marginInline: "auto" }}>
+            <div
+              style={{
+                height: "8px",
+                background: "#f0f0f0",
+                borderRadius: "4px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "80%",
+                  width: `${(remainingTime / (6 * 60)) * 100}%`,
+                  background: getColor(),
+                  transition: "width 1s linear",
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </Spin>
     </div>
   );
