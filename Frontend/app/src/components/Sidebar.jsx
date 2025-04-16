@@ -94,13 +94,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         mode="inline"
         defaultSelectedKeys={["1"]}
         items={items}
-        style={{
-          backgroundColor: "#46494e",
-          color: "#fff", // Yazı rengi
-          fontSize: "16px", // Yazı boyutu
-          fontWeight: "500", // Yazı kalınlığı
-          borderRight: "none", // Sağ kenar çizgisi
-        }}
+        className="sidebar-menu"
         theme="dark"
       />
     </Sider>

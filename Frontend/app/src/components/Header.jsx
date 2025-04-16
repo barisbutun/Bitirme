@@ -76,7 +76,12 @@ const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
       <SearchBar />
 
       <div className="headerbuttons">
-        <Menu mode="horizontal" defaultSelectedKeys={["2"]} items={items} />
+        <Menu
+          mode="horizontal"
+          defaultSelectedKeys={["2"]}
+          items={items}
+          className="header-menu"
+        />
 
         <Button icon={<ShoppingCartOutlined />}>
           <Link to="/user/ShoppingCard">Sepetim</Link>

@@ -27,3 +27,9 @@
     padding: 10px 0; /* Adjust padding as needed */
    
   }
+  .header-menu .ant-menu-submenu-popup {
+    background-color: #fff !important; /* White background for header */
+    color: #000; /* Ensure text is visible */
+    box-shadow: none !important; /* Remove shadow */
+    border: none !important; /* Remove border */
+  }

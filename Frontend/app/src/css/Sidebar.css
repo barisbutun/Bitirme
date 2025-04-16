@@ -4,9 +4,33 @@
     background:#46494e;
   }
 
-.ant-menu-submenu-popup {
-    background-color: #46494e !important; /* Match the sidebar background */
-    color: #fff; /* Ensure text is visible */
+
+
+.sidebar-menu  {
+  background-color: #46494e;
+  color: "#fff";
+  font-size: 16px;
+  font-weight: 400;
+  border-right: "none";
+  color: #fff; 
+  box-shadow: none ;
+  border: none ;
 }
 
+
+/* Sidebar içindeki submenu açıldığında çıkan popup'ın arka planı */
+.sidebar-menu .ant-menu-submenu .ant-menu {
+  background-color: #46494e !important;
+  color: #fff !important;
+}
+
+/* Alt menü item'larının yazı rengi */
+.sidebar-menu .ant-menu-submenu .ant-menu-item {
+  color: #fff !important;
+}
+
+/* Hover efekti */
+.sidebar-menu .ant-menu-submenu .ant-menu-item:hover {
+  background-color: #5a5d63 !important;
+}
   

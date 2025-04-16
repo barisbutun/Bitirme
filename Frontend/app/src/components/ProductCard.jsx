@@ -139,7 +139,7 @@ function ProductCard({
         <Image className="image" src={image} />
       </div>
 
-      <CardText className="product-price">Fiyat: {price}</CardText>
+      <CardText className="product-price">Fiyat: {price} TL</CardText>
       <CardText className="product-info">Açıklama: {description}</CardText>
 
       <CardText
