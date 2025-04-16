@@ -10,7 +10,7 @@ import {
   Modal,
 } from "antd";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../../AdminComponents/AdminHeader";
 import Footer from "../../components/Footer";
 import "../Admin/AdminCss/UpdateProduct.css";
 import {
@@ -140,7 +140,7 @@ const UpdateProductContent = ({ id }) => {
     <Layout>
       <AdminSidebar />
       <Layout className="update-product-layout">
-        <Header />
+        <AdminHeader />
         <div className="update-product-container">
           <h1>Ürün Güncelleme Paneli</h1>
           <Steps current={currentStep - 1} style={{ marginBottom: "24px" }}>

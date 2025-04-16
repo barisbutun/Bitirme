@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Select, Button, message, Modal } from "antd";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../../AdminComponents/AdminHeader";
 import Footer from "../../components/Footer";
 import "../Admin/AdminCss/DeleteProduct.css";
 import {
@@ -60,7 +60,7 @@ const DeleteProductContent = () => {
     <Layout>
       <AdminSidebar />
       <Layout className="delete-product-layout">
-        <Header />
+        <AdminHeader />
         <div className="delete-product-container">
           <h1>Ürün Silme Paneli</h1>
           <div className="product-selector">

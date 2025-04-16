@@ -19,7 +19,7 @@ import {
   updateProduct,
 } from "../../services/ProductService/AdminProductService";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../../AdminComponents/AdminHeader";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import FilterComponent from "../../components/FilterComponent";
@@ -169,9 +169,9 @@ const AddProductContent = () => {
     <Layout>
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="homepage-layout">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
+        <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed}>
           <FilterComponent onApplyFilter={handleApplyFilter} />
-        </Header>
+        </AdminHeader>
         <div className="urun-ekle-container">
           <h1>Ürün Ekleme Paneli</h1>
           <Steps current={currentStep - 1} style={{ marginBottom: "24px" }}>

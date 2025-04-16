@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout } from "antd";
 import AdminSidebar from "../../AdminComponents/AdminSidebar";
-import Header from "../../components/Header";
+import AdminHeader from "../../AdminComponents/AdminHeader";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import FilterComponent from "../../components/FilterComponent";
@@ -26,9 +26,9 @@ const Homepage = () => {
     <Layout>
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="homepage-layout">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
+        <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed}>
           <FilterComponent onApplyFilter={handleApplyFilter} />
-        </Header>
+        </AdminHeader>
         <div className="content">Ürün İşlemleri Sayfası</div>
         <Footer />
       </Layout>
