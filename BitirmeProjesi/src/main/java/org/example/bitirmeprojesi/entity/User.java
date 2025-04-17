@@ -53,6 +53,9 @@ public class User implements Serializable, UserDetails {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "balance")
+    private Double balance = 0.0;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ShoppingCartItem> shoppingCartItems;
@@ -68,6 +71,11 @@ public class User implements Serializable, UserDetails {
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Favourite> favourites;
+
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Payment> payment;
 
 
     @Override

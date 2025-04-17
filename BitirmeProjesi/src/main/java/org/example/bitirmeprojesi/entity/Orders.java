@@ -48,6 +48,10 @@ public class Orders implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    private Payment payment;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<OrderItem> orderItems;
@@ -56,5 +60,8 @@ public class Orders implements Serializable {
     public void prePersist() {
         this.saleDate = LocalDateTime.now();
     }
+
+
+
 
 }

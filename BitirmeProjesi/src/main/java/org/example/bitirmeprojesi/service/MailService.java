@@ -107,7 +107,7 @@ public class MailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("E-posta gönderilemedi", e);
+            throw new RuntimeException("Email could not send", e);
         }
     }
 
@@ -123,7 +123,7 @@ public class MailService {
 
             return html;
         } catch (IOException e) {
-            throw new RuntimeException("HTML şablonu yüklenemedi", e);
+            throw new RuntimeException("html template could not read", e);
         }
     }
 

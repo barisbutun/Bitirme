@@ -18,8 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
 
     @Query("SELECT p FROM Product p WHERE " +
-            "( :category IS NULL OR p.category = :category ) AND " +
-            "( :name IS NULL OR p.name LIKE %:name% ) AND " +
+            "( :category IS NULL OR p.category.name = :category ) AND " +
+            "( :name IS NULL OR p.name = :name ) AND " +
             "( :minPrice IS NULL OR p.price >= :minPrice ) AND " +
             "( :maxPrice IS NULL OR p.price <= :maxPrice ) " +
             "ORDER BY p.price ASC")

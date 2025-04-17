@@ -25,7 +25,7 @@ public class AuthenticationController {
     @PostMapping("v1/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestBody UserResetPasswordDto userResetPasswordDto) {
         authenticationService.resetPassword(userResetPasswordDto);
-        return ResponseEntity.ok("Sıfırlama kodu e-posta adresinize gönderildi.");
+        return ResponseEntity.ok("Your password has been reset.");
     }
 
     @PostMapping("/v1/register")
