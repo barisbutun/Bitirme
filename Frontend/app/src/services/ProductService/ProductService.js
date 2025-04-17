@@ -1,7 +1,7 @@
-//ürünleri çekme
+import{getAuthHeaders} from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:8082/api";
-
+//ürünleri çekme
 export const fetchProducts = async () => {
   try { 
     const response = await fetch(`${API_BASE_URL}/product/v1/home`, {
@@ -48,6 +48,8 @@ export const fetchProductImages = async (productId) => {
   }
 };
 
+
+
 export const fetchProductById=async(id)=>{
   const response=await fetch(`http://localhost:8082/api/product/v1/${id}`);
   if(!response.ok){
@@ -55,3 +57,51 @@ export const fetchProductById=async(id)=>{
   }
   return await response.json();
 }
+
+export const fetchFilteredProducts = async (filters) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8082/api/product/v1/filter?name=${filters.name}&category=${filters.category}&minPrice=${filters.minPrice}&maxPrice=${filters.maxPrice}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Filtrelenmiş ürünler alınamadı", error);
+  }
+};
+
+
+export const fetchFilteredProductsWithImages = async (filters) => {
+  try {
+    const filteredProducts = await fetchFilteredProducts(filters);
+
+    const productsWithImages = await Promise.all(
+      filteredProducts.map(async (product) => {
+        const images = await fetchProductImages(product.id);
+        return {
+          ...product,
+          images,
+        };
+      })
+    );
+
+    return productsWithImages;
+  } catch (error) {
+    console.error("Filtrelenmiş ürün + resim verileri alınamadı", error);
+    return [];
+  }
+};
+
+export const ProductCategories = async () => {
+  
+  const response = await fetch("http://localhost:8082/api/categories/v1", {
+    method: "GET",
+    headers:{
+      'Content-Type':'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Kategori bilgileri çekilirken bir hata oluştu.");
+  }
+  return response.json();
+};

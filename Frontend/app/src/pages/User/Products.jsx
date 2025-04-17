@@ -5,10 +5,10 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Products.css";
 import ProductCard from "../../components/ProductCard";
-import FilterComponent from "../../components/FilterComponent";
 import {
   fetchProducts,
   fetchProductImages,
+  fetchFilteredProductsWithImages,
 } from "../../services/ProductService/ProductService";
 import { fetchFavorites } from "../../services/ProductService/FavoriteService";
 const Products = ({ setLoading }) => {
@@ -60,14 +60,13 @@ const Products = ({ setLoading }) => {
 
   if (error) return <div>Hata: {error}</div>;
 
-  const handleApplyFilter = (category) => {
-    if (category) {
-      const filtered = products.filter(
-        (product) => product.category === category
-      );
-      setFilteredProducts(filtered);
-    } else {
-      setFilteredProducts(products);
+  const handleApplyFilter = async (filters) => {
+    console.log("filtreleme kriterleri:", filters);
+    try {
+      const dataWithImages = await fetchFilteredProductsWithImages(filters);
+      setFilteredProducts(dataWithImages);
+    } catch (error) {
+      console.error("Filtreleme sırasında hata:", error);
     }
   };
 
@@ -75,9 +74,12 @@ const Products = ({ setLoading }) => {
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="product-layout">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
-          <FilterComponent onApplyFilter={handleApplyFilter} />
-        </Header>
+        <Header
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          onFilterChange={handleApplyFilter}
+        />
+
         <div className="content">
           {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
@@ -96,7 +98,9 @@ const Products = ({ setLoading }) => {
               />
             ))
           ) : (
-            <p></p>
+            <p style={{ textAlign: "center", marginTop: "2rem" }}>
+              Ürün bulunamadı.
+            </p>
           )}
         </div>
         <Footer />

@@ -1,44 +1,68 @@
-import React, { useState } from "react";
-import { Select, Button, Row, Col } from "antd";
-import "../css/FilterComponent.css";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Select, Form } from "antd";
+import { ProductCategories } from "../services/ProductService/ProductService";
 
 const { Option } = Select;
 
 const FilterComponent = ({ onApplyFilter }) => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [form] = Form.useForm();
+  const [categories, setCategories] = useState([]);
 
-  // Kategori değiştirme
-  const handleCategoryChange = (value) => {
-    setSelectedCategory(value);
-  };
+  useEffect(() => {
+    ProductCategories()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.error("Kategoriler alınırken hata oluştu:", error);
+      });
+  }, []);
 
-  const handleApplyFilter = () => {
-    onApplyFilter(selectedCategory);
+  const onFinish = (values) => {
+    onApplyFilter({
+      ...values,
+      category: values.category, // Sadece kategori adını gönderiyoruz
+    });
   };
 
   return (
-    <div className="filter-container">
-      <Row gutter={16}>
-        <Col span={24}>
-          <h3 className="filter-title">Kategori</h3>
-          <Select
-            placeholder="Kategori Seçin"
-            className="filter-select"
-            onChange={handleCategoryChange}
-            allowClear
-          >
-            <Option value="Akıllı Telefon">Akıllı Telefon</Option>
-            <Option value="Dizüstü Bilgisayar">Dizüstü Bilgisayar</Option>
-            <Option value="Kablosuz Kulaklık">Kablosuz Kulaklık</Option>
-            <Option value="Akıllı Saat">Akıllı Saat</Option>
-            <Option value="4K Televizyon">4K Televizyon</Option>
-          </Select>
-          <Button onClick={handleApplyFilter} style={{ marginTop: "10px" }}>
-            Uygula
-          </Button>
-        </Col>
-      </Row>
-    </div>
+    <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Form.Item name="name" label="Ürün Adı">
+        <Input placeholder="Ürün adı girin" />
+      </Form.Item>
+
+      <Form.Item name="category" label="Kategori">
+        <Select
+          placeholder="Kategori seçin"
+          allowClear
+          onChange={(value) => {
+            // Seçilen kategori nesnesinin adını göndereceğiz
+            const selectedCategory = categories.find((cat) => cat.id === value);
+            form.setFieldsValue({ category: selectedCategory.name });
+          }}
+        >
+          {categories.map((cat) => (
+            <Option key={cat.id} value={cat.id}>
+              {cat.name}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item name="minPrice" label="Min Fiyat">
+        <Input type="number" placeholder="Minimum fiyat" />
+      </Form.Item>
+
+      <Form.Item name="maxPrice" label="Max Fiyat">
+        <Input type="number" placeholder="Maksimum fiyat" />
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Filtrele
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

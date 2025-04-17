@@ -1,5 +1,11 @@
 import { jwtDecode } from "jwt-decode"; // jwt-decode kütüphanesini import ediyoruz
 
+export const getAuthHeaders = () => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${getToken()}`, // Token'ı Authorization başlığına ekle
+});
+
+
 export const getToken = () => {
   return localStorage.getItem('token'); // 'token' localStorage'da saklanıyor
 };

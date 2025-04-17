@@ -15,7 +15,11 @@ import {
 
 const { Header } = Layout;
 
-const HeaderComponent = ({ onFilterChange, collapsed, setCollapsed }) => {
+const HeaderComponent = ({
+  onFilterChange = () => {},
+  collapsed,
+  setCollapsed,
+}) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {

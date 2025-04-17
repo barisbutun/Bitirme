@@ -5,10 +5,10 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import ProductCard from "../../components/ProductCard";
-import FilterComponent from "../../components/FilterComponent";
 import {
   fetchProducts,
   fetchProductImages,
+  fetchFilteredProducts,
 } from "../../services/ProductService/ProductService";
 const Homepage = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
@@ -43,14 +43,13 @@ const Homepage = ({ setLoading }) => {
 
   if (error) return <div>Hata: {error}</div>;
 
-  const handleApplyFilter = (category) => {
-    if (category) {
-      const filtered = products.filter(
-        (product) => product.category === category
-      );
-      setFilteredProducts(filtered);
-    } else {
-      setFilteredProducts(products);
+  const handleApplyFilter = async (filters) => {
+    console.log("filtreleme kriterleri:", filters);
+    try {
+      const data = await fetchFilteredProducts(filters);
+      setFilteredProducts(data);
+    } catch (error) {
+      console.error("Filtreleme sırasında hata:", error);
     }
   };
 
@@ -58,9 +57,12 @@ const Homepage = ({ setLoading }) => {
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout className="homepage-layout">
-        <Header collapsed={collapsed} setCollapsed={setCollapsed}>
-          <FilterComponent onApplyFilter={handleApplyFilter} />
-        </Header>
+        <Header
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          onFilterChange={handleApplyFilter}
+        />
+
         <div className="content">
           {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (

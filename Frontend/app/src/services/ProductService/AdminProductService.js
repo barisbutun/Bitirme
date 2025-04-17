@@ -1,4 +1,5 @@
-import { getToken } from "../../utils/auth"; // getToken fonksiyonunu içeri aktar
+import { getToken } from "../../utils/auth"; 
+import { getAuthHeaders } from "../../utils/auth";
 const API_URL = "http://localhost:8082/api/admin/v1";
 
 export const getAllProducts = async () => {
@@ -31,11 +32,7 @@ export const getProductById = async (id) => {
 };
 
 
-const getAuthHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${getToken()}`, // Token'ı Authorization başlığına ekle
-});
-
+ 
 export const createProduct = async (productData) => {
   const response = await fetch(`${API_URL}/product`, {
     method: "POST",
@@ -139,9 +136,10 @@ export const deleteCategory = async (id) => {
 };
 
 export const Categories = async () => {
+  
   const response = await fetch("http://localhost:8082/api/categories/v1", {
     method: "GET",
-    headers: getAuthHeaders(),
+    headers:getAuthHeaders(),
   });
   if (!response.ok) {
     throw new Error("Kategori bilgileri çekilirken bir hata oluştu.");
