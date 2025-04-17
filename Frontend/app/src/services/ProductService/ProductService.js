@@ -60,8 +60,15 @@ export const fetchProductById=async(id)=>{
 
 export const fetchFilteredProducts = async (filters) => {
   try {
+    const queryParams = new URLSearchParams();
+
+    if (filters.name) queryParams.append("name", filters.name);
+    if (filters.category) queryParams.append("category", filters.category);
+    if (filters.minPrice) queryParams.append("minPrice", filters.minPrice);
+    if (filters.maxPrice) queryParams.append("maxPrice", filters.maxPrice);
+
     const response = await fetch(
-      `http://localhost:8082/api/product/v1/filter?name=${filters.name}&category=${filters.category}&minPrice=${filters.minPrice}&maxPrice=${filters.maxPrice}`
+      `http://localhost:8082/api/product/v1/filter?${queryParams.toString()}`
     );
     const data = await response.json();
     return data;

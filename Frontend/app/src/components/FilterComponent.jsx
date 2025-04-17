@@ -32,17 +32,9 @@ const FilterComponent = ({ onApplyFilter }) => {
       </Form.Item>
 
       <Form.Item name="category" label="Kategori">
-        <Select
-          placeholder="Kategori seçin"
-          allowClear
-          onChange={(value) => {
-            // Seçilen kategori nesnesinin adını göndereceğiz
-            const selectedCategory = categories.find((cat) => cat.id === value);
-            form.setFieldsValue({ category: selectedCategory.name });
-          }}
-        >
+        <Select placeholder="Kategori seçin" allowClear>
           {categories.map((cat) => (
-            <Option key={cat.id} value={cat.id}>
+            <Option key={cat.id} value={cat.name}>
               {cat.name}
             </Option>
           ))}
