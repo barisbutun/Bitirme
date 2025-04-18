@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Rate, Row, Col, Image, notification } from "antd";
+import {
+  Card,
+  Button,
+  Rate,
+  Row,
+  Col,
+  Image,
+  notification,
+  Tooltip,
+} from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import "../css/ProductDetailsCard.css";
 import { addToCart } from "../services/ProductService/ShoppingCardService";
@@ -7,17 +16,25 @@ import {
   addFavorite,
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
+import { getReviewCount } from "../services/ProductService/ReviewService";
 
 const ProductDetailsCard = ({ product, images }) => {
-  // Prop olarak 'product' ve 'images' alıyoruz
   const [isFavorite, setIsFavorite] = useState(false);
+  const [reviewCount, setReviewCount] = useState(0); // ✅ Yorum sayısı state
 
-  // Ürün bilgisi geldiğinde favori durumunu güncelle
   useEffect(() => {
     if (product) {
       setIsFavorite(
         product.favorite?.some((fav) => fav.product_id === product.id)
       );
+    }
+
+    if (product?.id) {
+      getReviewCount(product.id)
+        .then(setReviewCount)
+        .catch((err) =>
+          console.error("Yorum sayısı alınırken hata oluştu:", err)
+        );
     }
   }, [product]);
 
@@ -85,16 +102,27 @@ const ProductDetailsCard = ({ product, images }) => {
     <Card className="product-details-card">
       <Row gutter={16}>
         <Col span={10}>
-          <Image className="zoom-image" width={400} src={images[0]} />{" "}
-          {/* resim listesi eğer varsa */}
+          <Image className="zoom-image" width={400} src={images[0]} />
         </Col>
         <Col span={14}>
           <h2 className="product-details-title">{product.name}</h2>
-          <Rate defaultValue={product.averageRating || 0} />
+
+          {/* ⭐ Puan ve yorum sayısı birlikte */}
+          <Tooltip title={`${reviewCount} yorum`}>
+            <Rate
+              allowHalf
+              disabled
+              defaultValue={product.averageRating || 0}
+            />
+          </Tooltip>
+          <p style={{ marginTop: 4 }}>{reviewCount} yorum</p>
+
           <p className="product-details-price">{product.price} TL</p>
+
           <Button type="primary" size="large" onClick={addToCartHandler}>
             Sepete Ekle
           </Button>
+
           <button
             className={`favoriteButton ${isFavorite ? "active" : ""}`}
             onClick={toggleFavoriteHandler}

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Card, Button, notification, Image } from "antd";
+import React, { useState, useEffect } from "react";
+import { Card, Button, notification, Image, Rate, Tooltip } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { CardText, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,8 @@ import {
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
 import { isAuthenticated, getToken } from "../utils/auth";
+import { getReviewCount } from "../services/ProductService/ReviewService"; // API'den review count almak için service
+
 function ProductCard({
   id,
   name,
@@ -24,23 +26,37 @@ function ProductCard({
   favorite = [],
   onFavoriteChange,
 }) {
-  console.log("ProductCard props:", {
-    id,
-    category_id,
-  });
-
   const navigate = useNavigate();
-
   const [isFavorite, setIsFavorite] = useState(() => {
     // Favori durumunu backend'den gelen veriye göre kontrol et
     return favorite.some((fav) => fav.product_id === id);
   });
 
+  // State for review count and average rating
+  const [reviewCount, setReviewCount] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
+
+  // Fetch review count and rating data on component mount
+  useEffect(() => {
+    const fetchReviewData = async () => {
+      try {
+        const reviewCountData = await getReviewCount(id);
+        setReviewCount(reviewCountData);
+
+        // Diğer API çağrılarıyla averageRating'i de alabilirsin
+        const averageRatingData = 4.2; // Örnek: backend'den gelen ortalama puan
+        setAverageRating(averageRatingData);
+      } catch (error) {
+        console.error("Review verisi alınamadı:", error);
+      }
+    };
+
+    fetchReviewData();
+  }, [id]);
+
   const addToCartHandler = async () => {
     try {
       const token = getToken();
-      console.log("Token mevcut mu:", !!token);
-
       if (!token) {
         notification.info({
           message: "Giriş Yapın",
@@ -56,11 +72,8 @@ function ProductCard({
         quantity: 1,
       };
 
-      console.log("Sepete eklenecek veri:", productData);
+      await addToCart(productData);
 
-      const result = await addToCart(productData);
-
-      // Başarılı veya boş response durumunda başarılı bildirimi göster
       notification.success({
         message: "Başarılı",
         description: "Ürün sepete eklendi.",
@@ -74,19 +87,17 @@ function ProductCard({
       });
     }
   };
+
   const toggleFavoriteHandler = async () => {
     try {
       const effectiveCategoryId = category_id || categoryId;
-
       let success;
+
       if (isFavorite) {
-        // Favori ID'sini bulmak için favorites array'ini kullan
-        const favorite = favorite.find((f) => f.product_id === id);
-        if (favorite) {
-          success = await removeFavorite(favorite.id); // Favori ID'sini gönder
-          if (success) {
-            setIsFavorite(false);
-          }
+        const favoriteItem = favorite.find((f) => f.product_id === id);
+        if (favoriteItem) {
+          success = await removeFavorite(favoriteItem.id);
+          if (success) setIsFavorite(false);
         }
       } else {
         success = await addFavorite({
@@ -96,14 +107,10 @@ function ProductCard({
           name: name,
           id: id,
         });
-        if (success) {
-          setIsFavorite(true);
-        }
+        if (success) setIsFavorite(true);
       }
 
-      if (success && onFavoriteChange) {
-        onFavoriteChange();
-      }
+      if (success && onFavoriteChange) onFavoriteChange();
     } catch (error) {
       showNotification("error", "Hata", error.message || "Bir hata oluştu.");
       if (error.message === "Giriş yapmalısınız.") {
@@ -111,6 +118,7 @@ function ProductCard({
       }
     }
   };
+
   const showNotification = (type, message, description) => {
     notification[type]({
       message,
@@ -122,8 +130,28 @@ function ProductCard({
   const isAvailable =
     stock_state && stock_state.toUpperCase() === "AVAILABLE" && quantity > 0;
 
+  const handleCardClick = () => {
+    // Ürün detay sayfasına yönlendirme yapıyoruz
+    navigate(`/user/ProductDetails/${id}`, {
+      state: {
+        product: {
+          id,
+          name,
+          image,
+          price,
+          quantity,
+          stock_state,
+          description,
+          category_id,
+          favorite_id,
+          favorite,
+        },
+      },
+    });
+  };
+
   return (
-    <Card className="ProductCard">
+    <Card className="ProductCard" onClick={handleCardClick}>
       <button
         className={`favorite-button ${isFavorite ? "active" : ""}`}
         onClick={toggleFavoriteHandler}
@@ -148,6 +176,14 @@ function ProductCard({
         {isAvailable ? "Stokta Var" : "Stokta Yok"}
       </CardText>
 
+      {/* Yorum sayısı ve ortalama puanı burada gösteriyoruz */}
+      <div style={{ marginTop: "10px" }}>
+        <Tooltip title={`${reviewCount} yorum`}>
+          <Rate allowHalf disabled defaultValue={averageRating} />
+        </Tooltip>
+        <p>{reviewCount} yorum</p>
+      </div>
+
       {isAvailable && (
         <CardText className="product-info">Kalan Miktar: {quantity}</CardText>
       )}
@@ -159,29 +195,6 @@ function ProductCard({
           disabled={!isAvailable}
         >
           Sepete Ekle
-        </Button>
-        <Button
-          className="InceleButon"
-          onClick={() =>
-            navigate(`/user/ProductDetails/${id}`, {
-              state: {
-                product: {
-                  id,
-                  name,
-                  image,
-                  price,
-                  quantity,
-                  stock_state,
-                  description,
-                  category_id,
-                  favorite_id,
-                  favorite,
-                },
-              },
-            })
-          }
-        >
-          İncele
         </Button>
       </div>
     </Card>

@@ -21,10 +21,7 @@
   transform: scale(1.05); /* Kartın üzerine gelindiğinde büyütür */
  }
 
- .InceleButon{
-  margin-left:5px;
-  background-color: #fd702d;
- }
+ 
  .image-container {
   width: 100%;
   height: 100%; /* Resmin yüksekliğini ayarlayın */
@@ -65,7 +62,7 @@
 }
 
 .product-buttons Button {
-  font-size: 14px; /* Smaller font for compact buttons */
+  font-size: 14px; 
   padding: 6px 12px;
   margin-top: 10px;
   border-radius: 4px;
