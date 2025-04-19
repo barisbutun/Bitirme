@@ -67,7 +67,17 @@ const HeaderComponent = ({
   return (
     <Header
       className="site-layout-header"
-      style={{ background: colorBgContainer }}
+      style={{
+        background: colorBgContainer,
+        transition: "all 0.2s ease", // yumuşak geçiş
+        zIndex: 1000,
+        width: "100%",
+        padding: 0,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        height: 64,
+      }}
     >
       <Button
         type="text"

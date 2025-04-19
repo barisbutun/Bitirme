@@ -4,8 +4,8 @@ import "../css/Footer.css";
 
 const { Footer } = Layout;
 
-const FooterComponent = () => (
-  <Footer className="site-layout-footer">Fashion Design</Footer>
+const FooterComponent = ({ children }) => (
+  <Footer className="site-layout-footer">{children}</Footer>
 );
 
 export default FooterComponent;

@@ -2,9 +2,9 @@ import{getAuthHeaders} from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:8082/api";
 //ürünleri çekme
-export const fetchProducts = async () => {
+export const fetchProducts = async (page=0,size=10) => {
   try { 
-    const response = await fetch(`${API_BASE_URL}/product/v1/home`, {
+    const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

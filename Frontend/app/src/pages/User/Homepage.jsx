@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Spin } from "antd";
+import { Layout, Spin, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -15,11 +15,19 @@ const Homepage = ({ setLoading }) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+
+  const handlePageChange = (pageNumber, pageSize) => {
+    setPage(pageNumber);
+    setSize(pageSize);
+  };
+
   useEffect(() => {
     const fetchAllProducts = async () => {
       setLoading(true);
       try {
-        const productsData = await fetchProducts();
+        const productsData = await fetchProducts(page - 1, size);
 
         // Resimleri ekle
         const productsWithImages = await Promise.all(
@@ -39,7 +47,7 @@ const Homepage = ({ setLoading }) => {
       }
     };
     fetchAllProducts();
-  }, []);
+  }, [page, size]);
 
   if (error) return <div>Hata: {error}</div>;
 
@@ -54,8 +62,25 @@ const Homepage = ({ setLoading }) => {
   };
 
   return (
-    <Layout>
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+    <Layout
+      style={{
+        transition: "all 0.2s ease",
+      }}
+    >
+      <Sidebar
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        trigger={null}
+        width={200}
+        style={{
+          position: "fixed", // Ekrana sabitlenir
+          height: "100vh",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 100, // Önde kalsın
+        }}
+      />
       <Layout className="homepage-layout">
         <Header
           collapsed={collapsed}
@@ -70,7 +95,7 @@ const Homepage = ({ setLoading }) => {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                image={product.images?.[0] || "default-image-path"} // İlk resmi veya varsayılan resmi göster
+                image={product.images?.[0] || "default-image-path"}
                 price={product.price}
                 description={product.description}
                 quantity={product.quantity}
@@ -79,10 +104,23 @@ const Homepage = ({ setLoading }) => {
               />
             ))
           ) : (
-            <p></p>
+            <p>Ürün bulunamadı.</p>
           )}
         </div>
-        <Footer />
+
+        <Footer>
+          <div className="pagination-inside-footer">
+            <Pagination
+              current={page}
+              pageSize={size}
+              onChange={handlePageChange}
+              showSizeChanger
+              pageSizeOptions={["5", "10", "20", "50"]}
+              total={100}
+            />
+            <p className="footer-text">@Fashion Design</p>
+          </div>
+        </Footer>
       </Layout>
     </Layout>
   );

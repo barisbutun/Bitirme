@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Spin } from "antd";
+import { Layout, Spin, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -17,13 +17,21 @@ const Products = ({ setLoading }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+
+  const handlePageChange = (pageNumber, pageSize) => {
+    setPage(pageNumber);
+    setSize(pageSize);
+  };
+
   useEffect(() => {
     const fetchAllProducts = async () => {
       setLoading(true);
       try {
         // Ürünleri ve favorileri paralel olarak çek
         const [productsData] = await Promise.all([
-          fetchProducts(),
+          fetchProducts(page - 1, size),
           fetchFavorites(setFavorites),
         ]);
         console.log("products.jsx'deki -API'den gelen ham veri:", productsData); // Debug log 1
@@ -56,7 +64,7 @@ const Products = ({ setLoading }) => {
     };
 
     fetchAllProducts();
-  }, []);
+  }, [page, size]);
 
   if (error) return <div>Hata: {error}</div>;
 
@@ -103,7 +111,19 @@ const Products = ({ setLoading }) => {
             </p>
           )}
         </div>
-        <Footer />
+        <Footer>
+          <div className="pagination-inside-footer">
+            <Pagination
+              current={page}
+              pageSize={size}
+              onChange={handlePageChange}
+              showSizeChanger
+              pageSizeOptions={["5", "10", "20", "50"]}
+              total={100}
+            />
+            <p className="footer-text">@Fashion Design</p>
+          </div>
+        </Footer>
       </Layout>
     </Layout>
   );
