@@ -25,20 +25,25 @@ const Homepage = ({ setLoading }) => {
 
   useEffect(() => {
     const fetchAllProducts = async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const productsData = await fetchProducts(page - 1, size);
 
-        // Resimleri ekle
-        const productsWithImages = await Promise.all(
-          productsData.map(async (product) => {
-            const images = await fetchProductImages(product.id);
-            return { ...product, images };
-          })
-        );
+        // Önce sadece ürünleri göster
+        const initialProducts = productsData.map((product) => ({
+          ...product,
+          images: [], // Başlangıçta boş
+        }));
+        setProducts(initialProducts);
+        setFilteredProducts(initialProducts);
 
-        setProducts(productsWithImages);
-        setFilteredProducts(productsWithImages);
+        // Sonra resimleri getirip state'i güncelle
+        for (const product of productsData) {
+          const images = await fetchProductImages(product.id);
+          setFilteredProducts((prev) =>
+            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
+          );
+        }
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -46,6 +51,7 @@ const Homepage = ({ setLoading }) => {
         setLoading(false);
       }
     };
+
     fetchAllProducts();
   }, [page, size]);
 

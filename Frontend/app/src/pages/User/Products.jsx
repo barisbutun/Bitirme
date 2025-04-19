@@ -27,37 +27,28 @@ const Products = ({ setLoading }) => {
 
   useEffect(() => {
     const fetchAllProducts = async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
-        // Ürünleri ve favorileri paralel olarak çek
-        const [productsData] = await Promise.all([
-          fetchProducts(page - 1, size),
-          fetchFavorites(setFavorites),
-        ]);
-        console.log("products.jsx'deki -API'den gelen ham veri:", productsData); // Debug log 1
+        const productsData = await fetchProducts(page - 1, size);
 
-        // Resimleri ekle
-        const productsWithImages = await Promise.all(
-          productsData.map(async (product) => {
-            const images = await fetchProductImages(product.id);
-            const transformedProduct = {
-              ...product,
-              images,
-              category_id: product.categoryId || product.category_id,
-              categoryId: product.categoryId || product.category_id, // Her iki formatı da koruyalım
-            };
-            console.log(
-              "Products.jsx - Dönüştürülmüş ürün:",
-              transformedProduct
-            ); // Debug log 2
-            return transformedProduct;
-          })
-        );
-        console.log("Products.jsx - Final ürün listesi:", productsWithImages); // Debug log 3
-        setProducts(productsWithImages);
-        setFilteredProducts(productsWithImages);
+        // Önce sadece ürünleri göster
+        const initialProducts = productsData.map((product) => ({
+          ...product,
+          images: [], // Başlangıçta boş
+        }));
+        setProducts(initialProducts);
+        setFilteredProducts(initialProducts);
+
+        // Sonra resimleri getirip state'i güncelle
+        for (const product of productsData) {
+          const images = await fetchProductImages(product.id);
+          setFilteredProducts((prev) =>
+            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
+          );
+        }
       } catch (error) {
         setError(error.message);
+        console.error("Ürünler yüklenirken hata oluştu:", error.message);
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, notification, Image, Rate, Tooltip } from "antd";
+import {
+  Card,
+  Button,
+  notification,
+  Image,
+  Rate,
+  Tooltip,
+  Spin,
+  Skeleton,
+} from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { CardText, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
@@ -162,9 +171,17 @@ function ProductCard({
       <CardTitle className="product-title" tag="h3">
         {name}
       </CardTitle>
-
       <div className="image-container">
-        <Image className="image" src={image} />
+        {image ? (
+          <Image
+            className="image"
+            src={image}
+            placeholder={<Spin />}
+            preview={false}
+          />
+        ) : (
+          <Skeleton.Image active style={{ width: "100%", height: "200px" }} />
+        )}
       </div>
 
       <CardText className="product-price">Fiyat: {price} TL</CardText>

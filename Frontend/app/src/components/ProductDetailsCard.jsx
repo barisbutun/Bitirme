@@ -8,6 +8,7 @@ import {
   Image,
   notification,
   Tooltip,
+  Skeleton,
 } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import "../css/ProductDetailsCard.css";
@@ -102,7 +103,25 @@ const ProductDetailsCard = ({ product, images }) => {
     <Card className="product-details-card">
       <Row gutter={16}>
         <Col span={10}>
-          <Image className="zoom-image" width={400} src={images[0]} />
+          {images[0] ? (
+            <Image
+              className="zoom-image"
+              width={400}
+              src={images[0]}
+              placeholder={
+                <Skeleton.Image
+                  active
+                  style={{ width: 400, height: 400, borderRadius: "8px" }}
+                />
+              }
+              preview={false}
+            />
+          ) : (
+            <Skeleton.Image
+              active
+              style={{ width: 400, height: 400, borderRadius: "8px" }}
+            />
+          )}
         </Col>
         <Col span={14}>
           <h2 className="product-details-title">{product.name}</h2>
