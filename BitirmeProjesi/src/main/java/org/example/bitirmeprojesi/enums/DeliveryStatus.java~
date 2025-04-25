@@ -1,0 +1,14 @@
+package org.example.bitirmeprojesi.enums;
+
+public enum DeliveryStatus {
+    PENDING,
+    PROCESSING,
+    SHIPPED,
+    IN_TRANSIT,
+    DELIVERED,
+    OUT_FOR_DELIVERY,
+    FAILED_DELIVERY,
+    RETURNED,
+    CANCELLED
+
+}

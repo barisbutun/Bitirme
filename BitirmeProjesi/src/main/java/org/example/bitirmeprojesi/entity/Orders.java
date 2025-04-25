@@ -49,7 +49,13 @@ public class Orders implements Serializable {
     private User user;
 
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Cancellation> cancellations;
+
+
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @JsonManagedReference

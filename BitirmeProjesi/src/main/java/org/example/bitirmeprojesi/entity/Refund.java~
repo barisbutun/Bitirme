@@ -1,13 +1,12 @@
 package org.example.bitirmeprojesi.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.bitirmeprojesi.enums.PaymentState;
+import lombok.extern.slf4j.Slf4j;
+import org.example.bitirmeprojesi.enums.RefundStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
@@ -16,10 +15,10 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="payment")
 @Getter
 @Setter
-public class Payment {
+@Slf4j
+public class Refund {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -31,24 +30,32 @@ public class Payment {
     private UUID id;
 
 
-    @Enumerated(EnumType.STRING)
-    private PaymentState paymentState;
+    @Column(name = "refund_amount", nullable = false)
+    private double refundAmount;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "order_item_id")
+    private OrderItem orderItem;
 
-    @JsonBackReference
-    @OneToOne(mappedBy="payment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Orders order;
 
-    @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
+    @Column(name = "refund_reason", nullable = false)
+    private String refundReason;
 
+    private LocalDateTime refundDate;
+
+    @Enumerated(EnumType.STRING)
+    private RefundStatus status;
 
     @PrePersist
     public void prePersist() {
-        paymentDate = LocalDateTime.now();
+        refundDate = LocalDateTime.now();
+        if(orderItem!=null){
+            this.refundAmount=orderItem.getQuantity()*orderItem.getProduct().getPrice();
+        }
+        
+
+
     }
 
 }

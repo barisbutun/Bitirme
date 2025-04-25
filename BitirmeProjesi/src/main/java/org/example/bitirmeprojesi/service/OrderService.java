@@ -95,10 +95,11 @@ public class OrderService {
         return orderMapper.toDto(orders);
     }
 
-    public List<OrdersDto> findAll(int page, int size) {
+    public Page<OrdersDto> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Orders> orders = orderRepository.findAll(pageable);
-        return orderMapper.toDtoList(orders.getContent());
+        Page<OrdersDto> ordersDtos = orders.map(orderMapper::toDto);
+        return ordersDtos;
     }
 
     public void delete(long id) {

@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.mapper;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.Product;
 import org.mapstruct.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public interface ProductMapper {
     Product toEntity(final ProductDto productDto);
 
     List<ProductDto> toDtoList(final List<Product> productList);
+
 
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

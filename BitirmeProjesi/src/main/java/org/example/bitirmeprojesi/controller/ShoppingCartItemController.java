@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ShoppingCartItemDto;
 import org.example.bitirmeprojesi.service.ShoppingCartItemService;
 import org.example.bitirmeprojesi.util.JwtUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class ShoppingCartItemController {
     }
 
     @GetMapping("/v1/user")
-    private ResponseEntity<List<ShoppingCartItemDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+    private ResponseEntity<Page<ShoppingCartItemDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
                                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok().body(shoppingCartItemService.findAllByUserId(userId, page, size));

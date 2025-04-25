@@ -4,12 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.*;
 import org.example.bitirmeprojesi.service.AdminService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/admin")
@@ -25,6 +28,11 @@ public class AdminController {
        adminService.createProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productDto);
     }
+    @GetMapping("/v1/product/count")
+    public ResponseEntity<Integer> getProductCount() {
+        return ResponseEntity.ok(adminService.getProductCount());
+    }
+
 
     @PutMapping("/v1/product/{id}")
     public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto, @PathVariable Long id) {
@@ -43,6 +51,17 @@ public class AdminController {
         CategoryDto createdCategory = adminService.createCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
+    @GetMapping("v1/category/count")
+    public ResponseEntity<Integer> getCategoryCount() {
+        return ResponseEntity.ok(adminService.getCategoryCount());
+    }
+
+    @GetMapping("/v1/category/count-product")
+    public ResponseEntity<HashMap<String, Integer>> getCategoryCountMap() {
+        return ResponseEntity.ok(adminService.getCategoryCountMap());
+    }
+
+
 
     @PutMapping("/v1/category/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
@@ -56,10 +75,11 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+
     @GetMapping("/v1/orders")
-    public ResponseEntity<List<OrdersDto>> getAllOrders(@RequestParam("page") int page,
+    public ResponseEntity<Page<OrdersDto>> getAllOrders(@RequestParam("page") int page,
                                                         @RequestParam("size") int size) {
-        List<OrdersDto> orders = adminService.getAllOrders(page, size);
+        Page<OrdersDto> orders = adminService.getAllOrders(page, size);
         return ResponseEntity.ok(orders);
     }
 
@@ -74,6 +94,25 @@ public class AdminController {
         List<UserDto> users = adminService.findAllUsers();
         return ResponseEntity.ok(users);
     }
+    @GetMapping("/v1/user/count")
+    public ResponseEntity<Integer> getUserCount() {
+        return ResponseEntity.ok(adminService.getUserCount());
+    }
+
+
+    @PutMapping("/v1/user/{id}")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable UUID id) {
+        UserDto updatedUser = adminService.updateUser(userDto, id);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/v1/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
     @DeleteMapping("/v1/image/{id}")
     public ResponseEntity<Void> deleteImage(@PathVariable long id) {

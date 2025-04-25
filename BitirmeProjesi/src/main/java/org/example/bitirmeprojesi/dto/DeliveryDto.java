@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class DeliveryDto implements Serializable {
     @JsonProperty("company_name")
     private String companyName;
     @JsonProperty("delivery_state")
-    private boolean deliveryState;
+    private DeliveryStatus deliveryState;
     @JsonProperty("delivery_date")
     private LocalDateTime deliveryDate;
 }

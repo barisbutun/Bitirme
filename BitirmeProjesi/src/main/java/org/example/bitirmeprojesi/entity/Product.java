@@ -13,7 +13,6 @@ import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @AllArgsConstructor
@@ -57,10 +56,14 @@ public class Product implements Serializable {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ShoppingCartItem> shoppingCartItem;
+    private List<ShoppingCartItem> shoppingCartItems;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Review> reviews;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Image> images;
 
     @JsonManagedReference

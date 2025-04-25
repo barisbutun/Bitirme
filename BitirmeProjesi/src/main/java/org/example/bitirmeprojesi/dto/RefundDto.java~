@@ -1,0 +1,22 @@
+package org.example.bitirmeprojesi.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
+import java.io.Serializable;
+
+/**
+ * DTO for {@link org.example.bitirmeprojesi.entity.Refund}
+ */
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class RefundDto implements Serializable {
+    
+    @JsonProperty("order_id")
+    private long order_id;
+
+    @JsonProperty("refund_reason")
+    String refundReason;
+}

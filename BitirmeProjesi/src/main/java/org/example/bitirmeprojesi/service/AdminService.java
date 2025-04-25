@@ -2,11 +2,13 @@ package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.*;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +26,36 @@ public class AdminService {
         return productService.create(productDto);
     }
 
+    public Integer getProductCount() {
+        return productService.getProductCount();
+    }
+
+    public void deleteUser(UUID id) {
+        userService.delete(id);
+    }
+
+    public UserDto updateUser(UserDto userDto, UUID id) {
+        return userService.update(userDto, id);
+    }
+    public Integer getUserCount() {
+        return userService.countUser();
+    }
+
+
     public CategoryDto createCategory(CategoryDto categoryDto) {
         return categoryService.create(categoryDto);
     }
 
-    public List<OrdersDto> getAllOrders(int page,int size) {
+    public Integer getCategoryCount() {
+        return categoryService.getCategoryCount();
+    }
+
+    public HashMap<String, Integer> getCategoryCountMap() {
+        return categoryService.getCategoryCountMap();
+    }
+
+
+    public Page<OrdersDto> getAllOrders(int page, int size) {
         return orderService.findAll(page , size);
     }
 

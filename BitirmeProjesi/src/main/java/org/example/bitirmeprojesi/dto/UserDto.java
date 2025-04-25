@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -27,11 +28,18 @@ public class UserDto implements Serializable {
     private String password;
 
 
+    @JsonProperty("balance")
+    private double balance;
+
+
     @JsonProperty("phone")
     private String phone;
 
     @JsonProperty("address")
     private String address;
+
+    @JsonProperty("role")
+    private Role role;
 
 
 }

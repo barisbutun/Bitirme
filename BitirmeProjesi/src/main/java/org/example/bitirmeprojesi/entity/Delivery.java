@@ -1,13 +1,11 @@
 package org.example.bitirmeprojesi.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
@@ -33,12 +31,18 @@ public class Delivery {
     private String followNumber;
 
     @Column(name = "company_name")
-    private String companyName;
+    private String companyName="Fashion Design";
 
     @Column(name = "delivery_state")
-    private boolean deliveryState;
+    private DeliveryStatus deliveryState;
 
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
+
+
+    @PrePersist
+    public void prePersist() {
+        this.deliveryDate = LocalDateTime.now();
+    }
 
 }

@@ -78,6 +78,11 @@ public class ProductService {
         return productMapper.toDtoList(productsList);
     }
 
+    public Integer getProductCount() {
+        return Math.toIntExact(productRepository.count());
+    }
+
+
 
     public ProductDto findById(long id) {
         Product product = productRepository.findById(id)
@@ -86,12 +91,16 @@ public class ProductService {
     }
 
     @Cacheable(value = "products", key = "'page_'+#page+'_size_'+#size")
-    public List<ProductDto> findAll(int page, int size) {
+    public Page<ProductDto> findAll(int page, int size) {
 
-        Pageable pageable =  PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<Product> productPage = productRepository.findAll(pageable);
-        log.info("Product Page: {}", productPage);
-        return productMapper.toDtoList(productPage.getContent());
+
+
+        Page<ProductDto> dtoPage = productPage.map(productMapper::toDto);
+
+        log.info("Product Page: {}", dtoPage);
+        return dtoPage;
     }
 
     @CacheEvict(value = "products", allEntries = true)
@@ -104,7 +113,6 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    @Cacheable(value = "products", key = "'name_'+#name+'_category_'+#category+'_minPrice_'+#minPrice+'_maxPrice_'+#maxPrice")
     public List<ProductDto> filterbyProduct(String name,
                                             String category,
                                             Double minPrice,

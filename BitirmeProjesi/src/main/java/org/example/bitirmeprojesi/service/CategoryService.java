@@ -7,6 +7,7 @@ import org.example.bitirmeprojesi.mapper.CategoryMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -29,6 +30,19 @@ public class CategoryService {
     public List<CategoryDto> findAll(){
         return categoryRepository.findAll().stream().map(categoryMapper::toDto).toList();
     }
+    public Integer getCategoryCount() {
+        return categoryRepository.findAll().size();
+    }
+
+    public HashMap<String, Integer> getCategoryCountMap() {
+        HashMap<String, Integer> categoryCountMap = new HashMap<>();
+        List<Category> categories = categoryRepository.findAll();
+        for (Category category : categories) {
+            categoryCountMap.put(category.getName(), category.getProducts().size());
+        }
+        return categoryCountMap;
+    }
+
 
     public CategoryDto update(CategoryDto categoryDto, long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));

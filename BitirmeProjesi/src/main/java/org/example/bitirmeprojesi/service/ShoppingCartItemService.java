@@ -58,12 +58,13 @@ public class ShoppingCartItemService {
         return shoppingCartItemMapper.toDto(shoppingCartItem);
     }
 
-    public List<ShoppingCartItemDto> findAllByUserId(UUID userId, int page, int size) {
+    public Page<ShoppingCartItemDto> findAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
         Page<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(user.getId(), pageable);
-        return shoppingCartItemMapper.toDtoList( shoppingCartItems.getContent());
+        Page<ShoppingCartItemDto> shoppingCartItemsDto=shoppingCartItems.map(shoppingCartItemMapper::toDto);
+        return shoppingCartItemsDto;
     }
 
     public void delete(UUID userId,Long id) {

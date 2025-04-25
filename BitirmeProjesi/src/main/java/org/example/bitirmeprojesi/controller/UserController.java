@@ -45,6 +45,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/v1/balance")
+    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        userService.uploadBalance(userId, userDto);
+        return ResponseEntity.ok(userDto);
+
+    }
 
 
     @PatchMapping("/v1")

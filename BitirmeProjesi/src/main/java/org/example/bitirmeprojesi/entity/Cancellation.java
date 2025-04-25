@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -27,5 +29,20 @@ public class Cancellation implements Serializable {
     @Column(name = "cancel_state")
     private boolean cancelState;
 
+    @Column(name = "cancel_date")
+    private LocalDateTime cancelDate;
+
+    @Column(name = "cancelled_by")
+    private Role cancelledBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Orders order;
+
+
+    @PrePersist
+    public void prePersist() {
+        cancelDate = LocalDateTime.now();
+    }
 
 }

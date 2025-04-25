@@ -50,6 +50,11 @@ public class UserService implements UserDetailsService {
         return userMapper.toDto(user);
     }
 
+    public Integer countUser() {
+        return Math.toIntExact(userRepository.count());
+    }
+
+
     public List<UserDto> findAll() {
         return userMapper.toDtoList(userRepository.findAll());
     }
@@ -74,6 +79,21 @@ public class UserService implements UserDetailsService {
 
     }
 
+    public UserDto uploadBalance(UUID id, UserDto userDto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        double balance = userDto.getBalance();
+        user.setBalance(user.getBalance() + balance);
+        userRepository.save(user);
+        return userMapper.toDto(user);
+    }
+
+    public UserDto update(UserDto userDto, UUID id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        userMapper.update(userDto, user);
+        userRepository.save(user);
+        return userMapper.toDto(user);
+
+    }
 
     public void delete(UUID id) {
         userRepository.deleteById(id);
