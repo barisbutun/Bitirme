@@ -17,15 +17,16 @@ import {
   CheckCircleOutlined,
   StopOutlined,
   SafetyOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const { Title } = Typography;
 
 const UserListWithDashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUsers = async () => {
       const token = localStorage.getItem("token");
@@ -108,15 +109,27 @@ const UserListWithDashboard = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={2} style={{ textAlign: "center", marginBottom: 24 }}>
-        👤 Kullanıcı Yönetimi Paneli
-      </Title>
+    <div style={{ padding: 24, position: "relative" }}>
+      {/* Anasayfaya dön butonunu sağ üst köşeye konumlandırdık */}
       <Link to="/admin">
-        <Button type="primary" style={{ marginBottom: 24 }}>
+        <Button
+          icon={<HomeOutlined />}
+          onClick={() => navigate("/admin")}
+          style={{
+            position: "absolute",
+            top: 24,
+            right: 24,
+            zIndex: 10, // Butonun diğer öğelerin üstünde olmasını sağlıyor
+          }}
+        >
           Anasayfaya Dön
         </Button>
       </Link>
+
+      <Title level={2} style={{ textAlign: "center", marginBottom: 24 }}>
+        👤 Kullanıcı Yönetimi Paneli
+      </Title>
+
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} md={6}>
           <Card>
