@@ -17,7 +17,7 @@ const Homepage = ({ setLoading }) => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
-
+  const [total, setTotal] = useState(0);
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
     setSize(pageSize);
@@ -25,25 +25,26 @@ const Homepage = ({ setLoading }) => {
 
   useEffect(() => {
     const fetchAllProducts = async () => {
-      // setLoading(true);
+      setLoading(true);
       try {
         const productsData = await fetchProducts(page - 1, size);
+        // console.log("API'den dönen ürünler:", productsData); // Veriyi kontrol et
 
-        // Önce sadece ürünleri göster
-        const initialProducts = productsData.map((product) => ({
-          ...product,
-          images: [], // Başlangıçta boş
-        }));
-        setProducts(initialProducts);
-        setFilteredProducts(initialProducts);
+        const productList = productsData.content;
 
-        // Sonra resimleri getirip state'i güncelle
-        for (const product of productsData) {
-          const images = await fetchProductImages(product.id);
-          setFilteredProducts((prev) =>
-            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
-          );
+        if (!Array.isArray(productList)) {
+          throw new Error("Ürün verisi dizisi bekleniyor.");
         }
+
+        const productsWithImages = await Promise.all(
+          productList.map(async (product) => {
+            const images = await fetchProductImages(product.id);
+            return { ...product, images };
+          })
+        );
+        setProducts(productsWithImages);
+        setFilteredProducts(productsWithImages);
+        setTotal(productsData.totalElements);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -51,7 +52,6 @@ const Homepage = ({ setLoading }) => {
         setLoading(false);
       }
     };
-
     fetchAllProducts();
   }, [page, size]);
 
@@ -122,7 +122,7 @@ const Homepage = ({ setLoading }) => {
               onChange={handlePageChange}
               showSizeChanger
               pageSizeOptions={["5", "10", "20", "50"]}
-              total={100}
+              total={total}
             />
             <p className="footer-text">@Fashion Design</p>
           </div>
