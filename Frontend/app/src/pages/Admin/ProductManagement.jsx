@@ -298,12 +298,18 @@ const AdminDashboard = () => {
         ))}
       </Row>
 
-      <Drawer
+      <Modal
         title={drawerType === "add" ? "Ürün Ekle" : "Ürün Güncelle"}
-        placement="right"
-        onClose={() => setDrawerOpen(false)}
+        placement="bottom"
         open={drawerOpen}
-        width={400}
+        onCancel={() => setDrawerOpen(false)}
+        footer={null}
+        width="50%"
+        style={{
+          overflow: "auto",
+          paddingBottom: "10px",
+          top: "20px",
+        }}
       >
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
           {drawerType === "edit" && (
@@ -312,6 +318,7 @@ const AdminDashboard = () => {
                 placeholder="Bir ürün seçin"
                 onChange={handleProductSelect}
                 value={selectedProduct?.id || undefined}
+                style={{ width: "100%" }} // Daha estetik bir görünüm için width:100% ekledim.
               >
                 {allProducts.map((product) => (
                   <Select.Option key={product.id} value={product.id}>
@@ -359,7 +366,7 @@ const AdminDashboard = () => {
             label="Kategori"
             rules={[{ required: true, message: "Kategori seçiniz" }]}
           >
-            <Select placeholder="Kategori Seçin">
+            <Select placeholder="Kategori Seçin" style={{ width: "100%" }}>
               {categories.map((cat) => (
                 <Select.Option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -385,14 +392,15 @@ const AdminDashboard = () => {
             </Button>
           </Form.Item>
         </Form>
-      </Drawer>
+      </Modal>
+
       <Modal
         title="Ürün Silme"
         open={deleteModalOpen}
         onCancel={() => setDeleteModalOpen(false)}
         footer={null}
-        width={500}
-        style={{ top: 100 }}
+        width="50%"
+        style={{ top: 200 }}
       >
         <div style={{ textAlign: "center" }}>
           <h3 style={{ color: "#ff4d4f" }}>
@@ -456,7 +464,7 @@ const AdminDashboard = () => {
         open={stockModalOpen}
         onCancel={() => setStockModalOpen(false)}
         footer={null}
-        width={800}
+        width="80%"
       >
         <Table
           columns={columns}
