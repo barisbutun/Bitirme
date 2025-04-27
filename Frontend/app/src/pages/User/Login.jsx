@@ -148,7 +148,9 @@ const LoginForm = ({ setLoading }) => {
             </Col>
 
             <Col span={30}>
-              <Typography.Text strong>{captcha}</Typography.Text>
+              <Typography.Text strong className="no-select">
+                {captcha}
+              </Typography.Text>
             </Col>
             <Button className="captcha-button" onClick={refreshCaptcha}>
               Captcha Al
