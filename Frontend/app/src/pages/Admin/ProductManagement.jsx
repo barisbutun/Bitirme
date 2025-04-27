@@ -14,6 +14,8 @@ import {
   Select,
   Statistic,
   Modal,
+  Table,
+  Tag,
 } from "antd";
 import {
   PlusOutlined,
@@ -25,6 +27,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import {
+  getAllProducts,
   createProduct,
   uploadProductImage,
   Categories,
@@ -62,20 +65,47 @@ const AdminDashboard = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stockModalOpen, setStockModalOpen] = useState(false);
 
+  // Stok durumu için tablo
+  const columns = [
+    {
+      title: "Ürün Adı",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Stok",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (quantity) => {
+        let color = "green";
+        if (quantity <= 10) {
+          color = "red";
+        } else if (quantity <= 20) {
+          color = "orange";
+        }
+        return <Tag color={color}>{quantity}</Tag>;
+      },
+    },
+    {
+      title: "Kategori",
+      dataIndex: "category",
+      key: "category",
+      render: (category) => category?.name || "Kategori Yok",
+    },
+  ];
+
   const fetchAllProducts = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const page = 0;
-      const size = 100;
-      const res = await axios.get(
-        `http://localhost:8082/api/product/v1/home?page=${page}&size=${size}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setAllProducts(res.data.content);
+      const products = await getAllProducts();
+      const categories = await Categories();
+      const productsWithCategory = products.map((product) => ({
+        ...product,
+        category: categories.find((cat) => cat.id === product.category_id) || {
+          name: "Kategori Yok",
+        },
+      }));
+
+      setAllProducts(productsWithCategory);
     } catch (err) {
       console.error("Tüm ürünleri çekme hatası:", err);
     }
@@ -356,24 +386,69 @@ const AdminDashboard = () => {
           </Form.Item>
         </Form>
       </Drawer>
-
       <Modal
-        title="Ürün Sil"
+        title="Ürün Silme"
         open={deleteModalOpen}
         onCancel={() => setDeleteModalOpen(false)}
         footer={null}
+        width={500}
+        style={{ top: 100 }}
       >
-        <Select
-          placeholder="Silinecek ürünü seçin"
-          style={{ width: "100%" }}
-          onChange={(id) => handleDeleteProduct(id)}
-        >
-          {allProducts.map((product) => (
-            <Select.Option key={product.id} value={product.id}>
-              {product.name}
-            </Select.Option>
-          ))}
-        </Select>
+        <div style={{ textAlign: "center" }}>
+          <h3 style={{ color: "#ff4d4f" }}>
+            <DeleteOutlined style={{ fontSize: 24, marginRight: 8 }} />
+            Silmek Üzeresiniz
+          </h3>
+          <p>
+            Bu işlemi geri alamazsınız. {selectedProduct?.name} ürününü silmek
+            istediğinizden emin misiniz?
+          </p>
+          <Select
+            placeholder="Silinecek ürünü seçin"
+            style={{ width: "100%", marginBottom: 16 }}
+            onChange={(id) =>
+              setSelectedProduct(allProducts.find((p) => p.id === id))
+            }
+          >
+            {allProducts.map((product) => (
+              <Select.Option key={product.id} value={product.id}>
+                {product.name}
+              </Select.Option>
+            ))}
+          </Select>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 20,
+            }}
+          >
+            <Button
+              type="default"
+              style={{
+                width: "48%",
+                backgroundColor: "#f5f5f5",
+                borderColor: "#d9d9d9",
+              }}
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              İptal
+            </Button>
+            <Button
+              type="default"
+              icon={<DeleteOutlined />}
+              style={{
+                width: "48%",
+                backgroundColor: "#f5f5f5",
+                borderColor: "#d9d9d9",
+                color: "#ff4d4f",
+              }}
+              onClick={() => handleDeleteProduct(selectedProduct?.id)}
+            >
+              Sil
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       <Modal
@@ -381,14 +456,16 @@ const AdminDashboard = () => {
         open={stockModalOpen}
         onCancel={() => setStockModalOpen(false)}
         footer={null}
+        width={800}
       >
-        <ul>
-          {allProducts.map((product) => (
-            <li key={product.id}>
-              {product.name} - Stok: {product.quantity}
-            </li>
-          ))}
-        </ul>
+        <Table
+          columns={columns}
+          dataSource={allProducts}
+          rowKey="id"
+          pagination={false}
+          bordered
+          size="middle"
+        />
       </Modal>
     </div>
   );

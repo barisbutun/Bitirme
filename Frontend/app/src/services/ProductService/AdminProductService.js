@@ -10,8 +10,13 @@ export const getAllProducts = async () => {
   if (!response.ok) {
     throw new Error("Ürün bilgilerini çekilirken bir hata oluştu.");
   }
-  return response.json();
+  const data = await response.json();
+  return data.content.map(product => ({
+    ...product,
+    category: product.category || { name: "Kategori Yok" } 
+  }));
 };
+
 
 
 
