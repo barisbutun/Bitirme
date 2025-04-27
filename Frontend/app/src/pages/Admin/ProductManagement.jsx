@@ -35,6 +35,19 @@ import {
   deleteProduct,
 } from "../../services/ProductService/AdminProductService";
 import { useNavigate } from "react-router-dom";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const { Title } = Typography;
 
@@ -64,6 +77,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stockModalOpen, setStockModalOpen] = useState(false);
+  const [productDataOverTime, setProductDataOverTime] = useState([]);
+  const [categoryDistribution, setCategoryDistribution] = useState([]);
 
   // Stok durumu için tablo
   const columns = [
@@ -98,6 +113,7 @@ const AdminDashboard = () => {
     try {
       const products = await getAllProducts();
       const categories = await Categories();
+
       const productsWithCategory = products.map((product) => ({
         ...product,
         category: categories.find((cat) => cat.id === product.category_id) || {
@@ -105,12 +121,29 @@ const AdminDashboard = () => {
         },
       }));
 
+      const timeData = productsWithCategory.map((product, index) => ({
+        name: `Ürün ${index + 1}`,
+        ürünler: index + 1,
+      }));
+      setProductDataOverTime(timeData);
+
+      const categoryCount = {};
+      productsWithCategory.forEach((product) => {
+        const categoryName = product.category.name || "Kategori Yok";
+        categoryCount[categoryName] = (categoryCount[categoryName] || 0) + 1;
+      });
+      const categoryData = Object.keys(categoryCount).map((key) => ({
+        name: key,
+        value: categoryCount[key],
+      }));
+      setCategoryDistribution(categoryData);
+
       setAllProducts(productsWithCategory);
     } catch (err) {
       console.error("Tüm ürünleri çekme hatası:", err);
     }
   };
-
+  //ürün sayısın çekmek için kullanılan fetch
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -265,8 +298,12 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div style={{ padding: "32px" }}>
-      <Title level={2}>Ürün İşlemleri</Title>
+    <div
+      style={{
+        padding: "30px",
+      }}
+    >
+      <Title level={3}>🏷️ Ürün Yönetimi</Title>
 
       <Button
         type="link"
@@ -277,7 +314,7 @@ const AdminDashboard = () => {
         Anasayfaya Dön
       </Button>
 
-      <Row gutter={[24, 24]} style={{ marginBottom: "24px" }}>
+      <Row gutter={[24, 24]} style={{ marginBottom: "20px" }}>
         <Col span={24}>
           <Statistic
             title="Toplam Ürün Sayısı"
@@ -286,8 +323,58 @@ const AdminDashboard = () => {
           />
         </Col>
       </Row>
-
-      <Row gutter={[24, 24]}>
+      <Row gutter={[24, 24]} style={{ marginTop: "48px" }}>
+        <Col xs={24} md={12}>
+          <Card
+            title="Ürün Artışı (Line Chart)"
+            style={{ borderRadius: "16px" }}
+          >
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={productDataOverTime}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="ürünler" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+        <Col xs={24} md={10}>
+          <Card
+            title="Kategori Dağılımı (Pie Chart)"
+            style={{ borderRadius: "16px" }}
+          >
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={categoryDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={60}
+                  label
+                >
+                  {categoryDistribution.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA00FF"][
+                          index % 5
+                        ]
+                      }
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[24, 24]} style={{ paddingTop: "20px" }}>
         {actionCards.map((card, index) => (
           <Col key={index} xs={24} sm={12} md={6}>
             <Card hoverable style={cardStyle} onClick={card.onClick}>
@@ -308,7 +395,7 @@ const AdminDashboard = () => {
         style={{
           overflow: "auto",
           paddingBottom: "10px",
-          top: "20px",
+          top: "10px",
         }}
       >
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
