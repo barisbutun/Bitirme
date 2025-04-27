@@ -13,6 +13,7 @@ import {
   Upload,
   Select,
   Statistic,
+  Modal,
 } from "antd";
 import {
   PlusOutlined,
@@ -27,7 +28,8 @@ import {
   createProduct,
   uploadProductImage,
   Categories,
-  updateProduct, // Ürün güncelleme fonksiyonu
+  updateProduct,
+  deleteProduct,
 } from "../../services/ProductService/AdminProductService";
 import { useNavigate } from "react-router-dom";
 
@@ -54,15 +56,43 @@ const AdminDashboard = () => {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [fileList, setFileList] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null); // Seçilen ürün
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
   const navigate = useNavigate();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [stockModalOpen, setStockModalOpen] = useState(false);
+
+  const fetchAllProducts = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const page = 0;
+      const size = 100;
+      const res = await axios.get(
+        `http://localhost:8082/api/product/v1/home?page=${page}&size=${size}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAllProducts(res.data.content);
+    } catch (err) {
+      console.error("Tüm ürünleri çekme hatası:", err);
+    }
+  };
 
   const fetchData = async () => {
     try {
+      const token = localStorage.getItem("token");
       const products = await axios.get(
-        "http://localhost:8082/api/product/v1/home"
+        "http://localhost:8082/api/admin/v1/product/count",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      setProductCount(products.data.length);
+      setProductCount(products.data);
     } catch (err) {
       console.error("Veri çekme hatası:", err);
     } finally {
@@ -79,23 +109,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const openDrawer = (type, product = null) => {
+  const openDrawer = (type) => {
     setDrawerType(type);
-    setSelectedProduct(product); // Güncelleme için seçilen ürün
     setDrawerOpen(true);
     form.resetFields();
     setFileList([]);
     fetchCategories();
-    if (type === "edit" && product) {
-      // Ürün güncelleme için formu doldur
-      form.setFieldsValue({
-        productName: product.name,
-        description: product.description,
-        price: product.price,
-        quantity: product.quantity,
-        category: product.category.id,
-      });
-    }
+    fetchAllProducts();
   };
 
   const handleFileChange = ({ file, fileList: newFileList }) => {
@@ -110,7 +130,6 @@ const AdminDashboard = () => {
   const handleSubmit = async (values) => {
     try {
       if (drawerType === "add") {
-        // 1. Ürünü oluştur
         const productData = {
           name: values.productName,
           description: values.description,
@@ -120,18 +139,12 @@ const AdminDashboard = () => {
         };
         const created = await createProduct(productData);
 
-        // 2. Resimleri yükle
         for (const file of fileList) {
           await uploadProductImage(created.id, file.originFileObj);
         }
 
         message.success("Ürün ve resimler başarıyla eklendi!");
-        form.resetFields();
-        setFileList([]);
-        setDrawerOpen(false);
-        fetchData(); // Ürün sayısını güncelle
       } else if (drawerType === "edit" && selectedProduct) {
-        // 1. Ürünü güncelle
         const updatedProductData = {
           name: values.productName,
           description: values.description,
@@ -139,20 +152,21 @@ const AdminDashboard = () => {
           quantity: parseInt(values.quantity, 10),
           category_id: parseInt(values.category),
         };
-
         await updateProduct(selectedProduct.id, updatedProductData);
 
-        // 2. Resimleri yükle (Eğer yeni resimler varsa)
         for (const file of fileList) {
           await uploadProductImage(selectedProduct.id, file.originFileObj);
         }
 
         message.success("Ürün başarıyla güncellendi!");
-        form.resetFields();
-        setFileList([]);
-        setDrawerOpen(false);
-        fetchData(); // Ürün sayısını güncelle
       }
+
+      form.resetFields();
+      setFileList([]);
+      setSelectedProduct(null);
+      setDrawerOpen(false);
+      fetchData();
+      fetchAllProducts();
     } catch (error) {
       message.error(
         "Ekleme veya güncelleme sırasında hata oluştu: " + error.message
@@ -160,8 +174,35 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleProductSelect = (value) => {
+    const product = allProducts.find((p) => p.id === value);
+    if (product) {
+      setSelectedProduct(product);
+      form.setFieldsValue({
+        productName: product.name,
+        description: product.description,
+        price: product.price,
+        quantity: product.quantity,
+        category: product.category?.id,
+      });
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await deleteProduct(productId);
+      message.success("Ürün başarıyla silindi!");
+      setDeleteModalOpen(false);
+      fetchData();
+      fetchAllProducts();
+    } catch (error) {
+      message.error("Ürün silinirken hata oluştu!");
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchAllProducts();
   }, []);
 
   if (loading) {
@@ -184,12 +225,12 @@ const AdminDashboard = () => {
     {
       title: "Ürün Sil",
       icon: <DeleteOutlined style={{ ...iconStyle, color: "#ff4d4f" }} />,
-      onClick: () => openDrawer("delete"),
+      onClick: () => setDeleteModalOpen(true),
     },
     {
       title: "Stok Durumu",
       icon: <ShoppingOutlined style={{ ...iconStyle, color: "#faad14" }} />,
-      onClick: () => {},
+      onClick: () => setStockModalOpen(true),
     },
   ];
 
@@ -197,7 +238,6 @@ const AdminDashboard = () => {
     <div style={{ padding: "32px" }}>
       <Title level={2}>Ürün İşlemleri</Title>
 
-      {/* Anasayfaya Dön Butonu */}
       <Button
         type="link"
         icon={<HomeOutlined />}
@@ -207,7 +247,6 @@ const AdminDashboard = () => {
         Anasayfaya Dön
       </Button>
 
-      {/* Ürün Sayısı Grafik */}
       <Row gutter={[24, 24]} style={{ marginBottom: "24px" }}>
         <Col span={24}>
           <Statistic
@@ -218,7 +257,6 @@ const AdminDashboard = () => {
         </Col>
       </Row>
 
-      {/* Aksiyon Kartları */}
       <Row gutter={[24, 24]}>
         {actionCards.map((card, index) => (
           <Col key={index} xs={24} sm={12} md={6}>
@@ -230,15 +268,30 @@ const AdminDashboard = () => {
         ))}
       </Row>
 
-      {/* Ürün Ekleme Drawer */}
       <Drawer
-        title="Ürün Ekle"
+        title={drawerType === "add" ? "Ürün Ekle" : "Ürün Güncelle"}
         placement="right"
         onClose={() => setDrawerOpen(false)}
-        open={drawerOpen && drawerType === "add"}
+        open={drawerOpen}
         width={400}
       >
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
+          {drawerType === "edit" && (
+            <Form.Item label="Güncellenecek Ürün">
+              <Select
+                placeholder="Bir ürün seçin"
+                onChange={handleProductSelect}
+                value={selectedProduct?.id || undefined}
+              >
+                {allProducts.map((product) => (
+                  <Select.Option key={product.id} value={product.id}>
+                    {product.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+
           <Form.Item
             name="productName"
             label="Ürün Adı"
@@ -246,6 +299,7 @@ const AdminDashboard = () => {
           >
             <Input placeholder="Örn: Laptop" />
           </Form.Item>
+
           <Form.Item
             name="description"
             label="Açıklama"
@@ -253,6 +307,7 @@ const AdminDashboard = () => {
           >
             <Input placeholder="Ürün açıklaması" />
           </Form.Item>
+
           <Form.Item
             name="price"
             label="Fiyat"
@@ -260,6 +315,7 @@ const AdminDashboard = () => {
           >
             <Input type="number" placeholder="Fiyat" />
           </Form.Item>
+
           <Form.Item
             name="quantity"
             label="Stok"
@@ -267,13 +323,14 @@ const AdminDashboard = () => {
           >
             <Input type="number" placeholder="Stok" />
           </Form.Item>
+
           <Form.Item
             name="category"
             label="Kategori"
             rules={[{ required: true, message: "Kategori seçiniz" }]}
           >
             <Select placeholder="Kategori Seçin">
-              {(categories || []).map((cat) => (
+              {categories.map((cat) => (
                 <Select.Option key={cat.id} value={cat.id}>
                   {cat.name}
                 </Select.Option>
@@ -294,81 +351,45 @@ const AdminDashboard = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Ürünü Kaydet
+              {drawerType === "add" ? "Ürünü Kaydet" : "Ürünü Güncelle"}
             </Button>
           </Form.Item>
         </Form>
       </Drawer>
 
-      {/* Ürün Güncelleme Drawer */}
-      <Drawer
-        title="Ürün Güncelle"
-        placement="right"
-        onClose={() => setDrawerOpen(false)}
-        open={drawerOpen && drawerType === "edit"}
-        width={400}
+      <Modal
+        title="Ürün Sil"
+        open={deleteModalOpen}
+        onCancel={() => setDeleteModalOpen(false)}
+        footer={null}
       >
-        <Form layout="vertical" form={form} onFinish={handleSubmit}>
-          <Form.Item
-            name="productName"
-            label="Ürün Adı"
-            rules={[{ required: true, message: "Ürün adı giriniz" }]}
-          >
-            <Input placeholder="Örn: Laptop" />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Açıklama"
-            rules={[{ required: true, message: "Açıklama giriniz" }]}
-          >
-            <Input placeholder="Ürün açıklaması" />
-          </Form.Item>
-          <Form.Item
-            name="price"
-            label="Fiyat"
-            rules={[{ required: true, message: "Fiyat giriniz" }]}
-          >
-            <Input type="number" placeholder="Fiyat" />
-          </Form.Item>
-          <Form.Item
-            name="quantity"
-            label="Stok"
-            rules={[{ required: true, message: "Stok sayısı giriniz" }]}
-          >
-            <Input type="number" placeholder="Stok" />
-          </Form.Item>
-          <Form.Item
-            name="category"
-            label="Kategori"
-            rules={[{ required: true, message: "Kategori seçiniz" }]}
-          >
-            <Select placeholder="Kategori Seçin">
-              {(categories || []).map((cat) => (
-                <Select.Option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+        <Select
+          placeholder="Silinecek ürünü seçin"
+          style={{ width: "100%" }}
+          onChange={(id) => handleDeleteProduct(id)}
+        >
+          {allProducts.map((product) => (
+            <Select.Option key={product.id} value={product.id}>
+              {product.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </Modal>
 
-          <Form.Item label="Resim Yükle">
-            <Upload
-              beforeUpload={() => false}
-              onChange={handleFileChange}
-              fileList={fileList}
-              listType="picture"
-            >
-              <Button icon={<UploadOutlined />}>Resim Seç</Button>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Ürünü Güncelle
-            </Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
+      <Modal
+        title="Stok Durumu"
+        open={stockModalOpen}
+        onCancel={() => setStockModalOpen(false)}
+        footer={null}
+      >
+        <ul>
+          {allProducts.map((product) => (
+            <li key={product.id}>
+              {product.name} - Stok: {product.quantity}
+            </li>
+          ))}
+        </ul>
+      </Modal>
     </div>
   );
 };

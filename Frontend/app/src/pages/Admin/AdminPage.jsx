@@ -19,6 +19,7 @@ import {
   FileTextOutlined,
   HeartFilled,
   PlusOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import {
@@ -33,7 +34,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
-
+import { logout } from "../../services/UserService/AuthService";
 const { Title } = Typography;
 
 const cardStyle = {
@@ -63,27 +64,56 @@ const AdminDashboard = () => {
   const [favouriteCount, setFavouriteCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [categoryProduct, setCategoryProduct] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
   const navigate = useNavigate();
 
   const fetchData = async () => {
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
     try {
-      const [products, categories, orders, users, favourites, reviews] =
-        await Promise.all([
-          axios.get("http://localhost:8082/api/product/v1/home"),
-          axios.get("http://localhost:8082/api/categories/v1"),
-          axios.get("/api/admin/v1/orders?page=0&size=5"),
-          axios.get("http://localhost:8082/api/admin/v1/users"),
-          axios.get("http://localhost:8082/api/admin/v1/favourites/findAll"),
-          axios.get("http://localhost:8082/api/admin/v1/reviews/findall"),
-        ]);
+      const [
+        products,
+        categories,
+        users,
+        favourites,
+        reviews,
+        categoryProductResponse,
+      ] = await Promise.all([
+        axios.get("http://localhost:8082/api/admin/v1/product/count", config),
+        axios.get("http://localhost:8082/api/admin/v1/category/count", config),
+        // axios.get("/api/admin/v1/orders?page=0&size=5", config),
+        axios.get("http://localhost:8082/api/admin/v1/user/count", config),
+        axios.get(
+          "http://localhost:8082/api/admin/v1/favourites/findAll",
+          config
+        ),
+        axios.get("http://localhost:8082/api/admin/v1/reviews/findall", config),
+        axios.get(
+          "http://localhost:8082/api/admin/v1/category/count-product",
+          config
+        ),
+      ]);
 
-      setProductCount(products.data.length);
-      setCategoryCount(categories.data.length);
-      setOrderList(orders.data);
-      setUserCount(users.data.length);
+      setProductCount(products.data);
+      setCategoryCount(categories.data);
+      // setOrderList(orders.data.content);
+      setUserCount(users.data);
       setFavouriteCount(favourites.data.length);
       setReviewCount(reviews.data.length);
+      setCategoryProduct(categoryProductResponse.data);
+      const categoryData = Object.entries(categoryProductResponse.data).map(
+        ([key, value]) => ({
+          name: key,
+          value: value,
+        })
+      );
+      setChartData(categoryData);
     } catch (error) {
       console.error("Veri çekme hatası:", error);
     } finally {
@@ -94,7 +124,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
+  const handleLogout = () => {
+    if (logout()) {
+      navigate("/");
+    } else {
+      console.error("Çıkış işlemi başarısız.");
+    }
+  };
   if (loading) {
     return (
       <Spin size="large" style={{ margin: "100px auto", display: "block" }} />
@@ -134,16 +170,24 @@ const AdminDashboard = () => {
     },
   ];
 
-  const chartData = statCards.map((item) => ({
-    name: item.title,
-    value: item.count,
-  }));
-
   return (
     <div style={{ padding: 16 }}>
       <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
         👨‍💼 Admin Paneli
       </Title>
+
+      <Button
+        icon={<LogoutOutlined />}
+        onClick={handleLogout}
+        style={{
+          position: "absolute",
+          top: 24,
+          right: 24,
+          zIndex: 10,
+        }}
+      >
+        Çıkış Yap
+      </Button>
 
       <Row gutter={[16, 16]}>
         {statCards.map((item, index) => (
@@ -164,7 +208,7 @@ const AdminDashboard = () => {
 
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col xs={24} md={12}>
-          <Card title="📊 Kategorik Dağılım" style={cardStyle}>
+          <Card title="📊 Kategorik Ürün Dağılımı" style={cardStyle}>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
@@ -203,7 +247,7 @@ const AdminDashboard = () => {
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-        <Col xs={24} md={12}>
+        {/* <Col xs={24} md={12}>
           <Card
             title="📦 Son 5 Sipariş"
             style={cardStyle}
@@ -226,7 +270,7 @@ const AdminDashboard = () => {
               )}
             />
           </Card>
-        </Col>
+        </Col> */}
         <Col xs={24} md={12}>
           <Card title="⚡ Hızlı İşlemler" style={cardStyle}>
             <Button

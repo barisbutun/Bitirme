@@ -30,6 +30,7 @@ const UserListWithDashboard = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       const token = localStorage.getItem("token");
+
       try {
         const response = await axios.get(
           "http://localhost:8082/api/admin/v1/users",
