@@ -2,33 +2,39 @@ import{getAuthHeaders} from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:8082/api";
 //ürünleri çekme
-export const fetchProducts = async (page=0,size=10) => {
-  try { 
+export const fetchProducts = async (page = 0, size = 10) => {
+  try {
     const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
-  
+
     if (!response.ok) {
       throw new Error("Ürün bilgileri alınamadı");
     }
 
-    const products = await response.json();
-    console.log("API'den gelen ürün verisi:", products);// api den gelen verileri kontrol etmek için
-  // categoryId'yi category_id'ye dönüştür
-  const formattedProducts = products.map(product => ({
-    ...product,
-    category_id: product.category_id ,// Backend'den gelen categoryId'yi frontend'in beklediği formata dönüştür
-  }));
-  console.log("Format sonrası ürünler:", formattedProducts); // Debug log 2
-  return formattedProducts;
-} catch (error) {
+    const data = await response.json();
+
+  
+    const totalElements = data.totalElements||data.content.length; 
+    const formattedProducts = data.content.map(product => ({
+      ...product,
+      category_id: product.category_id,
+    }));
+
+    return {
+      content: formattedProducts,
+      totalElements:totalElements, 
+    };
+  } catch (error) {
     console.error("fetchProducts Error:", error);
     throw error;
   }
 };
+
+
 
 export const fetchProductImages = async (productId) => {
   try {

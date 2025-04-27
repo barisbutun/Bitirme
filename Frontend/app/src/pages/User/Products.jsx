@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Spin, Pagination } from "antd";
+import { Layout, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -11,14 +11,16 @@ import {
   fetchFilteredProductsWithImages,
 } from "../../services/ProductService/ProductService";
 import { fetchFavorites } from "../../services/ProductService/FavoriteService";
+
 const Products = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [page, setPage] = useState(1); // Sayfa başlangıç değeri
+  const [size, setSize] = useState(10); // Sayfa başına gösterilecek ürün sayısı
+  const [total, setTotal] = useState(0); // Toplam ürün sayısı
 
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
@@ -27,20 +29,19 @@ const Products = ({ setLoading }) => {
 
   useEffect(() => {
     const fetchAllProducts = async () => {
-      // setLoading(true);
       try {
-        const productsData = await fetchProducts(page - 1, size);
+        setLoading(true);
 
-        // Önce sadece ürünleri göster
-        const initialProducts = productsData.map((product) => ({
-          ...product,
-          images: [], // Başlangıçta boş
-        }));
-        setProducts(initialProducts);
-        setFilteredProducts(initialProducts);
+        const response = await fetchProducts(page - 1, size); // page-1, çünkü backend genellikle sıfırdan başlar
 
-        // Sonra resimleri getirip state'i güncelle
-        for (const product of productsData) {
+        const { content = [], totalElements = 0 } = response;
+
+        setTotal(totalElements); // Toplam öğe sayısını güncelle
+        setProducts(content); // Ürünleri ayarla
+        setFilteredProducts(content); // Filtrelenen ürünleri ayarla
+
+        // Resimleri yükle
+        for (const product of content) {
           const images = await fetchProductImages(product.id);
           setFilteredProducts((prev) =>
             prev.map((p) => (p.id === product.id ? { ...p, images } : p))
@@ -86,7 +87,7 @@ const Products = ({ setLoading }) => {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                image={product.images?.[0] || "default-image-path"} // İlk resmi veya varsayılan resmi göster
+                image={product.images?.[0] || "default-image-path"}
                 price={product.price}
                 description={product.description}
                 quantity={product.quantity}
@@ -108,9 +109,10 @@ const Products = ({ setLoading }) => {
               current={page}
               pageSize={size}
               onChange={handlePageChange}
+              onShowSizeChange={handlePageChange}
               showSizeChanger
               pageSizeOptions={["5", "10", "20", "50"]}
-              total={100}
+              total={total}
             />
             <p className="footer-text">@Fashion Design</p>
           </div>
