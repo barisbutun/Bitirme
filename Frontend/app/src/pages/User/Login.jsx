@@ -99,13 +99,11 @@ const LoginForm = ({ setLoading }) => {
       >
         <Form.Item
           name="username"
-          rules={[
-            { required: true, message: "Lütfen kullanıcı adınızı girin!" },
-          ]}
+          rules={[{ required: true, message: "Lütfen emailinizi girin!" }]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />} // Kullanıcı adı ikonu
-            placeholder="Kullanıcı Adı"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
