@@ -8,6 +8,7 @@ import {
   Row,
   Typography,
   Spin,
+  notification,
 } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
@@ -34,6 +35,11 @@ const LoginForm = ({ setLoading }) => {
       navigate("/Homepage"); // Giriş başarılı olduğunda yönlendir
     } catch (error) {
       setError(error.message || "Giriş sırasında bir hata oluştu");
+      notification.error({
+        message: "Giriş Hatası",
+        description: "Email veya şifre hatalı.",
+        placement: "topRight",
+      });
     } finally {
       setLoading(false);
     }
