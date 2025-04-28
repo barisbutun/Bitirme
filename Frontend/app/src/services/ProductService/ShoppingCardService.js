@@ -136,13 +136,24 @@ export const getCartByUserId = async () => {
     const cartItems = await response.json();
     console.log("Backend'den gelen ham sepet verisi:", cartItems);
 
+    // Verinin 'content' özelliğini kontrol et
+    if (!cartItems.content || !Array.isArray(cartItems.content)) {
+      throw new Error("Geçersiz sepet verisi");
+    }
+
+    // Eğer sepet boşsa
+    if (cartItems.content.length === 0) {
+      console.log("Sepetiniz boş.");
+      return []; // Boş bir dizi döndür
+    }
+
     // Her bir sepet öğesi için ürün bilgilerini düzenle
     const cartItemsWithImages = await Promise.all(
-      cartItems.map(async (item) => {
+      cartItems.content.map(async (item) => {
         try {
           // Ürün resmini al
           const images = await fetchProductImages(item.product_id);
-          
+
           // Ürün bilgilerini düzenle
           return {
             id: item.id,
@@ -151,8 +162,8 @@ export const getCartByUserId = async () => {
               id: item.product_id,
               name: item.name,
               price: item.price,
-              images: images || []
-            }
+              images: images || [],
+            },
           };
         } catch (error) {
           console.error(`Ürün ${item.product_id} için resim alınamadı:`, error);
@@ -163,8 +174,8 @@ export const getCartByUserId = async () => {
               id: item.product_id,
               name: item.name,
               price: item.price,
-              images: []
-            }
+              images: [],
+            },
           };
         }
       })

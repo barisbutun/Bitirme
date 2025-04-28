@@ -46,12 +46,16 @@ const ShoppingCard = () => {
       setLoading(true);
       const cartItems = await getCartByUserId(userId);
       console.log("Backend'den gelen sepet verisi:", cartItems);
-      setData(cartItems);
+
+      if (cartItems && cartItems.length > 0) {
+        setData(cartItems);
+      } else {
+        throw new Error("Sepetiniz boş.");
+      }
     } catch (error) {
-      console.error("Sepet verisi alınamadı:", error);
       notification.error({
         message: "Hata",
-        description: "Sepet verisi alınamadı: " + error.message,
+        description: error.message || "Sepet verisi alınamadı ",
         placement: "topRight",
       });
     } finally {
@@ -89,6 +93,7 @@ const ShoppingCard = () => {
           .toFixed(2), // Toplam fiyat
         stock_state: "AVAILABLE",
         payment_state: "SUCCESS", // Stok durumu
+        content: data,
       };
 
       // Siparişi oluştur
@@ -98,7 +103,7 @@ const ShoppingCard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify(orderData), // JSON formatında gönderiyoruz
+        body: JSON.stringify(orderData.content), // JSON formatında gönderiyoruz
       });
 
       if (!response.ok) {
