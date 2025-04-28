@@ -3,10 +3,17 @@ package org.example.bitirmeprojesi.service;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.CancellationDto;
 import org.example.bitirmeprojesi.entity.Cancellation;
+import org.example.bitirmeprojesi.entity.Delivery;
+import org.example.bitirmeprojesi.entity.OrderItem;
+import org.example.bitirmeprojesi.entity.Orders;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.OrderNotFoundExceiption;
 import org.example.bitirmeprojesi.mapper.CancellationMapper;
 import org.example.bitirmeprojesi.repository.CancellationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -19,6 +26,13 @@ public class CancellationService {
 
     public CancellationDto create(CancellationDto cancellationDto) {
         Cancellation cancellation = cancellationMapper.toEntity(cancellationDto);
+        Delivery delivery = cancellation.getOrder().getDelivery();
+        if(delivery.getDeliveryState().equals(DeliveryStatus.DELIVERED)){
+
+        }
+
+
+
         cancellation = cancellationRepository.save(cancellation);
         return cancellationMapper.toDto(cancellation);
     }

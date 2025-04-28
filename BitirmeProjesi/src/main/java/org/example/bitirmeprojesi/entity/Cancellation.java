@@ -26,14 +26,9 @@ public class Cancellation implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "cancel_state")
-    private boolean cancelState;
 
     @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
-
-    @Column(name = "cancelled_by")
-    private Role cancelledBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

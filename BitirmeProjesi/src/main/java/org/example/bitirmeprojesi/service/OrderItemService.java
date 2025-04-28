@@ -9,7 +9,6 @@ import org.example.bitirmeprojesi.exception.error.UserIdNotFoundException;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.OrderItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
-import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,8 +38,6 @@ public class OrderItemService {
     }
 
     public List<OrderItemDto> findByOrderId(UUID userId,Long orderId) {
-
-        userId = JwtUtil.getUserIdFromToken();
         User user = userRepository.findById(userId).orElseThrow(() -> new UserIdNotFoundException(ErrorMesage.USER_ID_NOT_FOUND_ERROR));
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
         return orderMapper.toOrderItemDtoList(orderItems);

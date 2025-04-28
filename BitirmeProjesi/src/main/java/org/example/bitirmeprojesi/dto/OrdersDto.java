@@ -38,6 +38,12 @@ public class OrdersDto implements Serializable {
     @JsonProperty("sum_price")
     double sumPrice;
 
+    @JsonProperty("address")
+    String address;
+
+    @JsonProperty("is_same_address")
+    boolean isSameAddress;
+
     @JsonProperty("stock_state")
     StockState stockState;
 

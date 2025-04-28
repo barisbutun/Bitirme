@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 public class UserDto implements Serializable {
 
-    @JsonIgnore
+    @JsonProperty("id")
     private UUID id;
 
     @JsonProperty("name")

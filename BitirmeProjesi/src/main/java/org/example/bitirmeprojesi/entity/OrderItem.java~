@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +39,10 @@ public class OrderItem {
     @JsonBackReference
     @JoinColumn(name = "user_id")
     private User user;
+
+
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Refund> refund;
 
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

@@ -3,6 +3,10 @@ package org.example.bitirmeprojesi.service;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.DeliveryDto;
 import org.example.bitirmeprojesi.entity.Delivery;
+import org.example.bitirmeprojesi.entity.Orders;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.DeliveryNotFoundException;
 import org.example.bitirmeprojesi.mapper.DeliveryMapper;
 import org.example.bitirmeprojesi.repository.DeliveryRepository;
 import org.springframework.stereotype.Service;
@@ -17,14 +21,16 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final DeliveryMapper deliveryMapper;
 
-    public DeliveryDto create(DeliveryDto deliveryDto) {
+    public DeliveryDto create(DeliveryDto deliveryDto, Orders orders) {
         Delivery delivery = deliveryMapper.toEntity(deliveryDto);
+        delivery.setDeliveryState(DeliveryStatus.PENDING);
+        delivery.setOrder(orders);
         deliveryRepository.save(delivery);
         return deliveryMapper.toDto(delivery);
     }
 
     public DeliveryDto findById(UUID id) {
-        Delivery delivery = deliveryRepository.findById(id).get();
+        Delivery delivery = deliveryRepository.findById(id).orElseThrow(() -> new DeliveryNotFoundException(ErrorMesage.DELIVERY_NOT_FOUND_ERROR));
         return deliveryMapper.toDto(delivery);
     }
 
@@ -34,7 +40,7 @@ public class DeliveryService {
     }
 
     public DeliveryDto update(DeliveryDto deliveryDto, UUID id) {
-        Delivery delivery = deliveryRepository.findById(id).get();
+        Delivery delivery = deliveryRepository.findById(id).orElseThrow(() -> new DeliveryNotFoundException(ErrorMesage.DELIVERY_NOT_FOUND_ERROR));
         deliveryMapper.update(deliveryDto, delivery);
         deliveryRepository.save(delivery);
         return deliveryMapper.toDto(delivery);

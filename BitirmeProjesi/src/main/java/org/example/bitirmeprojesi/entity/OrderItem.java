@@ -41,8 +41,8 @@ public class OrderItem {
     private User user;
 
 
-    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Refund> refund;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Refund refund;
 
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

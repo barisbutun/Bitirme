@@ -40,6 +40,9 @@ public class Orders implements Serializable {
     @Enumerated(EnumType.STRING)
     private StockState stockState = StockState.AVAILABLE;
 
+    @Column(name = "address")
+    private String address;
+
     @Column(name = "payment_state")
     @Enumerated(EnumType.STRING)
     private PaymentState paymentState;
@@ -47,6 +50,11 @@ public class Orders implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @JsonManagedReference
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "delivery_id",referencedColumnName = "id")
+    private Delivery delivery;
 
 
     @JsonManagedReference

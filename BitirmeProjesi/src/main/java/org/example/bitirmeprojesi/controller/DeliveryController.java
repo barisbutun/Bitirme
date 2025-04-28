@@ -15,10 +15,6 @@ import java.util.UUID;
 public class DeliveryController {
     private final DeliveryService deliveryService;
 
-    @PostMapping("/v1")
-    public ResponseEntity<DeliveryDto> create(DeliveryDto deliveryDto) {
-        return ResponseEntity.ok(deliveryService.create(deliveryDto));
-    }
 
     @GetMapping("/v1/{id}")
     public ResponseEntity<DeliveryDto> findById(@PathVariable UUID id) {

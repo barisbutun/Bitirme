@@ -10,6 +10,7 @@ import org.example.bitirmeprojesi.enums.RefundStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,9 +35,9 @@ public class Refund {
     private double refundAmount;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "order_item_id")
-    private OrderItem orderItem;
+    private List<OrderItem> orderItems;
 
 
     @Column(name = "refund_reason", nullable = false)
@@ -50,12 +51,13 @@ public class Refund {
     @PrePersist
     public void prePersist() {
         refundDate = LocalDateTime.now();
-        if(orderItem!=null){
-            this.refundAmount=orderItem.getQuantity()*orderItem.getProduct().getPrice();
+        double price = 0.0;
+        for (OrderItem orderItem : orderItems) {
+
+            price+=orderItem.getQuantity()*orderItem.getProduct().getPrice();
+
         }
-        else {
-            log.warn("Refund entity persisted without an orderItem!");
-        }
+        refundAmount = price;
     }
 
 }

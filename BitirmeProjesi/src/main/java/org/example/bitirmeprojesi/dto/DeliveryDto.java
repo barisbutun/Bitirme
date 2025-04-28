@@ -23,8 +23,6 @@ import java.util.UUID;
 public class DeliveryDto implements Serializable {
     @JsonIgnore
     private UUID id;
-    @JsonProperty("follow_number")
-    private String followNumber;
     @JsonProperty("company_name")
     private String companyName;
     @JsonProperty("delivery_state")

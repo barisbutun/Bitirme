@@ -27,11 +27,11 @@ public class Delivery {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "follow_number")
-    private String followNumber;
-
     @Column(name = "company_name")
     private String companyName="Fashion Design";
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Orders order;
 
     @Column(name = "delivery_state")
     private DeliveryStatus deliveryState;

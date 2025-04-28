@@ -146,12 +146,40 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INVALID_REVIEW_INFORMATION_ERROR, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<Object> paymentNotFoundExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.PAYMENT_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(ExistByEmailException.class)
     public ResponseEntity<Object> existByEmailExceptionHandler(Exception ex) {
         log.error(ex.getLocalizedMessage(), ex);
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.EXIST_BY_EMAIL_ERROR, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InsufficientBalanceError.class)
+    public ResponseEntity<Object> insufficientBalanceExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INSUFFICIENT_BALANCE_ERROR, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(JwtNotFoundException.class)
+    public ResponseEntity<Object> jwtNotFoundExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.JWT_TOKEN_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(DeliveredOrderShouldBeRefundedException.class)
+    public ResponseEntity<Object> deliveredOrderShouldBeRefundedExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR, HttpStatus.BAD_REQUEST);
+    }
+
+
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message, status));

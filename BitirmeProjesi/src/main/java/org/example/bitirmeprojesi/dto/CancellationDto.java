@@ -17,9 +17,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class CancellationDto implements Serializable {
-    private String id;
+    private Long id;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("cancel_state")
-    private boolean cancelState;
 }

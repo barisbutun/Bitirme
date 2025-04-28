@@ -12,6 +12,7 @@ import org.example.bitirmeprojesi.enums.StockState;
 
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -47,6 +48,8 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     private StockState stockState;
 
+    private LocalDateTime createdDate;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
@@ -69,5 +72,11 @@ public class Product implements Serializable {
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Favourite> favourites;
+
+
+    @PrePersist
+    public void prePersist() {
+        createdDate = LocalDateTime.now();
+    }
 
 }
