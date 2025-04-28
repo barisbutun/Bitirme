@@ -53,6 +53,11 @@ public class ShoppingCartItemService {
         return shoppingCartItemMapper.toDto(savedShoppingCartItem);
 
     }
+    public void save(ShoppingCartItem shoppingCartItem) {
+        shoppingCartItemRepository.save(shoppingCartItem);
+    }
+
+
     public ShoppingCartItemDto findById(long id) {
         ShoppingCartItem shoppingCartItem = shoppingCartItemRepository.findById(id).orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
         return shoppingCartItemMapper.toDto(shoppingCartItem);

@@ -34,6 +34,13 @@ public class Cancellation implements Serializable {
     @JoinColumn(name = "order_id")
     private Orders order;
 
+    @Column(name = "cancel_amount")
+    private double cancelAmount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     @PrePersist
     public void prePersist() {

@@ -38,8 +38,6 @@ public class ProductService {
     private final ReviewRepository reviewRepository;
 
 
-
-
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
     public ProductDto create(ProductDto productDto) throws Exception {
@@ -58,12 +56,11 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    public List<ProductDto> getTopRatedProducts(int page, int size) {
+    public Page<ProductDto> getTopRatedProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("averageRating")));
         Page<Product> products = productRepository.findAllRatedProducts(pageable);
-        List<Product> productsList= products.getContent();
-
-        return productMapper.toDtoList(productsList);
+        Page<ProductDto> dtoPage=products.map(productMapper::toDto);
+        return dtoPage;
     }
 
     public int getReviewCountForProduct(Long productId) {

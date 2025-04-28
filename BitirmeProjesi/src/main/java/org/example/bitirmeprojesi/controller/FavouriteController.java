@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.FavouriteDto;
 import org.example.bitirmeprojesi.service.FavouriteService;
 import org.example.bitirmeprojesi.util.JwtUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +26,11 @@ public class FavouriteController {
     }
 
     @GetMapping("/v1/getAllByUserId")
-    public ResponseEntity<List<FavouriteDto>> getlAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+    public ResponseEntity<Page<FavouriteDto>> getlAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
                                                               @RequestParam(required = false, defaultValue = "10") int size) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(favouriteService.getlAllByUserId(userId, page, size));
     }
-
 
     @GetMapping("/v1/{id}")
     public ResponseEntity<FavouriteDto> findById(@PathVariable long id) {
@@ -43,8 +43,5 @@ public class FavouriteController {
         favouriteService.delete(userId,id);
         return ResponseEntity.noContent().build();
     }
-
-
-
 
 }

@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findActiveByEmail(email);
     }
 
 
@@ -64,7 +64,7 @@ public class UserService implements UserDetailsService {
         if (temproraryUser == null) {
             throw new CodeNotFoundException(ErrorMesage.CODE_NOT_FOUND_ERROR);
         }
-        User user = userRepository.findByEmail(temproraryUser.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        User user = userRepository.findActiveByEmail(temproraryUser.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
         userMapper.update(userDto, user);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);
@@ -96,13 +96,22 @@ public class UserService implements UserDetailsService {
     }
 
     public void delete(UUID id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        user.setRegistered(false);
+        user.setDeleted(true);
+        userRepository.save(user);
     }
+
+    public void deleteById(UUID id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        userRepository.delete(user);
+    }
+
 
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
+        return userRepository.findActiveByEmail(email)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
     }
 

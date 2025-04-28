@@ -1,6 +1,5 @@
 package org.example.bitirmeprojesi.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 public class UserDto implements Serializable {
 
-    @JsonProperty("id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
     @JsonProperty("name")
@@ -26,6 +25,9 @@ public class UserDto implements Serializable {
 
     @JsonProperty("password")
     private String password;
+
+    @JsonProperty("email")
+    private String email;
 
 
     @JsonProperty("balance")
@@ -38,8 +40,11 @@ public class UserDto implements Serializable {
     @JsonProperty("address")
     private String address;
 
-    @JsonProperty("role")
+    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
     private Role role;
+
+    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
+    private boolean isDeleted;
 
 
 }

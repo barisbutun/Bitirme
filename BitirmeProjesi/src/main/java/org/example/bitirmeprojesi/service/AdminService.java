@@ -21,6 +21,39 @@ public class AdminService {
     private final ImageService imageService;
     private final FavouriteService favouriteService;
     private final ReviewService reviewService;
+    private final PaymentService paymentService;
+    private final CancellationService cancellationService;
+
+    public Page<PaymentDto> findAllPayment(int page, int size) {
+        return paymentService.findAll(page, size);
+    }
+
+    public Page<PaymentDto> findAllPaymentByUserId(UUID userId, int page, int size) {
+        return paymentService.findAllByUserId(userId, page, size);
+    }
+
+    public Page<CancellationDto> findAllCancellationByUserId(UUID userId, int page, int size) {
+        return cancellationService.findAllByUserId(userId, page, size);
+    }
+
+    public void deletePayment(UUID id) {
+        paymentService.delete(id);
+    }
+
+    public Page<CancellationDto> findAllCancellation(int page, int size) {
+        return cancellationService.findAll(page, size);
+    }
+    public CancellationDto updateCancellation(CancellationDto cancellationDto,Long id) {
+        return cancellationService.update(cancellationDto, id);
+    }
+
+    public PaymentDto updatePayment(PaymentDto paymentDto,UUID id) {
+        return paymentService.update(paymentDto, id);
+    }
+
+    public void deleteCancellation(Long id) {
+        cancellationService.delete(id);
+    }
 
     public ProductDto createProduct(ProductDto productDto) throws Exception {
         return productService.create(productDto);
@@ -37,10 +70,10 @@ public class AdminService {
     public UserDto updateUser(UserDto userDto, UUID id) {
         return userService.update(userDto, id);
     }
+
     public Integer getUserCount() {
         return userService.countUser();
     }
-
 
     public CategoryDto createCategory(CategoryDto categoryDto) {
         return categoryService.create(categoryDto);
@@ -90,13 +123,21 @@ public class AdminService {
         return userService.findAll();
     }
 
-    public List<FavouriteDto> getAllFavourites() {
-        return favouriteService.findAll();
+    public Page<FavouriteDto> getAllFavourites(int page,int size) {
+        return favouriteService.findAll(page,size);
+    }
+
+    public Page<FavouriteDto> getAllFavouritesByUserId(UUID userId,int page,int size) {
+        return favouriteService.getlAllByUserId(userId, page, size);
     }
 
     public FavouriteDto updateFavourite(FavouriteDto favouriteDto, Long id) {
         return favouriteService.update(favouriteDto, id);
     }
+    public Integer countFavouriteByUserId(UUID userId) {
+        return favouriteService.getFavouriteCountByUserId(userId);
+    }
+
 
     public List<ReviewDto> findAllReviews() {
         return reviewService.findAll();

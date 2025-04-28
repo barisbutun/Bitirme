@@ -89,9 +89,6 @@ public class MailService {
             sendHtmlEmail(dto.getEmail(), code, content);
         }
 
-
-
-
     }
 
     private void sendHtmlEmail(String email, String code, EmailContent content) {

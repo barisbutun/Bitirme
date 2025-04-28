@@ -179,6 +179,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(CancellationNotFoundException.class)
+    public ResponseEntity<Object> cancellationNotFoundExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CANCELLATION_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
+    }
+
 
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {

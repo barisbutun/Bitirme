@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.bitirmeprojesi.enums.StockState;
+import org.example.bitirmeprojesi.enums.Size;
 
 import java.io.Serializable;
 
@@ -35,11 +36,23 @@ public class ProductDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
+    @JsonProperty("size")
+    private Size size;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double averageRating;
 
     @JsonProperty("category_id")
     private Long categoryId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer totalRating;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer favouriteCount;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer reviewCount;
 
     @JsonProperty("quantity")
     @NotNull(message = "Quantity cannot be null")

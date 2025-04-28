@@ -6,12 +6,16 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface CancellationMapper {
 
 
+    @Mapping(target = "orderItemId", ignore = true)
+    @Mapping(target = "quantity", ignore = true)
     CancellationDto toDto(final Cancellation cancellation);
 
     Cancellation toEntity(final CancellationDto cancellationDto);
@@ -20,6 +24,4 @@ public interface CancellationMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(final CancellationDto cancellationDto, @MappingTarget final Cancellation cancellation);
-
-
 }

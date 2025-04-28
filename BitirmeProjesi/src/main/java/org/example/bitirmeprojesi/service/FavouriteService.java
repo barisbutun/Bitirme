@@ -40,7 +40,8 @@ public class FavouriteService {
 
         Product product = productRepository.findById(favouriteDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
-
+        product.setFavouriteCount(product.getFavouriteCount() + 1);
+        productRepository.save(product);
         Category category = categoryRepository.findById(favouriteDto.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));
 
@@ -75,13 +76,22 @@ public class FavouriteService {
                 .findFirst()
                 .orElseThrow(() -> new FavouriteNotFoundException(ErrorMesage.FAVOURITE_NOT_FOUND_ERROR));
 
+        Product product = favourite.getProduct();
+        product.setFavouriteCount(product.getFavouriteCount() - 1);
+        productRepository.save(product);
         favouriteRepository.deleteById(favourite.getId());
     }
 
-    public List<FavouriteDto> findAll(){
-       List<Favourite> favourite=favouriteRepository.findAll().stream().toList();
-       List<FavouriteDto> favouriteDto=favouriteMapper.toDtoList(favourite);
-       return favouriteDto;
+    public Integer getFavouriteCountByUserId(UUID userId) {
+        return favouriteRepository.countByUserId(userId);
+    }
+
+
+    public Page<FavouriteDto> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Favourite> favourites = favouriteRepository.findAll(pageable);
+        Page<FavouriteDto> dtoPage = favourites.map(favouriteMapper::toDto);
+        return dtoPage;
     }
 
     public FavouriteDto update(FavouriteDto favouriteDto,long id){
@@ -92,16 +102,13 @@ public class FavouriteService {
     }
 
 
-    public List<FavouriteDto> getlAllByUserId(UUID userId, int page, int size) {
+    public Page<FavouriteDto> getlAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
         userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
-
         Page<Favourite> favourites = favouriteRepository.findByUserId(userId, pageable);
+        Page<FavouriteDto> dtoPage=favourites.map(favouriteMapper::toDto);
 
-        List<Favourite> favouriteList = favourites.getContent();
-
-        return favouriteMapper.toDtoList(favouriteList);
+        return dtoPage;
     }
 
     public FavouriteDto findById(long id) {

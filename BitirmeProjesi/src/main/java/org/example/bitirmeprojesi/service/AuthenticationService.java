@@ -19,6 +19,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -43,15 +45,27 @@ public class AuthenticationService {
             tempUser.setVerified(true);
             temproraryUserRepository.save(tempUser);
 
-            User user = new User();
-            user.setEmail(tempUser.getEmail());
-            String temproraryPassword=PasswordGenerator.generateRandomPassword();
-            mailService.temproraryPassword(verifyUserDto.getEmail(), temproraryPassword);
-            user.setPassword(passwordEncoder.encode(temproraryPassword));
+            tempUser.setVerified(true);
+            temproraryUserRepository.save(tempUser);
 
+            Optional<User> optionalUser = userRepository.findActiveByEmail(tempUser.getEmail());
 
-            user.setRegistered(true);
-            userRepository.save(user);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setDeleted(false);
+                user.setRegistered(true);
+                userRepository.save(user);
+            } else {
+                User user = new User();
+                user.setEmail(tempUser.getEmail());
+                String temproraryPassword = PasswordGenerator.generateRandomPassword();
+                mailService.temproraryPassword(verifyUserDto.getEmail(), temproraryPassword);
+                user.setPassword(passwordEncoder.encode(temproraryPassword));
+
+                user.setRegistered(true);
+                userRepository.save(user);
+
+            }
 
 
         }
@@ -59,7 +73,7 @@ public class AuthenticationService {
     public void resetPassword(UserResetPasswordDto userResetPasswordDto){
 
 
-        User user=userRepository.findByEmail(userResetPasswordDto.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        User user = userRepository.findActiveByEmail(userResetPasswordDto.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
         String newPassword = PasswordGenerator.generateRandomPassword();
         mailService.sendResetPasswordEmail(userResetPasswordDto.getEmail(),newPassword);
         user.setPassword(passwordEncoder.encode(newPassword));

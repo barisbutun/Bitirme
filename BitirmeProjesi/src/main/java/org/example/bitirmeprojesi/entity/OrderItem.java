@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.PaymentState;
 
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class OrderItem {
     @JsonBackReference
     @JoinColumn(name = "order_id")
     private Orders order;
+
+    @Column(name = "payment_state")
+    private PaymentState paymentState;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

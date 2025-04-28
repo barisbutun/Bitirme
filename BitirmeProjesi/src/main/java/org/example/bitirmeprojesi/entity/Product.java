@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.bitirmeprojesi.enums.StockState;
+import org.example.bitirmeprojesi.enums.Size;
 
 
 import java.io.Serializable;
@@ -48,7 +49,20 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     private StockState stockState;
 
+    @Column(name="review_count")
+    private Integer reviewCount=0;
+
+    @Column(name="favourite_count")
+    private Integer favouriteCount=0;
+
+    @Column(name="total_rating")
+    private Integer totalRating=0;
+
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
+
+    @Enumerated(EnumType.STRING)
+    private Size size;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)

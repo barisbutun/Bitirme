@@ -26,4 +26,5 @@ public class ErrorMesage {
     public static final String INSUFFICIENT_BALANCE_ERROR="Insufficient balance";
     public static final String JWT_TOKEN_NOT_FOUND_ERROR="JWT Token does not exist in our systems";
     public static final String DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR="Delivered order should be refunded";
+    public static final String CANCELLATION_NOT_FOUND_ERROR="Cancellation does not exist in our systems";
 }

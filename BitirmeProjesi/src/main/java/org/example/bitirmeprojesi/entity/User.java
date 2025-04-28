@@ -77,6 +77,12 @@ public class User implements Serializable, UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Payment> payment;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Cancellation> cancellation;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

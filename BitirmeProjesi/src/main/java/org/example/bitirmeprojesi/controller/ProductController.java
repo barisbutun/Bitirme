@@ -23,10 +23,10 @@ public class ProductController {
     }
 
     @GetMapping("/top-rated")
-    public ResponseEntity<List<ProductDto>> getTopRatedProducts(
+    public ResponseEntity<Page<ProductDto>> getTopRatedProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        List<ProductDto> topRatedProducts = productService.getTopRatedProducts(page, size);
+        Page<ProductDto> topRatedProducts = productService.getTopRatedProducts(page, size);
         return ResponseEntity.ok(topRatedProducts);
     }
 
