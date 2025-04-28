@@ -1,4 +1,4 @@
-import { getToken } from "../../utils/auth";
+import { getToken,getAuthHeaders,getUserIdFromToken } from "../../utils/auth";
 // API URL
 const API_URL = 'http://localhost:8082/api/admin/v1/users';
 
@@ -49,15 +49,18 @@ export const createUser = async (user) => {
   return await response.json(); 
 };
 
-// Kullanıcıyı güncelleme
+// Güncelleme işlemi
 export const updateUser = async (id, user) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/${id}`, {
+  const token = getToken(); 
+  const userId = getUserIdFromToken(); 
+
+  if (!userId) {
+    throw new Error('Kullanıcı kimliği alınamadı!');
+  }
+
+  const response = await fetch(`http://localhost:8082/api/admin/v1/user/${id}`, { 
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,  
-    },
+    headers: getAuthHeaders(), 
     body: JSON.stringify(user), 
   });
 
@@ -65,23 +68,25 @@ export const updateUser = async (id, user) => {
     throw new Error('Kullanıcı güncellenirken bir hata oluştu!');
   }
 
-  return await response.json(); 
+  return await response.json();
 };
 
-// Kullanıcıyı silme
+// Silme işlemi
 export const deleteUser = async (id) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetch(`http://localhost:8082/api/admin/v1/user/${id}`, { 
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`, 
-    },
+    headers: getAuthHeaders(), 
   });
 
   if (!response.ok) {
     throw new Error('Kullanıcı silinirken bir hata oluştu!');
   }
 
-  return await response.json(); 
+  // Eğer 204 No Content ise JSON parse etmeye çalışma
+  if (response.status === 204) {
+    return;
+  }
+
+  return await response.json();
 };
+
