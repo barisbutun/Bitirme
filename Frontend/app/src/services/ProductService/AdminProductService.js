@@ -51,7 +51,6 @@ export const createProduct = async (productData) => {
 };
 
 export const updateProduct = async (id, product) => {
-  console.log(`Updating product with ID: ${id}`, product); 
   try {
     const response = await fetch(`${API_URL}/product/${id}`, {
       method: "PUT",

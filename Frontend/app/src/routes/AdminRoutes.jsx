@@ -7,9 +7,6 @@ import UserManagement from "../pages/Admin/UserManagement";
 // import DeleteOrders from "../pages/Admin/DeleteOrders";
 import FavoriteManagement from "../pages/Admin/FavoriteManagement";
 import ProductManagement from "../pages/Admin/ProductManagement";
-import AddProduct from "../pages/Admin/AddProduct";
-import UpdateProduct from "../pages/Admin/UpdateProduct";
-import DeleteProduct from "../pages/Admin/DeleteProduct";
 import CategoryManagement from "../pages/Admin/CategoryManagement";
 // import ImageManagement from "../pages/Admin/ImageManagement";
 const AdminRoutes = () => {
@@ -19,14 +16,11 @@ const AdminRoutes = () => {
       <Route index element={<AdminPage />} />
 
       <Route path="ProductManagement" element={<ProductManagement />} />
-      <Route path="AddProduct" element={<AddProduct />} />
-      <Route path="UpdateProduct" element={<UpdateProduct />} />
-      <Route path="DeleteProduct" element={<DeleteProduct />} />
       <Route path="UserManagement" element={<UserManagement />} />
       {/* <Route path="OrderManagement" element={<OrderManagement />} /> */}
       {/* <Route path="RegisteredOrders" element={<RegisteredOrders />} /> */}
       {/* <Route path="DeleteOrders" element={<DeleteOrders />} /> */}
-      <Route path="FavoriteManagement" element={<FavoriteManagement />} />
+      {/* <Route path="FavoriteManagement" element={<FavoriteManagement />} /> */}
       {/* <Route path="ImageManagement" element={<ImageManagement />} /> */}
       <Route path="CategoryManagement" element={<CategoryManagement />} />
     </Routes>

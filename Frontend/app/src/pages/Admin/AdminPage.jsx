@@ -305,7 +305,7 @@ const AdminDashboard = () => {
               icon={<HeartFilled />}
               block
               style={{ marginBottom: 12 }}
-              onClick={() => navigate("/admin/UpdateProduct")}
+              onClick={() => navigate("/admin/FavoriteManagement")}
             >
               Favori İşlemleri
             </Button>
