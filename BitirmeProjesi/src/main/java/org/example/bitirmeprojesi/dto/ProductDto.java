@@ -7,10 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.bitirmeprojesi.enums.StockState;
 import org.example.bitirmeprojesi.enums.Size;
+import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Product}
@@ -36,8 +37,6 @@ public class ProductDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
-    @JsonProperty("size")
-    private Size size;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double averageRating;
@@ -46,16 +45,14 @@ public class ProductDto implements Serializable {
     private Long categoryId;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer totalRating;
+    private int totalRating;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer favouriteCount;
+    private int favouriteCount;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer reviewCount;
+    private int reviewCount;
 
     @JsonProperty("quantity")
-    @NotNull(message = "Quantity cannot be null")
-    @Positive(message = "Quantity must be positive")
-    private Integer quantity;
+    private Map<Size, @Positive(message = "Stock count must be positive") Integer> quantity;
 }

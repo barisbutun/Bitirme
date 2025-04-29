@@ -14,7 +14,9 @@ import org.example.bitirmeprojesi.enums.Size;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @AllArgsConstructor
@@ -42,21 +44,24 @@ public class Product implements Serializable {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @ElementCollection
+    @CollectionTable(name = "product_quantities", joinColumns = @JoinColumn(name = "product_id"))
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "stock")
+    private Map<Size, Integer> quantity = new HashMap<>();
 
     @Column(name = "stock_state")
     @Enumerated(EnumType.STRING)
     private StockState stockState;
 
     @Column(name="review_count")
-    private Integer reviewCount=0;
+    private int reviewCount=0;
 
     @Column(name="favourite_count")
-    private Integer favouriteCount=0;
+    private int favouriteCount=0;
 
     @Column(name="total_rating")
-    private Integer totalRating=0;
+    private int totalRating=0;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
@@ -64,12 +69,12 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     private Size size;
 
+    @Column(name = "average_rating")
+    private double averageRating=0.0;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
-
-    @Column(name = "average_rating")
-    private double averageRating=0.0;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
@@ -92,5 +97,21 @@ public class Product implements Serializable {
     public void prePersist() {
         createdDate = LocalDateTime.now();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        return id != null && id.equals(product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
 
 }

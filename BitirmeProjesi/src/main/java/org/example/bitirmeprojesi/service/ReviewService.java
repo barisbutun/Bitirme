@@ -47,10 +47,12 @@ public class ReviewService {
             throw new DuplicateReviewException(ErrorMesage.INVALID_REVIEW_INFORMATION_ERROR);
         }
 
-
         double averageRating = calculateAverageRating(productId);
+
+        product.setTotalRating(reviewDto.getRating() + product.getTotalRating());
         product.setAverageRating(averageRating);
 
+        product.setReviewCount(product.getReviewCount()+1);
         productRepository.saveAndFlush(product);
 
         review.setProduct(product);
@@ -81,7 +83,6 @@ public class ReviewService {
     private double calculateAverageRating(Long productId) {
         List<Review> reviews = reviewRepository.findAllByProductId(productId);
 
-
                return reviews.stream()
                 .mapToDouble(Review::getRating)
                 .average()
@@ -95,6 +96,7 @@ public class ReviewService {
         reviewMapper.update(reviewDto, review);
         reviewRepository.save(review);
         review.getProduct().setAverageRating(calculateAverageRating(review.getProduct().getId()));
+        review.getProduct().setTotalRating(review.getProduct().getTotalRating() - review.getRating() + reviewDto.getRating());
         productRepository.save(review.getProduct());
 
         return reviewMapper.toDto(review);
@@ -103,6 +105,8 @@ public class ReviewService {
     public void delete(Long id) {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new ReviewNotFoundException(ErrorMesage.REVIEW_NOT_FOUND_ERROR));
         reviewRepository.deleteById(id);
+        review.getProduct().setReviewCount(review.getProduct().getReviewCount() - 1);
+        review.getProduct().setTotalRating(review.getProduct().getTotalRating() - review.getRating());
         review.getProduct().setAverageRating(calculateAverageRating(review.getProduct().getId()));
         productRepository.save(review.getProduct());
 

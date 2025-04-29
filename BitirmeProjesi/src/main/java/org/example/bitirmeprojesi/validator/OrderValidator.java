@@ -3,11 +3,13 @@ package org.example.bitirmeprojesi.validator;
 import org.example.bitirmeprojesi.entity.OrderItem;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.entity.Product;
+import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.InsufficientStockException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,21 +30,35 @@ public class OrderValidator {
                 .collect(Collectors.toList());
 
         for (Product product : products) {
-            int orderedQuantity = orderItems.stream()
+            Map<Size, Integer> productQuantities = product.getQuantity();
+
+            Map<Size, Integer> orderedQuantitiesPerSize = orderItems.stream()
                     .filter(orderItem -> orderItem.getProduct().getId().equals(product.getId()))
-                    .mapToInt(OrderItem::getQuantity)
-                    .sum();
-            if (product.getQuantity() < orderedQuantity) {
-                throw new InsufficientStockException(ErrorMesage.INSUFFICIENT_STOCK_ERROR);
+                    .collect(Collectors.groupingBy(
+                            OrderItem::getSize,
+                            Collectors.summingInt(OrderItem::getQuantity)
+                    ));
+
+            for (Map.Entry<Size, Integer> entry : orderedQuantitiesPerSize.entrySet()) {
+                Size orderedSize = entry.getKey();
+                int orderedQuantity = entry.getValue();
+
+                if (!productQuantities.containsKey(orderedSize)) {
+                    throw new IllegalArgumentException("Product does not have size: " + orderedSize);
+                }
+
+                int currentStock = productQuantities.get(orderedSize);
+                if (currentStock < orderedQuantity) {
+                    throw new InsufficientStockException(ErrorMesage.INSUFFICIENT_STOCK_ERROR);
+                }
+
+                productQuantities.put(orderedSize, currentStock - orderedQuantity);
             }
         }
 
-        for (OrderItem orderItem : orderItems) {
-            Product product = orderItem.getProduct();
-            product.setQuantity(product.getQuantity() - orderItem.getQuantity());
-        }
         return products;
     }
+
 
 
 

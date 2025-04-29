@@ -9,6 +9,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.Map;
+
 @Document(indexName = "products")
 @Getter
 @Setter
@@ -36,8 +38,8 @@ public class ProductElastic {
     @Field(type = FieldType.Long, name = "categoryId")
     private Long categoryId;
 
-    @Field(type = FieldType.Integer, name = "quantity")
-    private Integer quantity;
+    @Field(type = FieldType.Object, name = "quantity")
+    private Map<String, Integer> quantity;
 
 
 

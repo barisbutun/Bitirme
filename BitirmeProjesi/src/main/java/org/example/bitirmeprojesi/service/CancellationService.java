@@ -57,7 +57,7 @@ public class CancellationService {
         Product product = productRepository.findByIdForUpdate(orderItem.getProduct().getId())
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
-        cancellationValidator.validateStockState(product, cancellationDto.getQuantity());
+        cancellationValidator.validateStockState(product, orderItem,cancellationDto.getQuantity());
 
         Cancellation savedCancellation = cancellationRepository.save(cancellation);
 

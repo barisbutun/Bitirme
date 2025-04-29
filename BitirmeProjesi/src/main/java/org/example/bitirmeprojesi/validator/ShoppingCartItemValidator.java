@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ShoppingCartItemDto;
 import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.entity.ShoppingCartItem;
+import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.enums.StockState;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
@@ -16,6 +17,7 @@ import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -25,8 +27,13 @@ public class ShoppingCartItemValidator {
 
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
-    public void validateStockState(final Product product, final int requestedQuantity) {
-        if (product.getQuantity() < requestedQuantity) {
+    public void validateStockState(final Product product, final int requestedQuantity, final Size size) {
+        if (!product.getQuantity().containsKey(size)) {
+            throw new IllegalArgumentException("Product does not have stock for size: " + size);
+        }
+
+        int availableStock = product.getQuantity().get(size);
+        if (availableStock < requestedQuantity) {
             throw new InsufficientStockException(ErrorMesage.INSUFFICIENT_STOCK_ERROR);
         }
     }

@@ -22,15 +22,6 @@ public class UserController {
     private final UserService userService;
 
 
-
-    @GetMapping("/v1")
-    public ResponseEntity<List<UserDto>> findAll() {
-        List<UserDto> userDtos = userService.findAll();
-        return ResponseEntity.ok(userDtos);
-    }
-
-
-
     @GetMapping("/v1/profile")
     public ResponseEntity<UserProfileDto> getProfile() {
         UUID userId = JwtUtil.getUserIdFromToken();

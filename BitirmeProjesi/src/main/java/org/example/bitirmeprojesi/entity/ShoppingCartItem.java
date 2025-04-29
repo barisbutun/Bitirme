@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Size;
 
 @Entity
 @Table(name = "shopping_cart_item")
@@ -27,6 +28,8 @@ public class ShoppingCartItem {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Column(name = "size", nullable = false)
+    private Size size;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

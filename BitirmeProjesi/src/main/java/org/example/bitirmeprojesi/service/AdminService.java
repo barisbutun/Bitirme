@@ -63,13 +63,7 @@ public class AdminService {
         return productService.getProductCount();
     }
 
-    public void deleteUser(UUID id) {
-        userService.delete(id);
-    }
 
-    public UserDto updateUser(UserDto userDto, UUID id) {
-        return userService.update(userDto, id);
-    }
 
     public Integer getUserCount() {
         return userService.countUser();
@@ -119,8 +113,16 @@ public class AdminService {
         return categoryService.update(categoryDto, id);
     }
 
-    public List<UserDto> findAllUsers() {
-        return userService.findAll();
+    public Page<UserDto> findAllUsers(int page,int size) {
+        return userService.findAll(page,size);
+    }
+
+    public void deleteUser(UUID id) {
+        userService.deleteById(id);
+    }
+
+    public UserDto updateUser(UserDto userDto, UUID id) {
+        return userService.update(userDto, id);
     }
 
     public Page<FavouriteDto> getAllFavourites(int page,int size) {

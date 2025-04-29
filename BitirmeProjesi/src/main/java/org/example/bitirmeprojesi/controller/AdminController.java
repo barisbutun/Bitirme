@@ -163,9 +163,10 @@ public class AdminController {
     }
 
     @GetMapping("/v1/users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                     @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        List<UserDto> users = adminService.findAllUsers();
+        Page<UserDto> users = adminService.findAllUsers(page, size);
         return ResponseEntity.ok(users);
     }
     @GetMapping("/v1/user/count")

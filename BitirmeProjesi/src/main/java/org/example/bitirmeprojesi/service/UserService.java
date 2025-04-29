@@ -14,6 +14,9 @@ import org.example.bitirmeprojesi.exception.error.CodeNotFoundException;
 import org.example.bitirmeprojesi.mapper.UserMapper;
 import org.example.bitirmeprojesi.repository.TemproraryUserRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,8 +58,13 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public List<UserDto> findAll() {
-        return userMapper.toDtoList(userRepository.findAll());
+    public Page<UserDto> findAll(int page, int size) {
+
+        Pageable pageable= PageRequest.of(page, size);
+
+        Page<User> users = userRepository.findAll(pageable);
+        Page<UserDto> userDtos = users.map(userMapper::toDto);
+       return userDtos;
     }
 
     public UserDto update(UserDto userDto, String code) throws CodeNotFoundException {

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Size;
 
 import java.io.Serializable;
 
@@ -28,4 +29,7 @@ public class ShoppingCartItemDto implements Serializable {
     private double price;
     @JsonProperty("name")
     private String name;
+    @JsonProperty("size")
+    private Size size;
+
 }

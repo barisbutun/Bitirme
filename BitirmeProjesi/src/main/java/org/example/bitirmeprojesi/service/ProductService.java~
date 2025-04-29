@@ -42,7 +42,7 @@ public class ProductService {
     @CacheEvict(value = "products", allEntries = true)
     public ProductDto create(ProductDto productDto) throws Exception {
         if (productDto.getCategoryId() == null) {
-            throw new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR);
+            throw new RuntimeException("Category ID is required");
         }
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR));

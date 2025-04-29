@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.bitirmeprojesi.enums.PaymentState;
+import org.example.bitirmeprojesi.enums.Size;
 
 import java.util.List;
 
@@ -44,6 +45,9 @@ public class OrderItem {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "size")
+    private Size size;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Refund refund;

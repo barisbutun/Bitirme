@@ -8,6 +8,7 @@ import org.example.bitirmeprojesi.dto.DeliveryDto;
 import org.example.bitirmeprojesi.dto.PaymentDto;
 import org.example.bitirmeprojesi.entity.*;
 import org.example.bitirmeprojesi.enums.PaymentState;
+import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.PaymentMapper;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -47,6 +49,7 @@ public class PaymentService {
         if (orders.getSumPrice() > user.getBalance()) {
             throw new InsufficientBalanceError(ErrorMesage.INSUFFICIENT_BALANCE_ERROR);
         }
+
         DeliveryDto deliveryDto = new DeliveryDto();
         user.setBalance(user.getBalance() - orders.getSumPrice());
         userRepository.save(user);
@@ -54,10 +57,13 @@ public class PaymentService {
         payment.setPaymentState(PaymentState.SUCCESS);
         List<OrderItem> orderItem=orders.getOrderItems();
         orderItem.forEach(orderItem1 -> orderItem1.setPaymentState(PaymentState.SUCCESS));
-        for(OrderItem orderItem1:orderItem){
+        for (OrderItem orderItem1 : orderItem) {
             Product product = productRepository.findByIdForUpdate(orderItem1.getProduct().getId())
                     .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
-            product.setQuantity(product.getQuantity() - orderItem1.getQuantity());
+
+            Map<Size, Integer> productQuantities = getSizeIntegerMap(orderItem1, product);
+
+            product.setQuantity(productQuantities);
             productRepository.save(product);
         }
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
@@ -65,6 +71,27 @@ public class PaymentService {
         shoppingCartItemRepository.saveAll(shoppingCartItems);
         paymentRepository.save(payment);
         return paymentMapper.toDto(payment);
+    }
+
+    private static Map<Size, Integer> getSizeIntegerMap(OrderItem orderItem, Product product) {
+        Size orderedSize = orderItem.getSize();
+        int orderedQuantity = orderItem.getQuantity();
+
+
+        Map<Size, Integer> productQuantities = product.getQuantity();
+
+        if (!productQuantities.containsKey(orderedSize)) {
+            throw new IllegalArgumentException("Product does not have size: " + orderedSize);
+        }
+
+        int currentStock = productQuantities.get(orderedSize);
+
+        if (currentStock < orderedQuantity) {
+            throw new IllegalArgumentException("Not enough stock for size: " + orderedSize);
+        }
+
+        productQuantities.put(orderedSize, currentStock - orderedQuantity);
+        return productQuantities;
     }
 
     public PaymentDto findById(UUID id) {

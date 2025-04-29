@@ -9,7 +9,6 @@ import org.example.bitirmeprojesi.entity.*;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
 import org.example.bitirmeprojesi.exception.error.OrderNotFoundExceiption;
-import org.example.bitirmeprojesi.mapper.OrderItemMapper;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
 import org.example.bitirmeprojesi.repository.*;
 import org.example.bitirmeprojesi.validator.OrderValidator;
@@ -31,10 +30,11 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderValidator orderValidator;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
-    private final OrderItemMapper orderItemMapper;
+    private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final OrderItemService orderItemService;
+
     @Transactional
     public OrdersDto create(OrdersDto ordersDto, UUID userId) {
         User user = userRepository.findById(userId)
@@ -54,6 +54,7 @@ public class OrderService {
             orderItem.setCategory(shoppingCartItem.getProduct().getCategory());
             orderItem.setShoppingCartItem(shoppingCartItem);
             orderItem.setUser(shoppingCartItem.getUser());
+            orderItem.setSize(shoppingCartItem.getSize());
             orderItem.setOrder(finalOrders);
             orderItem.setQuantity(shoppingCartItem.getQuantity());
             return orderItemService.create(orderItem);
@@ -79,7 +80,7 @@ public class OrderService {
         return orderMapper.toDto(orders);
     }
 
-    private final ProductRepository productRepository;
+
 
     public OrdersDto findById(Long id) {
         Orders orders = orderRepository.findById(id)
@@ -112,12 +113,14 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    public List<OrdersDto> findAllByUserId(UUID userId, int page, int size) {
+    public Page<OrdersDto> findAllByUserId(UUID userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
         Page<Orders> ordersList = orderRepository.findAllByUserId(user.getId(), pageable);
-        return orderMapper.toDtoList(ordersList.getContent());
+        Page<OrdersDto> ordersDtos = ordersList.map(orderMapper::toDto);
+
+        return ordersDtos;
     }
 }

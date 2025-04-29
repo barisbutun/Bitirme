@@ -45,7 +45,7 @@ public class ShoppingCartItemService {
         Product product=productRepository.findById(shoppingCartItemDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
-        shoppingCartItemValidator.validateStockState(product,shoppingCartItemDto.getQuantity());
+        shoppingCartItemValidator.validateStockState(product,shoppingCartItemDto.getQuantity(),shoppingCartItemDto.getSize());
         ShoppingCartItem shoppingCartItem = shoppingCartItemMapper.toEntity(shoppingCartItemDto);
         shoppingCartItem.setUser(user);
         shoppingCartItem.setProduct(product);
@@ -87,7 +87,7 @@ public class ShoppingCartItemService {
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
 
         shoppingCartItemValidator.validateShoppingState(shoppingCartItemDto, userId,id);
-        shoppingCartItemValidator.validateStockState(shoppingCartItem.getProduct(), shoppingCartItemDto.getQuantity());
+        shoppingCartItemValidator.validateStockState(shoppingCartItem.getProduct(), shoppingCartItemDto.getQuantity(), shoppingCartItemDto.getSize());
 
         shoppingCartItemMapper.update(shoppingCartItemDto, shoppingCartItem);
         return shoppingCartItemMapper.toDto(shoppingCartItemRepository.save(shoppingCartItem));

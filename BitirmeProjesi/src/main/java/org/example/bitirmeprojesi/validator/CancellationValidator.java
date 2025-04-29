@@ -5,10 +5,13 @@ import org.example.bitirmeprojesi.dto.CancellationDto;
 import org.example.bitirmeprojesi.entity.*;
 import org.example.bitirmeprojesi.enums.DeliveryStatus;
 import org.example.bitirmeprojesi.enums.PaymentState;
+import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.DeliveredOrderShouldBeRefundedException;
 import org.example.bitirmeprojesi.repository.*;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -59,9 +62,21 @@ public class CancellationValidator {
 
     }
 
-    public void validateStockState(Product product, Integer quantity) {
-        product.setQuantity(product.getQuantity() + quantity);
+    public void validateStockState(Product product,OrderItem orderItem, Integer quantity) {
 
+        Size size=orderItem.getSize();
+
+        Map<Size, Integer> productQuantities = product.getQuantity();
+
+        if (!productQuantities.containsKey(size)) {
+            throw new IllegalArgumentException("Product does not have size: " + size);
+        }
+        int currentStock = productQuantities.get(size);
+        if (currentStock < quantity) {
+            throw new IllegalArgumentException("Not enough stock for size: " + size);
+        }
+
+        productQuantities.put(size, currentStock - quantity);
     }
 
 

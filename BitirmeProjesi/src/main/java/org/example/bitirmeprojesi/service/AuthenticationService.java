@@ -48,7 +48,7 @@ public class AuthenticationService {
             tempUser.setVerified(true);
             temproraryUserRepository.save(tempUser);
 
-            Optional<User> optionalUser = userRepository.findActiveByEmail(tempUser.getEmail());
+            Optional<User> optionalUser = userRepository.findByEmail(tempUser.getEmail());
 
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
