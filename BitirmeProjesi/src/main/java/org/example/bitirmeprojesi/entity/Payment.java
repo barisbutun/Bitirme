@@ -45,6 +45,15 @@ public class Payment {
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
 
     @PrePersist
     public void prePersist() {

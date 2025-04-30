@@ -18,7 +18,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class ProductElastic {
 
-
     @Id
     @Field(type = FieldType.Long, name = "id")
     private Long id;
@@ -40,7 +39,5 @@ public class ProductElastic {
 
     @Field(type = FieldType.Object, name = "quantity")
     private Map<String, Integer> quantity;
-
-
 
 }

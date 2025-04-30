@@ -56,6 +56,10 @@ public class Orders implements Serializable {
     @JoinColumn(name = "delivery_id",referencedColumnName = "id")
     private Delivery delivery;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Refund> refunds;
+
 
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)

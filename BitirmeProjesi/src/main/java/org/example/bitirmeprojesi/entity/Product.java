@@ -66,9 +66,6 @@ public class Product implements Serializable {
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    @Enumerated(EnumType.STRING)
-    private Size size;
-
     @Column(name = "average_rating")
     private double averageRating=0.0;
 
@@ -92,10 +89,16 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Favourite> favourites;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
         createdDate = LocalDateTime.now();
+    }
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     @Override

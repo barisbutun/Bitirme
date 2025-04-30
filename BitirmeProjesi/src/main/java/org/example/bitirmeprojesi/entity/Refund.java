@@ -34,14 +34,19 @@ public class Refund {
     @Column(name = "refund_amount", nullable = false)
     private double refundAmount;
 
-
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "order_item_id")
-    private List<OrderItem> orderItems;
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id")
+    private Orders orders;
 
 
     @Column(name = "refund_reason", nullable = false)
     private String refundReason;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     private LocalDateTime refundDate;
 
@@ -51,13 +56,7 @@ public class Refund {
     @PrePersist
     public void prePersist() {
         refundDate = LocalDateTime.now();
-        double price = 0.0;
-        for (OrderItem orderItem : orderItems) {
 
-            price+=orderItem.getQuantity()*orderItem.getProduct().getPrice();
-
-        }
-        refundAmount = price;
     }
 
 }

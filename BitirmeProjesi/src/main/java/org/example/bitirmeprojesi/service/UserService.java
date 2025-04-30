@@ -115,14 +115,11 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
-
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findActiveByEmail(email)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
     }
-
 
     public UserProfileDto getUserProfile(UUID userId) {
         return userMapper.toDtoProfile(userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR)));
