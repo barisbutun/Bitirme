@@ -61,9 +61,8 @@ public class Orders implements Serializable {
     private List<Refund> refunds;
 
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Cancellation> cancellations;
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cancellation cancellation;
 
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)

@@ -2,7 +2,7 @@ package org.example.bitirmeprojesi.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.*;
-import org.example.bitirmeprojesi.entity.TemproraryUser;
+import org.example.bitirmeprojesi.entity.TemporaryUser;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.enums.Role;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
@@ -35,7 +35,7 @@ public class AuthenticationService {
 
     public void verifyUser(VerifyUserDto verifyUserDto) throws InvalidVerificationCodeException {
 
-        TemproraryUser tempUser = temproraryUserRepository.findByEmailAndCode(verifyUserDto.getEmail(), verifyUserDto.getCode());
+        TemporaryUser tempUser = temproraryUserRepository.findByEmailAndCode(verifyUserDto.getEmail(), verifyUserDto.getCode());
 
         if (tempUser == null) {
             throw new InvalidVerificationCodeException(ErrorMesage.INVALID_VERIFICATION_CODE);

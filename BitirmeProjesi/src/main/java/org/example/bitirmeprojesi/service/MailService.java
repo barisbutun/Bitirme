@@ -3,8 +3,8 @@ package org.example.bitirmeprojesi.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.TemproraryUserDto;
-import org.example.bitirmeprojesi.entity.TemproraryUser;
+import org.example.bitirmeprojesi.dto.TemporaryUserDto;
+import org.example.bitirmeprojesi.entity.TemporaryUser;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.ExistByEmailException;
 import org.example.bitirmeprojesi.mapper.TempororaryUserMapper;
@@ -50,16 +50,16 @@ public class MailService {
         sendHtmlEmail(email, newPassword, content);
     }
 
-    public void sendEmailVerification(TemproraryUserDto dto) throws MessagingException {
+    public void sendEmailVerification(TemporaryUserDto dto) throws MessagingException {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new ExistByEmailException(ErrorMesage.EXIST_BY_EMAIL_ERROR);
+            throw new ExistByEmailException(ErrorMesage.EMAIL_ALREADY_EXISTS_ERROR);
         }
 
         if(temproraryUserRepository.existsByEmail(dto.getEmail())){
             String code = VerificationCodeGenerator.generateCode();
-            TemproraryUser temproraryUser=temproraryUserRepository.findByEmail(dto.getEmail());
-            temproraryUser.setCode(code);
-            temproraryUserRepository.save(temproraryUser);
+            TemporaryUser temporaryUser =temproraryUserRepository.findByEmail(dto.getEmail());
+            temporaryUser.setCode(code);
+            temproraryUserRepository.save(temporaryUser);
 
             EmailContent content = new EmailContent(
                     "Hesap Doğrulama - Fashion Design",
@@ -75,7 +75,7 @@ public class MailService {
         else{
             String code = VerificationCodeGenerator.generateCode();
 
-            TemproraryUser user = tempororaryUserMapper.toEntity(dto);
+            TemporaryUser user = tempororaryUserMapper.toEntity(dto);
             user.setCode(code);
             temproraryUserRepository.save(user);
 

@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExistingProductException.class)
     public ResponseEntity<Object> existingProductExceptionHandler(Exception ex) {
         log.error(ex.getLocalizedMessage(), ex);
-        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ?ex.getLocalizedMessage():ErrorMesage.EXİSTİNG_PRODUCT_ERROR,HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ?ex.getLocalizedMessage():ErrorMesage.EXISTING_PRODUCT_ERROR,HttpStatus.BAD_REQUEST);
     }
 
 
@@ -157,7 +157,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> existByEmailExceptionHandler(Exception ex) {
         log.error(ex.getLocalizedMessage(), ex);
 
-        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.EXIST_BY_EMAIL_ERROR, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.EMAIL_ALREADY_EXISTS_ERROR, HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(InsufficientBalanceError.class)
     public ResponseEntity<Object> insufficientBalanceExceptionHandler(Exception ex) {
@@ -186,6 +186,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CANCELLATION_NOT_FOUND_ERROR, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PaymentNotSuccessfulCancellationException.class)
+    public ResponseEntity<Object> paymentNotSuccessfulCancellationExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.PAYMENT_NOT_SUCCESSFUL_CANCELLATION_ERROR, HttpStatus.BAD_REQUEST);
+    }
 
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {

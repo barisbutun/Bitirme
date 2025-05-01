@@ -3,27 +3,22 @@ package org.example.bitirmeprojesi.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.CancellationDto;
-import org.example.bitirmeprojesi.entity.Cancellation;
-import org.example.bitirmeprojesi.entity.OrderItem;
-import org.example.bitirmeprojesi.entity.Orders;
-import org.example.bitirmeprojesi.entity.Product;
+import org.example.bitirmeprojesi.entity.*;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
+import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
-import org.example.bitirmeprojesi.exception.error.CancellationNotFoundException;
-import org.example.bitirmeprojesi.exception.error.OrderItemNotFoundException;
-import org.example.bitirmeprojesi.exception.error.OrderNotFoundExceiption;
-import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
+import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.CancellationMapper;
-import org.example.bitirmeprojesi.repository.CancellationRepository;
-import org.example.bitirmeprojesi.repository.OrderItemRepository;
-import org.example.bitirmeprojesi.repository.OrderRepository;
-import org.example.bitirmeprojesi.repository.ProductRepository;
+import org.example.bitirmeprojesi.repository.*;
 import org.example.bitirmeprojesi.validator.CancellationValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -36,33 +31,65 @@ public class CancellationService {
     private final OrderItemRepository orderItemRepository;
     private final CancellationValidator cancellationValidator;
     private final ProductRepository productRepository;
-
+    private final UserRepository userRepository;
 
     @Transactional
-    public CancellationDto create(CancellationDto cancellationDto) {
+    public CancellationDto create(CancellationDto cancellationDto, UUID id) {
         Cancellation cancellation = cancellationMapper.toEntity(cancellationDto);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
         Orders order = orderRepository.findByIdForUpdate(cancellation.getOrder().getId())
                 .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
 
-        OrderItem orderItem = orderItemRepository.findByIdForUpdate(cancellationDto.getOrderItemId())
-                .orElseThrow(() -> new OrderItemNotFoundException(ErrorMesage.ORDER_ITEM_NOT_FOUND_ERROR));
+        cancellationValidator.validateOrderState(order);
 
-        cancellationValidator.validateOrderDeliveryState(order);
-        cancellationValidator.updateOrderItemQuantity(orderItem, cancellationDto.getQuantity());
-        cancellationValidator.updateUserBalance(order.getUser(), orderItem, cancellationDto.getQuantity());
-        cancellationValidator.updateOrderItemPayment(orderItem, order, cancellationDto);
-        cancellationValidator.amountCancelPrice(cancellation,orderItem,cancellationDto.getQuantity());
+        List<OrderItem> orderItems = processOrderItems(cancellationDto, user, cancellation);
 
-        Product product = productRepository.findByIdForUpdate(orderItem.getProduct().getId())
-                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        updateProductsAndOrderItems(orderItems, cancellationDto);
 
-        cancellationValidator.validateStockState(product, orderItem,cancellationDto.getQuantity());
-
-        Cancellation savedCancellation = cancellationRepository.save(cancellation);
-
-        return cancellationMapper.toDto(savedCancellation);
+        return cancellationMapper.toDto(cancellationRepository.save(cancellation));
     }
+
+
+
+    private List<OrderItem> processOrderItems(CancellationDto cancellationDto, User user, Cancellation cancellation) {
+        return cancellationDto.getOrderItems().stream()
+                .map(orderItemCancellationDto -> {
+                    OrderItem orderItem = orderItemRepository.findById(orderItemCancellationDto.getId())
+                            .orElseThrow(() -> new OrderItemNotFoundException(ErrorMesage.ORDER_ITEM_NOT_FOUND_ERROR));
+                    orderItem.setQuantity(orderItem.getQuantity() - orderItemCancellationDto.getCancelQuantity());
+                    double refundAmount = orderItemCancellationDto.getCancelQuantity() * orderItem.getProduct().getPrice();
+                    user.setBalance(user.getBalance() + refundAmount);
+                    cancellation.setCancelAmount(refundAmount);
+                    return orderItem;
+                })
+                .toList();
+    }
+
+    private void updateProductsAndOrderItems(List<OrderItem> orderItems, CancellationDto cancellationDto) {
+        orderItems.forEach(orderItem -> {
+            Product product = productRepository.findById(orderItem.getProduct().getId())
+                    .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+            product.getQuantity().put(orderItem.getSize(),
+                    product.getQuantity().getOrDefault(orderItem.getSize(), 0) + orderItem.getQuantity());
+            productRepository.save(product);
+
+            cancellationDto.getOrderItems().stream()
+                    .filter(item -> item.getProductId() == orderItem.getProduct().getId())
+                    .findFirst()
+                    .ifPresent(orderItemCancellationDto -> {
+                        if (orderItem.getQuantity().equals(orderItemCancellationDto.getCancelQuantity())) {
+                            orderItem.setPaymentState(PaymentState.CANCELLED);
+                        } else {
+                            orderItem.setPaymentState(PaymentState.UPDATED);
+                        }
+                    });
+            orderItemRepository.save(orderItem);
+        });
+    }
+
 
     public CancellationDto createAllOrdersCancellation(CancellationDto cancellationDto) {
 
@@ -100,11 +127,27 @@ public class CancellationService {
     }
 
     @Transactional
-    public CancellationDto update(CancellationDto cancellationDto, Long id) {
-        cancellationRepository.findById(id).orElseThrow(() -> new CancellationNotFoundException(ErrorMesage.CANCELLATION_NOT_FOUND_ERROR));
-        Cancellation cancellation = cancellationMapper.toEntity(cancellationDto);
-        cancellationRepository.save(cancellation);
-        return cancellationMapper.toDto(cancellation);
+    public CancellationDto update(CancellationDto cancellationDto, Long id,UUID userId) {
+
+        Cancellation existingCancellation = cancellationRepository.findById(id)
+                .orElseThrow(() -> new CancellationNotFoundException(ErrorMesage.CANCELLATION_NOT_FOUND_ERROR));
+
+        User user =userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+
+        Orders orders = orderRepository.findByIdForUpdate(cancellationDto.getOrderId())
+                .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
+
+        cancellationMapper.update(cancellationDto, existingCancellation);
+
+
+        List<OrderItem> orderItems = processOrderItems(cancellationDto, user, existingCancellation);
+
+        updateProductsAndOrderItems(orderItems, cancellationDto);
+
+        cancellationRepository.save(existingCancellation);
+
+        return cancellationMapper.toDto(existingCancellation);
     }
 
     public void delete(Long id) {

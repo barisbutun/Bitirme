@@ -14,10 +14,10 @@ import java.util.List;
 public interface CancellationMapper {
 
 
-    @Mapping(target = "orderItemId", ignore = true)
-    @Mapping(target = "quantity", ignore = true)
+    @Mapping(target="orderId", source = "order.id")
     CancellationDto toDto(final Cancellation cancellation);
 
+    @Mapping(target="order.id", source = "orderId")
     Cancellation toEntity(final CancellationDto cancellationDto);
 
     List<CancellationDto> toDtoList(final List<Cancellation> cancellationList);

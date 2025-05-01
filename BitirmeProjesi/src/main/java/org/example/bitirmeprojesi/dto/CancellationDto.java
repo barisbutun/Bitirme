@@ -1,13 +1,15 @@
 package org.example.bitirmeprojesi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Cancellation}
@@ -23,12 +25,12 @@ public class CancellationDto implements Serializable {
     @JsonProperty("description")
     private String description;
 
-    @NotBlank(message = "Quantity cannot be empty")
-    @JsonProperty("quantity")
-    private int quantity;
+    @JsonProperty("order_id")
+    private Long orderId;
 
-    @JsonProperty("order_item_id")
-    private Long orderItemId;
+
+    @JsonProperty("order_items")
+    private List<OrderItemCancellationDto>orderItems;
 
 
 }

@@ -43,8 +43,8 @@ public class AdminService {
     public Page<CancellationDto> findAllCancellation(int page, int size) {
         return cancellationService.findAll(page, size);
     }
-    public CancellationDto updateCancellation(CancellationDto cancellationDto,Long id) {
-        return cancellationService.update(cancellationDto, id);
+    public CancellationDto updateCancellation(CancellationDto cancellationDto,Long id,UUID userId) {
+        return cancellationService.update(cancellationDto, id,userId);
     }
 
     public PaymentDto updatePayment(PaymentDto paymentDto,UUID id) {

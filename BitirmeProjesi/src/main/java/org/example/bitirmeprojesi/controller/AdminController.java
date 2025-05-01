@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.*;
 import org.example.bitirmeprojesi.service.AdminService;
+import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,13 +57,15 @@ public class AdminController {
     @PutMapping("/v1/cancellation/{id}")
     public ResponseEntity<CancellationDto> updateCancellation(@PathVariable Long id, @Valid @RequestBody CancellationDto cancellationDto) {
 
-        CancellationDto updatedCancellation = adminService.updateCancellation(cancellationDto, id);
+        UUID userId = JwtUtil.getUserIdFromToken();
+        CancellationDto updatedCancellation = adminService.updateCancellation(cancellationDto, id,userId);
         return ResponseEntity.ok(updatedCancellation);
     }
 
     @GetMapping("/v1/cancellation/all")
     public ResponseEntity<Page<CancellationDto>> getAllCancellation(@RequestParam("page") int page,
                                                                     @RequestParam("size") int size) {
+
 
         Page<CancellationDto> cancellations = adminService.findAllCancellation(page, size);
         return ResponseEntity.ok(cancellations);

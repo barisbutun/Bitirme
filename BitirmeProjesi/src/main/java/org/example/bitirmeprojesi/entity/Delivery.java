@@ -30,7 +30,7 @@ public class Delivery {
     @Column(name = "company_name")
     private String companyName="Fashion Design";
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Orders order;
 
     @Column(name = "delivery_state")

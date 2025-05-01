@@ -21,7 +21,9 @@ public class CancellationController {
     @PostMapping("/v1")
     public ResponseEntity<CancellationDto> create(@RequestBody CancellationDto cancellationDto) {
 
-        return ResponseEntity.ok(cancellationService.create(cancellationDto));
+        UUID userId = JwtUtil.getUserIdFromToken();
+
+        return ResponseEntity.ok(cancellationService.create(cancellationDto,userId));
     }
 
     @PostMapping("v1/all")
@@ -35,6 +37,13 @@ public class CancellationController {
     public ResponseEntity<CancellationDto> findById(@PathVariable("id") Long id) {
 
         return ResponseEntity.ok(cancellationService.findById(id));
+    }
+
+    @PutMapping("/v1/{id}")
+    public ResponseEntity<CancellationDto> update(@PathVariable("id") Long id, @RequestBody CancellationDto cancellationDto) {
+
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(cancellationService.update(cancellationDto,id, userId));
     }
 
     @GetMapping("/v1")

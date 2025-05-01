@@ -1,8 +1,8 @@
 package org.example.bitirmeprojesi.mapper;
 
 
-import org.example.bitirmeprojesi.dto.TemproraryUserDto;
-import org.example.bitirmeprojesi.entity.TemproraryUser;
+import org.example.bitirmeprojesi.dto.TemporaryUserDto;
+import org.example.bitirmeprojesi.entity.TemporaryUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -13,8 +13,8 @@ import org.mapstruct.ReportingPolicy;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TempororaryUserMapper {
 
-     TemproraryUser toEntity(final TemproraryUserDto temproraryUserDto);
+     TemporaryUser toEntity(final TemporaryUserDto temporaryUserDto);
 
-     TemproraryUserDto toDto(final TemproraryUser temproraryUser);
+     TemporaryUserDto toDto(final TemporaryUser temporaryUser);
 
 }

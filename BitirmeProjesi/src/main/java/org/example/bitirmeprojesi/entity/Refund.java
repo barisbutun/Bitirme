@@ -39,6 +39,10 @@ public class Refund {
     private Orders orders;
 
 
+    @OneToMany(mappedBy = "refund" ,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems;
+
+
     @Column(name = "refund_reason", nullable = false)
     private String refundReason;
 

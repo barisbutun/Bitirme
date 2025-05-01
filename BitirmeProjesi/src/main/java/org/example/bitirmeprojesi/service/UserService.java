@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.UserDto;
 import org.example.bitirmeprojesi.dto.UserPatchDto;
 import org.example.bitirmeprojesi.dto.UserProfileDto;
-import org.example.bitirmeprojesi.entity.TemproraryUser;
+import org.example.bitirmeprojesi.entity.TemporaryUser;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,11 +67,11 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto update(UserDto userDto, String code) throws CodeNotFoundException {
-        TemproraryUser temproraryUser = temproraryUserRepository.findByCode(code);
-        if (temproraryUser == null) {
+        TemporaryUser temporaryUser = temproraryUserRepository.findByCode(code);
+        if (temporaryUser == null) {
             throw new CodeNotFoundException(ErrorMesage.CODE_NOT_FOUND_ERROR);
         }
-        User user = userRepository.findActiveByEmail(temproraryUser.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        User user = userRepository.findActiveByEmail(temporaryUser.getEmail()).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
         userMapper.update(userDto, user);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);

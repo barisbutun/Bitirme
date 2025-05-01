@@ -3,7 +3,7 @@ package org.example.bitirmeprojesi.controller;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.TemproraryUserDto;
+import org.example.bitirmeprojesi.dto.TemporaryUserDto;
 import org.example.bitirmeprojesi.service.MailService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +19,8 @@ public class MailController {
 
 
     @PostMapping("/v1/send-verification")
-    public String sendVerification( @RequestBody TemproraryUserDto TemproraryUserDto) throws MessagingException {
-        mailService.sendEmailVerification(TemproraryUserDto);
+    public String sendVerification( @RequestBody TemporaryUserDto TemporaryUserDto) throws MessagingException {
+        mailService.sendEmailVerification(TemporaryUserDto);
         return "Doğrulama kodu e-posta adresinize gönderildi!";
     }
 

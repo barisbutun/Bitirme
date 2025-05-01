@@ -9,6 +9,7 @@ import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -30,9 +31,12 @@ public class Cancellation implements Serializable {
     @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @OneToOne
+    @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
+
+    @OneToMany(mappedBy = "cancellation", cascade={CascadeType.PERSIST,CascadeType.MERGE})
+    private List<OrderItem> orderItems;
 
     @Column(name = "cancel_amount")
     private double cancelAmount;

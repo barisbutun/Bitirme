@@ -1,20 +1,20 @@
 package org.example.bitirmeprojesi.repository;
 
-import org.example.bitirmeprojesi.entity.TemproraryUser;
+import org.example.bitirmeprojesi.entity.TemporaryUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 
-public interface TemproraryUserRepository extends JpaRepository<TemproraryUser, Long> {
+public interface TemproraryUserRepository extends JpaRepository<TemporaryUser, Long> {
 
     void deleteByCodeGeneratedAtBefore(LocalDateTime expirationTime);
 
-    TemproraryUser findByEmailAndCode(String email, String code);
+    TemporaryUser findByEmailAndCode(String email, String code);
 
-    TemproraryUser findByEmail(String email);
+    TemporaryUser findByEmail(String email);
 
     boolean existsByEmail(String email);
 
-    TemproraryUser findByCode(String code);
+    TemporaryUser findByCode(String code);
 }
 

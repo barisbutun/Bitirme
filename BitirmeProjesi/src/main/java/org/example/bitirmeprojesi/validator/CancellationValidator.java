@@ -8,6 +8,7 @@ import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.DeliveredOrderShouldBeRefundedException;
+import org.example.bitirmeprojesi.exception.error.PaymentNotSuccessfulCancellationException;
 import org.example.bitirmeprojesi.repository.*;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +30,14 @@ public class CancellationValidator {
         }
     }
 
-    public void updateOrderItemQuantity(OrderItem orderItem, Integer quantity) {
-        orderItem.setQuantity(orderItem.getQuantity() - quantity);
-        orderItemRepository.save(orderItem);
-    }
+   public void validateOrderState(Orders order){
+       if(!order.getPaymentState().equals(PaymentState.UPDATED)&&!order.getPaymentState().equals(PaymentState.SUCCESS)){
+           throw new PaymentNotSuccessfulCancellationException(ErrorMesage.PAYMENT_NOT_SUCCESSFUL_CANCELLATION_ERROR);
+       }
+       if(order.getDelivery() != null && order.getDelivery().getDeliveryState().equals(DeliveryStatus.DELIVERED)){
+           throw new DeliveredOrderShouldBeRefundedException(ErrorMesage.DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR);
+       }
+   }
 
     public void updateUserBalance(User user, OrderItem orderItem, Integer quantity) {
         user.setBalance(user.getBalance() + quantity * orderItem.getProduct().getPrice());
@@ -46,20 +51,6 @@ public class CancellationValidator {
     public void cancelledOrderPayment(Orders orders) {
         orders.setPaymentState(PaymentState.CANCELLED);
         orderRepository.save(orders);
-    }
-
-    public void updateOrderItemPayment(OrderItem orderItem,Orders orders, CancellationDto cancellationDto) {
-
-        if (orderItem.getQuantity().equals(cancellationDto.getQuantity())) {
-
-            orderItem.setPaymentState(PaymentState.CANCELLED);
-        } else {
-            orderItem.setPaymentState(PaymentState.UPDATED);
-            orderItemRepository.save(orderItem);
-        }
-        orders.setPaymentState(PaymentState.UPDATED);
-        orderRepository.save(orders);
-
     }
 
     public void validateStockState(Product product,OrderItem orderItem, Integer quantity) {
