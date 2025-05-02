@@ -14,8 +14,8 @@ import {
   Form,
   Input,
   Select,
+  notification,
 } from "antd";
-import { notification } from "antd";
 import {
   UserOutlined,
   TeamOutlined,
@@ -30,31 +30,40 @@ import {
 } from "../../services/UserService/AdminUserService";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const { Title } = Typography;
 
 const UserListWithDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal kontrolü
-  const [selectedUser, setSelectedUser] = useState(null); // Seçilen kullanıcı
-  const [form] = Form.useForm(); // Form objesi
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [form] = Form.useForm();
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState(0); // eklendi
+  const [pageSize, setPageSize] = useState(8);
   const navigate = useNavigate();
   const [api, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     const fetchUsers = async () => {
       const token = localStorage.getItem("token");
-
       try {
         const response = await axios.get(
-          "http://localhost:8082/api/admin/v1/users",
+          `http://localhost:8082/api/admin/v1/users?page=${
+            currentPage - 1
+          }&size=${pageSize}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setUsers(response.data);
-        // console.log(response.data);
+        setUsers(response.data.content);
+        setFilteredUsers(response.data.content);
+        setTotalElements(response.data.totalElements); // eklendi
       } catch (error) {
         console.error("Kullanıcılar alınamadı:", error);
       } finally {
@@ -63,7 +72,17 @@ const UserListWithDashboard = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [navigate, currentPage]);
+
+  useEffect(() => {
+    let filtered = users;
+    if (filterStatus === "ACTIVE") {
+      filtered = users.filter((user) => !user.isDeleted);
+    } else if (filterStatus === "PASSIVE") {
+      filtered = users.filter((user) => user.isDeleted);
+    }
+    setFilteredUsers(filtered);
+  }, [filterStatus, users]);
 
   const handleDelete = async (id) => {
     Modal.confirm({
@@ -94,39 +113,38 @@ const UserListWithDashboard = () => {
   };
 
   const handleEdit = (user) => {
-    console.log("Düzenlenecek Kullanıcı ID:", user.id);
-    setSelectedUser(user); // Seçilen kullanıcıyı ayarla
+    setSelectedUser(user);
     form.setFieldsValue({
       name: user.name,
       phone: user.phone,
       address: user.address,
       role: user.role,
     });
-    setIsModalVisible(true); // Modal'ı göster
+    setIsModalVisible(true);
   };
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      await updateUser(selectedUser.id, values); // Kullanıcıyı güncelleme servisi
+      await updateUser(selectedUser.id, values);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === selectedUser.id ? { ...user, ...values } : user
         )
       );
-      setIsModalVisible(false); // Modal'ı kapat
+      setIsModalVisible(false);
     } catch (error) {
       console.error("Güncelleme işlemi sırasında hata:", error);
     }
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false); // Modal'ı kapat
+    setIsModalVisible(false);
   };
 
   const totalUsers = users.length;
-  const activeUsers = users.filter((user) => user.status === "ACTIVE").length;
-  const passiveUsers = users.filter((user) => user.status !== "ACTIVE").length;
+  const activeUsers = users.filter((user) => !user.isDeleted).length;
+  const passiveUsers = users.filter((user) => user.isDeleted).length;
   const adminCount = users.filter((user) => user.role === "ADMIN").length;
 
   const columns = [
@@ -174,11 +192,14 @@ const UserListWithDashboard = () => {
     },
     {
       title: "Durum",
-      dataIndex: "status",
+      dataIndex: "isDeleted",
       key: "status",
-      render: (status) => (
-        <Tag color={status === "ACTIVE" ? "green" : "volcano"}>{status}</Tag>
-      ),
+      render: (isDeleted) =>
+        isDeleted ? (
+          <Tag color="red">Pasif</Tag>
+        ) : (
+          <Tag color="green">Aktif</Tag>
+        ),
     },
     {
       title: "İşlemler",
@@ -212,12 +233,7 @@ const UserListWithDashboard = () => {
         <Button
           icon={<HomeOutlined />}
           onClick={() => navigate("/admin")}
-          style={{
-            position: "absolute",
-            top: 24,
-            right: 24,
-            zIndex: 10,
-          }}
+          style={{ position: "absolute", top: 24, right: 24, zIndex: 10 }}
         >
           Anasayfaya Dön
         </Button>
@@ -269,11 +285,26 @@ const UserListWithDashboard = () => {
       </Row>
 
       <Card
-        style={{
-          borderRadius: 12,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        }}
+        style={{ borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
       >
+        <div
+          style={{
+            marginBottom: 16,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Select
+            value={filterStatus}
+            onChange={(value) => setFilterStatus(value)}
+            style={{ width: 200 }}
+          >
+            <Select.Option value="ALL">Tüm Kullanıcılar</Select.Option>
+            <Select.Option value="ACTIVE">Aktif Kullanıcılar</Select.Option>
+            <Select.Option value="PASSIVE">Pasif Kullanıcılar</Select.Option>
+          </Select>
+        </div>
+
         {loading ? (
           <Spin
             size="large"
@@ -281,16 +312,20 @@ const UserListWithDashboard = () => {
           />
         ) : (
           <Table
-            dataSource={users}
+            dataSource={filteredUsers}
             columns={columns}
             rowKey={(record) => record.id}
-            pagination={{ pageSize: 8 }}
+            pagination={{
+              current: currentPage,
+              total: totalElements,
+              pageSize: pageSize,
+              onChange: (page) => setCurrentPage(page),
+            }}
             bordered
           />
         )}
       </Card>
 
-      {/* Modal for editing user */}
       <Modal
         title="Kullanıcıyı Güncelle"
         open={isModalVisible}
@@ -298,16 +333,7 @@ const UserListWithDashboard = () => {
         onCancel={handleCancel}
         destroyOnClose
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            name: selectedUser?.name,
-            phone: selectedUser?.phone,
-            address: selectedUser?.address,
-            role: selectedUser?.role,
-          }}
-        >
+        <Form form={form} layout="vertical">
           <Form.Item
             name="name"
             label="Ad Soyad"
@@ -318,7 +344,7 @@ const UserListWithDashboard = () => {
           <Form.Item
             name="phone"
             label="Telefon"
-            rules={[{ required: true, message: "Telefon numarası giriniz!" }]}
+            rules={[{ required: true, message: "Telefon giriniz!" }]}
           >
             <Input />
           </Form.Item>
