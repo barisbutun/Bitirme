@@ -83,7 +83,7 @@ const AdminDashboard = () => {
         users,
         favourites,
         reviews,
-        categoryProductResponse,
+        categoryProductRes,
       ] = await Promise.all([
         axios.get("http://localhost:8082/api/admin/v1/product/count", config),
         axios.get("http://localhost:8082/api/admin/v1/category/count", config),
@@ -104,10 +104,10 @@ const AdminDashboard = () => {
       setCategoryCount(categories.data);
       // setOrderList(orders.data.content);
       setUserCount(users.data);
-      setFavouriteCount(favourites.data.length);
+      setFavouriteCount(favourites.data.content.length);
       setReviewCount(reviews.data.length);
-      setCategoryProduct(categoryProductResponse.data);
-      const categoryData = Object.entries(categoryProductResponse.data).map(
+      setCategoryProduct(categoryProduct.data);
+      const categoryData = Object.entries(categoryProductRes.data).map(
         ([key, value]) => ({
           name: key,
           value: value,

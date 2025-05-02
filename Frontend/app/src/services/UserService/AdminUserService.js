@@ -2,31 +2,39 @@ import { getToken,getAuthHeaders,getUserIdFromToken } from "../../utils/auth";
 // API URL
 const API_URL = 'http://localhost:8082/api/admin/v1/users';
 
-// Kullanıcıları alma (filtreleme)
-export const getAllUsers = async () => {
-    const token = getToken();
-    try {
-    const response = await fetch(API_URL, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-  
-    if (!response.ok) {
-      throw new Error('Kullanıcılar alınırken bir hata oluştu!');
-    }
-  
-    const data = await response.json();
-    // console.log('serviceden gelen veriler',data);
-    return data;
-   }catch(error){
-    console.error('service error:',error);
-    throw error;
-   } 
+/// Kullanıcıları alma (filtreleme) - Sayfalama ile
+export const getAllUsers = async (page = 0, size = 10) => {
+  const token = getToken();
+  try {
+      const response = await fetch(`http://localhost:8082/api/admin/v1/users?page=${page}&size=${size}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+          },
+      });
 
-  };
+      if (!response.ok) {
+          throw new Error('Kullanıcılar alınırken bir hata oluştu!');
+      }
+
+      const data = await response.json();
+
+      // Pagination bilgilerini ve kullanıcıları döndür
+      return {
+          users: data.content, // Assuming 'content' contains the user list
+          totalPages: data.totalPages,
+          totalElements: data.totalElements,
+          currentPage: data.page,
+          pageSize: data.size,
+      };
+
+  } catch (error) {
+      console.error('service error:', error);
+      throw error;
+  }
+};
+
   
   
 
@@ -73,7 +81,7 @@ export const updateUser = async (id, user) => {
 
 // Silme işlemi
 export const deleteUser = async (id) => {
-  const response = await fetch(`http://localhost:8082/api/admin/v1/user/${id}`, { 
+  const response = await fetch(` http://localhost:8082/api/admin/v1/user/${id}`, { 
     method: 'DELETE',
     headers: getAuthHeaders(), 
   });
@@ -82,7 +90,7 @@ export const deleteUser = async (id) => {
     throw new Error('Kullanıcı silinirken bir hata oluştu!');
   }
 
-  // Eğer 204 No Content ise JSON parse etmeye çalışma
+  
   if (response.status === 204) {
     return;
   }
