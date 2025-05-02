@@ -4,7 +4,7 @@ const API_BASE_URL = "http://localhost:8082/api/auth/v1";
 
 export const login = async (email, password) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`http://localhost:8082/api/auth/v1/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

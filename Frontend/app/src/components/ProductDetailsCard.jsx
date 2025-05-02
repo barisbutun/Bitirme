@@ -9,6 +9,7 @@ import {
   notification,
   Tooltip,
   Skeleton,
+  Collapse,
 } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import "../css/ProductDetailsCard.css";
@@ -19,9 +20,12 @@ import {
 } from "../services/ProductService/FavoriteService";
 import { getReviewCount } from "../services/ProductService/ReviewService";
 
+const { Panel } = Collapse;
+
 const ProductDetailsCard = ({ product, images }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [reviewCount, setReviewCount] = useState(0); // ✅ Yorum sayısı state
+  const [reviewCount, setReviewCount] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
     if (product) {
@@ -99,6 +103,24 @@ const ProductDetailsCard = ({ product, images }) => {
     }
   };
 
+  const handleSizeClick = (size, count) => {
+    if (count > 0) {
+      setSelectedSize(size);
+    }
+  };
+
+  const getTotalQuantity = (qty) => {
+    if (typeof qty === "number") return qty;
+    if (typeof qty === "object") {
+      return Object.values(qty).reduce((acc, val) => acc + val, 0);
+    }
+    return 0;
+  };
+
+  const isAvailable =
+    product?.stock_state?.toUpperCase() === "AVAILABLE" &&
+    getTotalQuantity(product?.quantity) > 0;
+
   return (
     <Card className="product-details-card">
       <Row gutter={16}>
@@ -126,7 +148,6 @@ const ProductDetailsCard = ({ product, images }) => {
         <Col span={14}>
           <h2 className="product-details-title">{product.name}</h2>
 
-          {/* ⭐ Puan ve yorum sayısı birlikte */}
           <Tooltip title={`${reviewCount} yorum`}>
             <Rate
               allowHalf
@@ -137,6 +158,26 @@ const ProductDetailsCard = ({ product, images }) => {
           <p style={{ marginTop: 4 }}>{reviewCount} yorum</p>
 
           <p className="product-details-price">{product.price} TL</p>
+
+          {typeof product.quantity === "object" && (
+            <div className="product-sizes">
+              <h4 style={{ margin: "10px 0 5px" }}>Beden Seçimi</h4>
+              <div className="size-boxes">
+                {Object.entries(product.quantity).map(([size, count]) => (
+                  <div
+                    key={size}
+                    className={`size-box ${
+                      selectedSize === size ? "selected" : ""
+                    } ${count === 0 ? "out-of-stock" : ""}`}
+                    onClick={() => handleSizeClick(size, count)}
+                  >
+                    <div className="size-label">{size}</div>
+                    {/* Stok bilgisi gösterilmiyor */}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <Button type="primary" size="large" onClick={addToCartHandler}>
             Sepete Ekle
@@ -153,6 +194,24 @@ const ProductDetailsCard = ({ product, images }) => {
               <HeartOutlined style={{ fontSize: "24px" }} />
             )}
           </button>
+
+          {/* Açılır/Kapanır Bilgi Alanları */}
+          <Collapse className="extra-collapse" bordered={false}>
+            <Panel header="Model Bilgileri" key="1">
+              <ul className="extra-info-list">
+                Modelin Üzerindeki Beden: S, Modelin Ölçüleri: Boy: 175 cm,
+                Göğüs: 86 cm, Bel: 60 cm, Basen: 90 cm"
+              </ul>
+            </Panel>
+            <Panel header="Satış Şartları" key="2">
+              <ul className="extra-info-list">
+                <li>Ücretsiz kargo ile gönderim</li>
+                <li>14 gün içinde iade garantisi</li>
+                <li>Kapıda ödeme seçeneği mevcut</li>
+                <li>Tüm kredi kartlarına taksit imkanı</li>
+              </ul>
+            </Panel>
+          </Collapse>
         </Col>
       </Row>
     </Card>

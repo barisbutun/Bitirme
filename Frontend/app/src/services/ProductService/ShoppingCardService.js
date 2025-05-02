@@ -1,3 +1,4 @@
+import { message } from "antd";
 import { getUserIdFromToken, getToken } from "../../utils/auth";
 import { fetchProductImages } from "../ProductService/ProductService";
 const API_BASE_URL = "http://localhost:8082/api/shoppingCartItem/v1";
@@ -113,11 +114,15 @@ export const clearCartByUserId = async () => {
 
 
 // Sepetteki tüm ürünleri getirme
-
 export const getCartByUserId = async () => {
   const token = getToken();
+
   if (!token) {
-    throw new Error("Kullanıcı girişi yapılmamış");
+    message.warning({
+      content: "Kullanıcı girişi yapılmamış",
+      key: "login-warning", 
+    });
+    return;
   }
 
   try {
@@ -129,32 +134,26 @@ export const getCartByUserId = async () => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Sepet verisi alınamadı");
+      throw new Error("Sepet verisi alınamadı");
     }
 
     const cartItems = await response.json();
     console.log("Backend'den gelen ham sepet verisi:", cartItems);
 
-    // Verinin 'content' özelliğini kontrol et
     if (!cartItems.content || !Array.isArray(cartItems.content)) {
       throw new Error("Geçersiz sepet verisi");
     }
 
-    // Eğer sepet boşsa
     if (cartItems.content.length === 0) {
       console.log("Sepetiniz boş.");
-      return []; // Boş bir dizi döndür
+      return [];
     }
 
-    // Her bir sepet öğesi için ürün bilgilerini düzenle
     const cartItemsWithImages = await Promise.all(
       cartItems.content.map(async (item) => {
         try {
-          // Ürün resmini al
           const images = await fetchProductImages(item.product_id);
 
-          // Ürün bilgilerini düzenle
           return {
             id: item.id,
             quantity: item.quantity,

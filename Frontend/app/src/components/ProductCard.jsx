@@ -8,6 +8,7 @@ import {
   Tooltip,
   Spin,
   Skeleton,
+  Descriptions,
 } from "antd";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { CardText, CardTitle } from "reactstrap";
@@ -19,7 +20,7 @@ import {
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
 import { isAuthenticated, getToken } from "../utils/auth";
-import { getReviewCount } from "../services/ProductService/ReviewService"; // API'den review count almak için service
+import { getReviewCount } from "../services/ProductService/ReviewService";
 
 function ProductCard({
   id,
@@ -27,7 +28,7 @@ function ProductCard({
   image,
   price,
   quantity,
-  stock_state, // 'AVAILABLE' or 'UNAVAILABLE'
+  stock_state,
   description,
   category_id,
   categoryId,
@@ -37,23 +38,20 @@ function ProductCard({
 }) {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(() => {
-    // Favori durumunu backend'den gelen veriye göre kontrol et
     return favorite.some((fav) => fav.product_id === id);
   });
 
-  // State for review count and average rating
   const [reviewCount, setReviewCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
 
-  // Fetch review count and rating data on component mount
   useEffect(() => {
     const fetchReviewData = async () => {
       try {
         const reviewCountData = await getReviewCount(id);
         setReviewCount(reviewCountData);
 
-        // Diğer API çağrılarıyla averageRating'i de alabilirsin
-        const averageRatingData = 4.2; // Örnek: backend'den gelen ortalama puan
+        const averageRatingData = 4.2; // örnek değer
         setAverageRating(averageRatingData);
       } catch (error) {
         console.error("Review verisi alınamadı:", error);
@@ -97,7 +95,8 @@ function ProductCard({
     }
   };
 
-  const toggleFavoriteHandler = async () => {
+  const toggleFavoriteHandler = async (e) => {
+    e.stopPropagation(); // kart yönlendirmesini engelle
     try {
       const effectiveCategoryId = category_id || categoryId;
       let success;
@@ -136,11 +135,19 @@ function ProductCard({
     });
   };
 
+  const getTotalQuantity = (qty) => {
+    if (typeof qty === "number") return qty;
+    if (typeof qty === "object") {
+      return Object.values(qty).reduce((acc, val) => acc + val, 0);
+    }
+    return 0;
+  };
+
   const isAvailable =
-    stock_state && stock_state.toUpperCase() === "AVAILABLE" && quantity > 0;
+    stock_state?.toUpperCase() === "AVAILABLE" &&
+    getTotalQuantity(quantity) > 0;
 
   const handleCardClick = () => {
-    // Ürün detay sayfasına yönlendirme yapıyoruz
     navigate(`/user/ProductDetails/${id}`, {
       state: {
         product: {
@@ -171,6 +178,7 @@ function ProductCard({
       <CardTitle className="product-title" tag="h3">
         {name}
       </CardTitle>
+
       <div className="image-container">
         {image ? (
           <Image
@@ -193,7 +201,6 @@ function ProductCard({
         {isAvailable ? "Stokta Var" : "Stokta Yok"}
       </CardText>
 
-      {/* Yorum sayısı ve ortalama puanı burada gösteriyoruz */}
       <div style={{ marginTop: "10px" }}>
         <Tooltip title={`${reviewCount} yorum`}>
           <Rate allowHalf disabled defaultValue={averageRating} />
@@ -202,13 +209,20 @@ function ProductCard({
       </div>
 
       {isAvailable && (
-        <CardText className="product-info">Kalan Miktar: {quantity}</CardText>
+        <>
+          <CardText className="product-info">
+            Toplam Kalan Miktar: {getTotalQuantity(quantity)}
+          </CardText>
+        </>
       )}
 
       <div className="product-buttons">
         <Button
           className="SepetButon"
-          onClick={addToCartHandler}
+          onClick={(e) => {
+            e.stopPropagation(); // kart tıklamasını engelle
+            addToCartHandler();
+          }}
           disabled={!isAvailable}
         >
           Sepete Ekle

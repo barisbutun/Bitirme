@@ -12,7 +12,7 @@ export const fetchProducts = async (page = 0, size = 10) => {
     });
 
     if (!response.ok) {
-      throw new Error("Ürün bilgileri alınamadı");
+      // throw new Error("Ürün bilgileri alınamadı");
     }
 
     const data = await response.json();
