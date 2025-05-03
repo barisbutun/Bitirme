@@ -7,6 +7,7 @@ import org.example.bitirmeprojesi.enums.RefundStatus;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Refund}
@@ -18,8 +19,8 @@ import java.util.List;
 public class RefundDto implements Serializable {
 
 
-
-    private Long id;
+    @JsonProperty("id")
+    private UUID id;
 
     @JsonProperty("description")
     private String description;
@@ -32,6 +33,7 @@ public class RefundDto implements Serializable {
     @JsonProperty("refund_reason")
     private String refundReason;
 
+    @JsonProperty("status")
     private RefundStatus status;
 
     @JsonProperty("order_items")

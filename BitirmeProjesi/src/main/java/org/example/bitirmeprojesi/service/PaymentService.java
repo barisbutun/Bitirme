@@ -56,6 +56,7 @@ public class PaymentService {
         Payment payment = paymentMapper.toEntity(paymentDto);
         payment.setPaymentState(PaymentState.SUCCESS);
         payment.setOrder(orders);
+        payment.setUser(user);
         orders.setPayment(payment);
         orders.setPaymentState(PaymentState.SUCCESS);
 
