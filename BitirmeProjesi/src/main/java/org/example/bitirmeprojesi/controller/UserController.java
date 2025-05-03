@@ -29,6 +29,12 @@ public class UserController {
         return ResponseEntity.ok(userProfileDto);
     }
 
+    @GetMapping("/v1")
+    public ResponseEntity<UserDto> findById() {
+        UUID userId=JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(userService.findById(userId));
+    }
+
     @DeleteMapping("/v1")
     public ResponseEntity<Void> delete() {
         UUID userId = JwtUtil.getUserIdFromToken();
