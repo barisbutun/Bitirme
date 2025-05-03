@@ -27,6 +27,7 @@ public class CancellationDto {
     @JsonProperty("order_id")
     private Long orderId;
 
+    @JsonProperty("order_items")
     private List<OrderItemCancellationDto> orderItems;
 
 
