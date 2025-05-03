@@ -37,6 +37,7 @@ public class OrderItem {
     private Orders order;
 
     @Column(name = "payment_state")
+    @Enumerated(EnumType.STRING)
     private PaymentState paymentState;
 
 
@@ -49,11 +50,11 @@ public class OrderItem {
     @Column(name = "size")
     private Size size;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "cancellation_id")
     private Cancellation cancellation;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Refund refund;
 
 

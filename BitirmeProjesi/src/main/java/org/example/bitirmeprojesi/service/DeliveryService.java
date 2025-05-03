@@ -24,6 +24,8 @@ public class DeliveryService {
     public DeliveryDto create(DeliveryDto deliveryDto, Orders orders) {
         Delivery delivery = deliveryMapper.toEntity(deliveryDto);
         delivery.setDeliveryState(DeliveryStatus.PENDING);
+        orders.setDelivery(delivery);
+        delivery.setCompanyName("Fashion Design");
         delivery.setOrder(orders);
         deliveryRepository.save(delivery);
         return deliveryMapper.toDto(delivery);

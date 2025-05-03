@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.CancellationDto;
 import org.example.bitirmeprojesi.service.CancellationService;
 import org.example.bitirmeprojesi.util.JwtUtil;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,12 +44,12 @@ public class CancellationController {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(cancellationService.update(cancellationDto,id, userId));
     }
-
+/*
     @GetMapping("/v1")
     public ResponseEntity<Page<CancellationDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,
                                                          @RequestParam(required = false, defaultValue = "10") int size) {
 
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(cancellationService.findAllByUserId(userId,page, size));
-    }
+    }*/
 }

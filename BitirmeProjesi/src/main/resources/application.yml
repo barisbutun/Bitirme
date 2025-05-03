@@ -35,6 +35,8 @@ spring:
       show-sql: true
       properties:
         hibernate:
+          SQL: DEBUG
+          format_sql: true
           dialect: org.hibernate.dialect.PostgreSQLDialect
 
   security:

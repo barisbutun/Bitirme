@@ -29,6 +29,7 @@ public class ShoppingCartItem {
     private Integer quantity;
 
     @Column(name = "size", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Size size;
 
     @ManyToOne

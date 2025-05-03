@@ -17,6 +17,8 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
 
     void deleteAllByUserId(UUID userId);
 
+    boolean existsByUserIdAndProductId(UUID userId, Long productId);
+
     Page<ShoppingCartItem> findByUserId(UUID userId, Pageable pageable);
 
 }

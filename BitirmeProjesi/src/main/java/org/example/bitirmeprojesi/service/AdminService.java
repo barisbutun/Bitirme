@@ -47,8 +47,8 @@ public class AdminService {
         return cancellationService.update(cancellationDto, id,userId);
     }
 
-    public PaymentDto updatePayment(PaymentDto paymentDto,UUID id) {
-        return paymentService.update(paymentDto, id);
+    public PaymentDto updatePayment(PaymentDto paymentDto,UUID id,UUID userId) {
+        return paymentService.update(paymentDto, id,userId);
     }
 
     public void deleteCancellation(Long id) {

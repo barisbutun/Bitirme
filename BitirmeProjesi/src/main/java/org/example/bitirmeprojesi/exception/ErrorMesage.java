@@ -28,4 +28,7 @@ public class ErrorMesage {
     public static final String DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR="Delivered order should be refunded";
     public static final String CANCELLATION_NOT_FOUND_ERROR="Cancellation does not exist in our systems";
     public static final String PAYMENT_NOT_SUCCESSFUL_CANCELLATION_ERROR="It is not possible to cancel a missing payment or a failed payment";
+    public static final String EXIST_BY_SHOPPING_CART_ITEM_ERROR="That product already exist in our system";
+    public static final String PAYMENT_NOT_COMPLETED_ERROR="Requesting a refund for products whose payment was not successful.";
+    public static final String REFUND_NOT_FOUND_ERROR="Refund does not exist in our systems";
 }

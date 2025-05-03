@@ -3,8 +3,10 @@ package org.example.bitirmeprojesi.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.example.bitirmeprojesi.enums.RefundStatus;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * DTO for {@link org.example.bitirmeprojesi.entity.Refund}
@@ -15,12 +17,26 @@ import java.io.Serializable;
 @Setter
 public class RefundDto implements Serializable {
 
-    @NotBlank(message = "Order id cannot be empty")
-    @JsonProperty("order_id")
-    private long order_id;
 
+
+    private Long id;
+
+    @JsonProperty("description")
+    private String description;
+
+    @JsonProperty("order_id")
+    @NotBlank(message = "Order id cannot be empty")
+    private Long orderId;
 
     @NotBlank(message = "Refund reason cannot be empty")
     @JsonProperty("refund_reason")
-    String refundReason;
+    private String refundReason;
+
+    private RefundStatus status;
+
+    @JsonProperty("order_items")
+    private List<OrderItemRefundDto> orderItems;
+
+
+
 }

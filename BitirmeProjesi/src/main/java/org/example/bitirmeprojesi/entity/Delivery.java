@@ -34,6 +34,7 @@ public class Delivery {
     private Orders order;
 
     @Column(name = "delivery_state")
+    @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryState;
 
     @Column(name = "delivery_date")

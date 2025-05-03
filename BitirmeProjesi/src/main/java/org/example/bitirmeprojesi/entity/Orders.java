@@ -51,9 +51,8 @@ public class Orders implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonManagedReference
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "delivery_id",referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "delivery_id", referencedColumnName = "id")
     private Delivery delivery;
 
     @JsonManagedReference
@@ -65,7 +64,7 @@ public class Orders implements Serializable {
     private Cancellation cancellation;
 
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 

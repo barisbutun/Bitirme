@@ -43,7 +43,8 @@ public class AdminController {
     @PutMapping("/v1/payment/{id}")
     public ResponseEntity<PaymentDto> updatePayment(@PathVariable UUID id, @Valid @RequestBody PaymentDto paymentDto) {
 
-        PaymentDto updatedPayment = adminService.updatePayment(paymentDto, id);
+        UUID userId = JwtUtil.getUserIdFromToken();
+        PaymentDto updatedPayment = adminService.updatePayment(paymentDto, id, userId);
         return ResponseEntity.ok(updatedPayment);
     }
 

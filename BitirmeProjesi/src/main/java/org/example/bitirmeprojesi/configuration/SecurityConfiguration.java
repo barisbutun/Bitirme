@@ -80,6 +80,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/categories/v1/**").permitAll();
                     auth.requestMatchers("/api/chatbot/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.requestMatchers("/api/review/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
+                    auth.requestMatchers("/api/payment/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.anyRequest().permitAll();
                 });
         http.oauth2ResourceServer(
@@ -150,20 +151,3 @@ public class SecurityConfiguration {
         return (CorsConfigurationSource) source;
     }
 }
- /*.formLogin(form -> form // Manuel login işlemi için formLogin kullan
-                        .loginPage("/api/user/v1/login")  // Manuel login endpoint'i
-                        .permitAll()
-                );*/
-
-                /*.oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/oauth2/authorize") // OAuth2 endpoint
-                        )
-                        .tokenEndpoint(token -> token
-                                .accessTokenResponseClient(oAuth2AccessTokenResponseClient())
-                        )
-                        .defaultSuccessUrl("/api/user/v1/x", true) // OAuth2 login başarılı olduğunda
-                )
-                // Oturum yönetimi
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-*/
