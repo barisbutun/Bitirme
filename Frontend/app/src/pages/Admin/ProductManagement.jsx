@@ -16,6 +16,7 @@ import {
   Modal,
   Table,
   Tag,
+  InputNumber,
 } from "antd";
 import {
   PlusOutlined,
@@ -77,8 +78,31 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stockModalOpen, setStockModalOpen] = useState(false);
-  const [productDataOverTime, setProductDataOverTime] = useState([]);
+  const [productDataOverTimes, setProductDataOverTime] = useState();
   const [categoryDistribution, setCategoryDistribution] = useState([]);
+
+  const productDataOverTime = [
+    {
+      productName: "İnce uzun desenli bluz",
+      stockHistory: [
+        { date: "2024-12", stock: 50 },
+        { date: "2025-01", stock: 70 },
+        { date: "2025-02", stock: 90 },
+        { date: "2025-03", stock: 100 },
+        { date: "2025-03", stock: 0 },
+      ],
+    },
+    {
+      productName: "Kısa kollu tişört",
+      stockHistory: [
+        { date: "2024-12", stock: 200 },
+        { date: "2025-01", stock: 180 },
+        { date: "2025-02", stock: 160 },
+        { date: "2025-03", stock: 150 },
+        { date: "2025-04", stock: 60 },
+      ],
+    },
+  ];
 
   // Stok durumu için tablo
   const columns = [
@@ -92,13 +116,16 @@ const AdminDashboard = () => {
       dataIndex: "quantity",
       key: "quantity",
       render: (quantity) => {
-        let color = "green";
-        if (quantity <= 10) {
-          color = "red";
-        } else if (quantity <= 20) {
-          color = "orange";
-        }
-        return <Tag color={color}>{quantity}</Tag>;
+        if (!quantity) return "Bilinmiyor";
+
+        return Object.entries(quantity).map(([size, count]) => (
+          <Tag
+            color={count < 20 ? "red" : count < 100 ? "orange" : "green"}
+            key={size}
+          >
+            {size}: {count}
+          </Tag>
+        ));
       },
     },
     {
@@ -197,7 +224,7 @@ const AdminDashboard = () => {
           name: values.productName,
           description: values.description,
           price: parseFloat(values.price),
-          quantity: parseInt(values.quantity, 10),
+          quantity: values.quantity,
           category_id: parseInt(values.category),
         };
         const created = await createProduct(productData);
@@ -212,7 +239,7 @@ const AdminDashboard = () => {
           name: values.productName,
           description: values.description,
           price: parseFloat(values.price),
-          quantity: parseInt(values.quantity, 10),
+          quantity: values.quantity,
           category_id: parseInt(values.category),
         };
         await updateProduct(selectedProduct.id, updatedProductData);
@@ -326,16 +353,26 @@ const AdminDashboard = () => {
       <Row gutter={[24, 24]} style={{ marginTop: "48px" }}>
         <Col xs={24} md={12}>
           <Card
-            title="Ürün Artışı (Line Chart)"
+            title="Zamana Göre Ürün Stok Değişimi"
             style={{ borderRadius: "16px" }}
           >
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={productDataOverTime}>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={productDataOverTime[0].stockHistory}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="date" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Line type="monotone" dataKey="ürünler" stroke="#8884d8" />
+
+                {productDataOverTime.map((product, index) => (
+                  <Line
+                    key={index}
+                    type="monotone"
+                    dataKey="stock"
+                    data={product.stockHistory}
+                    stroke={index % 2 === 0 ? "#8884d8" : "#82ca9d"}
+                    name={product.productName}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -391,7 +428,8 @@ const AdminDashboard = () => {
         open={drawerOpen}
         onCancel={() => setDrawerOpen(false)}
         footer={null}
-        width="50%"
+        width="40%"
+        height="100%"
         style={{
           overflow: "auto",
           paddingBottom: "10px",
@@ -440,12 +478,74 @@ const AdminDashboard = () => {
             <Input type="number" placeholder="Fiyat" />
           </Form.Item>
 
-          <Form.Item
-            name="quantity"
-            label="Stok"
-            rules={[{ required: true, message: "Stok sayısı giriniz" }]}
-          >
-            <Input type="number" placeholder="Stok" />
+          <Form.Item label="Stok">
+            <div
+              style={{
+                border: "1px solid #d9d9d9",
+                borderRadius: "6px",
+                padding: "16px",
+                marginBottom: "24px",
+              }}
+            >
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item
+                    label="XS"
+                    name={["quantity", "XS"]}
+                    rules={[{ required: true, message: "XS bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="S"
+                    name={["quantity", "S"]}
+                    rules={[{ required: true, message: "S bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="M"
+                    name={["quantity", "M"]}
+                    rules={[{ required: true, message: "M bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item
+                    label="L"
+                    name={["quantity", "L"]}
+                    rules={[{ required: true, message: "L bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="XL"
+                    name={["quantity", "XL"]}
+                    rules={[{ required: true, message: "XL bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="XXL"
+                    name={["quantity", "XXL"]}
+                    rules={[{ required: true, message: "XXL bedeni giriniz" }]}
+                  >
+                    <InputNumber min={0} style={{ width: "100%" }} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
           </Form.Item>
 
           <Form.Item

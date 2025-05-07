@@ -132,7 +132,7 @@ export const addCategory = async (categoryData) => {
 export const deleteCategory = async (id) => {
   const response = await fetch(`${API_URL}/category/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(), 
   });
   if (!response.ok) {
     throw new Error("Kategori silinirken bir hata oluştu.");

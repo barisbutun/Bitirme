@@ -133,8 +133,31 @@ const UserListWithDashboard = () => {
         )
       );
       setIsModalVisible(false);
+      api.success({
+        message: "Başarılı",
+        description: "Kullanıcı başarıyla güncellendi.",
+        placement: "topRight",
+      });
     } catch (error) {
       console.error("Güncelleme işlemi sırasında hata:", error);
+
+      // Eğer özel hata mesajı varsa kontrol et
+      if (
+        error.message.includes("duplicate key") &&
+        error.message.includes("phone")
+      ) {
+        api.error({
+          message: "Hata",
+          description: "Kullanıcı güncellenirken bir hata oluştu.",
+          placement: "topRight",
+        });
+      } else {
+        api.error({
+          message: "Hata",
+          description: "Bu telefon numarası başka bir kullanıcıya ait!",
+          placement: "topRight",
+        });
+      }
     }
   };
 

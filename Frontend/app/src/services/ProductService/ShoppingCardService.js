@@ -16,7 +16,9 @@ export const addToCart = async (productData) => {
       method: "POST",
       body: JSON.stringify({
         product_id: productData.product_id,
-        quantity: productData.quantity
+        description:productData.description,
+        quantity: productData.quantity,
+        Size:productData.Size,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -188,26 +190,6 @@ export const getCartByUserId = async () => {
   }
 };
 
-//Ürün detaylarını getiren fonksiyon
-export const getProductDetails = async (productId) => {
-  const token = getToken();
-  if (!token) {
-    throw new Error("Kullanıcı girişi yapılmamış");
-  }
-
-  const response = await fetch(``, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Ürün detayları alınamadı.");
-  }
-
-  return await response.json();
-};
 
 // Yeni fonksiyon: updateCartItemQuantity
 export const updateCartItemQuantity = async (itemId, quantity) => {

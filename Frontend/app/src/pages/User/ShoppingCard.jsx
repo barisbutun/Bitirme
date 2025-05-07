@@ -14,7 +14,6 @@ import {
   removeFromCart,
   getCartByUserId,
   clearCartByUserId,
-  getProductDetails,
   updateCartItemQuantity,
 } from "../../services/ProductService/ShoppingCardService";
 
@@ -22,40 +21,33 @@ const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [expandedRowData, setExpandedRowData] = useState(null); // Detaylar için yeni state
+
   const navigate = useNavigate();
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedRowDetails, setExpandedRowDetails] = useState({});
 
-  // Sepet verilerini getiren fonksiyon
   const loadCartItems = async () => {
-    try {
-      if (!isAuthenticated()) {
-        notification.warning({
-          message: "Giriş Gerekli",
-          description: "Lütfen önce giriş yapın.",
-          placement: "topRight",
-        });
-        navigate("/login");
-        return;
-      }
+    if (!isAuthenticated()) {
+      notification.warning({
+        message: "Giriş Gerekli",
+        description: "Lütfen önce giriş yapın.",
+        placement: "topRight",
+      });
+      navigate("/login");
+      return;
+    }
 
+    try {
       const userId = getUserIdFromToken();
-      if (!userId) {
-        throw new Error("Kullanıcı bilgisi alınamadı");
-      }
+      if (!userId) throw new Error("Kullanıcı bilgisi alınamadı");
 
       setLoading(true);
       const cartItems = await getCartByUserId(userId);
-      console.log("Backend'den gelen sepet verisi:", cartItems);
-
-      if (cartItems && cartItems.length > 0) {
-        setData(cartItems);
-      } else {
-        throw new Error("Sepetiniz boş.");
-      }
+      setData(cartItems || []);
     } catch (error) {
       notification.error({
         message: "Hata",
-        description: error.message || "Sepet verisi alınamadı ",
+        description: error.message || "Sepet verisi alınamadı",
         placement: "topRight",
       });
     } finally {
@@ -65,7 +57,7 @@ const ShoppingCard = () => {
 
   useEffect(() => {
     loadCartItems();
-  }, [navigate]);
+  }, []);
 
   const handleOrder = async () => {
     try {
@@ -80,37 +72,42 @@ const ShoppingCard = () => {
         return;
       }
 
-      // Sipariş verilerini oluştur
+      const content = data.map((item) => ({
+        id: item.id,
+        product_id: item.product.id,
+        name: item.product.name,
+        description: item.product.description,
+        price: item.product.price,
+        quantity: item.quantity,
+        Size: item.product.Size || "",
+      }));
+
       const orderData = {
-        description: "Sipariş Açıklaması", // İsteğe bağlı açıklama
-        name: "Sipariş Adı", // İsteğe bağlı sipariş adı
-        sale_date: new Date().toISOString().slice(0, 19).replace("T", " "), // Şu anki tarih ve saat
+        description: "Sipariş Açıklaması",
+        name: "Sipariş Adı",
+        sale_date: new Date().toISOString().slice(0, 19).replace("T", " "),
         sum_price: data
           .reduce(
             (total, item) => total + item.product.price * item.quantity,
             0
           )
-          .toFixed(2), // Toplam fiyat
+          .toFixed(2),
         stock_state: "AVAILABLE",
-        payment_state: "SUCCESS", // Stok durumu
-        content: data,
+        payment_state: "SUCCESS",
+        content: content,
       };
 
-      // Siparişi oluştur
       const response = await fetch("http://localhost:8082/api/order/v1", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify(orderData.content), // JSON formatında gönderiyoruz
+        body: JSON.stringify(orderData.content),
       });
 
-      if (!response.ok) {
-        throw new Error("Sipariş oluşturulamadı");
-      }
+      if (!response.ok) throw new Error("Sipariş oluşturulamadı");
 
-      // Sepeti temizle
       await clearCartByUserId();
 
       notification.success({
@@ -119,7 +116,6 @@ const ShoppingCard = () => {
         placement: "topRight",
       });
 
-      // Siparişler sayfasına yönlendir
       navigate("/Orders");
     } catch (error) {
       notification.error({
@@ -130,34 +126,16 @@ const ShoppingCard = () => {
     }
   };
 
-  // Sepetten ürün çıkarma işlemi
   const handleRemoveFromCart = async (itemId) => {
     try {
-      if (!itemId) {
-        notification.error({
-          message: "Hata",
-          description: "Geçersiz ürün ID'si",
-          placement: "topRight",
-        });
-        return;
-      }
-
-      // ID'yi sayıya çevir
-      const cartItemId = parseInt(itemId, 10);
-
-      console.log("Silinecek ürün ID:", cartItemId);
-
-      await removeFromCart(cartItemId);
-
+      await removeFromCart(itemId);
       notification.success({
         message: "Başarılı",
         description: "Ürün sepetten çıkarıldı",
         placement: "topRight",
       });
-
-      // Sepeti yenile
       loadCartItems();
-    } catch (error) {
+    } catch {
       notification.error({
         message: "Hata",
         description: "Ürün sepetten çıkarılamadı",
@@ -167,39 +145,33 @@ const ShoppingCard = () => {
   };
 
   const handleQuantityChange = async (itemId, change) => {
+    const item = data.find((product) => product.id === itemId);
+    if (!item) {
+      notification.error({
+        message: "Hata",
+        description: "Ürün bulunamadı",
+        placement: "topRight",
+      });
+      return;
+    }
+
+    const newQuantity = item.quantity + change;
+    if (newQuantity < 1) {
+      notification.error({
+        message: "Hata",
+        description: "Miktar en az 1 olmalıdır",
+        placement: "topRight",
+      });
+      return;
+    }
+
     try {
-      // Mevcut ürünün miktarını bul
-      const item = data.find((product) => product.id === itemId);
-      if (!item) {
-        notification.error({
-          message: "Hata",
-          description: "Ürün bulunamadı",
-          placement: "topRight",
-        });
-        return;
-      }
-
-      // Yeni miktarı hesapla
-      const newQuantity = item.quantity + change;
-      if (newQuantity < 1) {
-        notification.error({
-          message: "Hata",
-          description: "Miktar en az 1 olmalıdır",
-          placement: "topRight",
-        });
-        return;
-      }
-
-      // API çağrısı yaparak miktarı güncelle
       await updateCartItemQuantity(itemId, newQuantity);
-
       notification.success({
         message: "Başarılı",
         description: "Ürün miktarı güncellendi",
         placement: "topRight",
       });
-
-      // Sepeti yenile
       loadCartItems();
     } catch (error) {
       notification.error({
@@ -210,19 +182,6 @@ const ShoppingCard = () => {
     }
   };
 
-  const handleExpandRow = async (record) => {
-    console.log("Genişletilen kayıt:", record); // Hata ayıklama için
-    if (record.product && record.product.id) {
-      const details = await getProductDetails(record.product.id); // Doğru ID'yi geçin
-      setExpandedRowData(details);
-    } else {
-      notification.error({
-        message: "Hata",
-        description: "Ürün ID'si bulunamadı!",
-        placement: "topRight",
-      });
-    }
-  };
   const columns = [
     {
       title: "Ürün Resmi",
@@ -252,7 +211,7 @@ const ShoppingCard = () => {
       render: (quantity, record) => (
         <div>
           <Button onClick={() => handleQuantityChange(record.id, -1)}>-</Button>
-          <span>{quantity}</span>
+          <span style={{ margin: "0 8px" }}>{quantity}</span>
           <Button onClick={() => handleQuantityChange(record.id, 1)}>+</Button>
         </div>
       ),
@@ -289,23 +248,6 @@ const ShoppingCard = () => {
           dataSource={data}
           rowKey={(record) => record.id}
           loading={loading}
-          expandable={{
-            expandedRowRender: (record) => {
-              handleExpandRow(record);
-              return (
-                <div>
-                  {expandedRowData && (
-                    <div>
-                      <h3>Ürün Detayları</h3>
-                      <p>{expandedRowData.description}</p>
-                      {/* Diğer detayları burada gösterin */}
-                    </div>
-                  )}
-                </div>
-              );
-            },
-            rowExpandable: (record) => record.name !== "Not Expandable",
-          }}
           footer={() => (
             <div>
               <Button
@@ -319,6 +261,7 @@ const ShoppingCard = () => {
             </div>
           )}
         />
+
         <Footer />
       </Layout>
     </Layout>

@@ -60,37 +60,46 @@ function ProductCard({
 
     fetchReviewData();
   }, [id]);
+  const availableSizes = React.useMemo(() => {
+    if (typeof quantity === "object" && quantity !== null) {
+      return Object.entries(quantity).filter(([size, count]) => count > 0);
+    }
+    return [];
+  }, [quantity]);
 
-  const addToCartHandler = async () => {
+  const addToCartHandler = async (e) => {
+    e.stopPropagation();
+
+    // Beden seçilmemişse uyarı göster
+    if (!selectedSize) {
+      notification.warning({
+        message: "Uyarı",
+        description: "Lütfen beden seçin.",
+        placement: "topRight",
+      });
+      return; // Sepete ekleme işlemini durdur
+    }
+
+    // Sepete gönderilecek ürün verisi
+    const productData = {
+      product_id: id,
+      name: name,
+      price: price,
+      quantity: 1,
+      Size: selectedSize,
+      description: description,
+    };
+
     try {
-      const token = getToken();
-      if (!token) {
-        notification.info({
-          message: "Giriş Yapın",
-          description: "Sepete ürün eklemek için giriş yapmalısınız.",
-          placement: "topRight",
-        });
-        navigate("/Login");
-        return;
-      }
-
-      const productData = {
-        product_id: id,
-        quantity: 1,
-      };
-
       await addToCart(productData);
-
       notification.success({
         message: "Başarılı",
         description: "Ürün sepete eklendi.",
-        placement: "topRight",
       });
     } catch (error) {
       notification.error({
         message: "Hata",
-        description: "Sepete ekleme sırasında bir sorun oluştu.",
-        placement: "topRight",
+        description: "Ürün sepete eklenirken bir hata oluştu.",
       });
     }
   };
@@ -215,13 +224,34 @@ function ProductCard({
           </CardText>
         </>
       )}
+      {availableSizes.length > 0 && (
+        <div className="size-selection">
+          <p>Beden Seçin:</p>
+          <div className="size-buttons">
+            {availableSizes.map(([size, count]) => (
+              <Button
+                key={size}
+                type={selectedSize === size ? "primary" : "default"}
+                disabled={count <= 0}
+                onClick={(e) => {
+                  e.stopPropagation(); // kart yönlendirmesini engelle
+                  setSelectedSize(size);
+                }}
+                style={{ marginRight: "5px", marginBottom: "5px" }}
+              >
+                {size}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="product-buttons">
         <Button
           className="SepetButon"
           onClick={(e) => {
-            e.stopPropagation(); // kart tıklamasını engelle
-            addToCartHandler();
+            e.stopPropagation();
+            addToCartHandler(e);
           }}
           disabled={!isAvailable}
         >

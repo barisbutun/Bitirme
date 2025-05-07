@@ -3,7 +3,8 @@ import { getUserIdFromToken } from "../../utils/auth";
 import { fetchProductImages } from "./ProductService";
 
 const API_BASE_URL = "http://localhost:8082/api/favourite";
-// Favori listeleme
+
+// ✅ Favori listeleme
 export const fetchFavorites = async () => {
   const token = localStorage.getItem("token");
   const userId = getUserIdFromToken(token);
@@ -26,15 +27,17 @@ export const fetchFavorites = async () => {
       throw new Error(`API Hatası: ${response.status}`);
     }
 
-    const favoriteProducts = await response.json();
-    console.log("Backend'den dönen ham veri:", favoriteProducts);
+    const responseData = await response.json();
+    console.log("Backend'den dönen ham veri:", responseData);
+
+    const favoriteProducts = responseData.content || [];
 
     const favoritesWithImages = await Promise.all(
       favoriteProducts.map(async (favorite) => {
         try {
           const images = await fetchProductImages(favorite.product_id);
           return {
-            favorite_id: favorite.id, // Backend'den gelen favori ID'si
+            favorite_id: favorite.id,
             product_id: favorite.product_id,
             category_id: favorite.category_id,
             price: favorite.price,
@@ -63,7 +66,7 @@ export const fetchFavorites = async () => {
   }
 };
 
-// Favori silme fonksiyonu
+// ✅ Favori silme fonksiyonu
 export const removeFavorite = async (favorite_id) => {
   const token = localStorage.getItem("token");
 
@@ -104,7 +107,7 @@ export const removeFavorite = async (favorite_id) => {
   }
 };
 
-// Favori Ekleme
+// ✅ Favori ekleme fonksiyonu
 export const addFavorite = async (product) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -120,10 +123,10 @@ export const addFavorite = async (product) => {
     product_id: Number(product.id),
     category_id: Number(product.categoryId || product.category_id),
     price: Number(product.price),
-    name: product.name
+    name: product.name,
   };
 
-  console.log('Backende gönderilen veri:', favoriteData);
+  console.log("Backende gönderilen veri:", favoriteData);
 
   try {
     const response = await fetch(`${API_BASE_URL}/v1`, {
@@ -170,4 +173,3 @@ export const addFavorite = async (product) => {
     return false;
   }
 };
-
