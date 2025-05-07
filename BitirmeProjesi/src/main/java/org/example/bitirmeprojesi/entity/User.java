@@ -3,6 +3,7 @@ package org.example.bitirmeprojesi.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.bitirmeprojesi.enums.Gender;
 import org.example.bitirmeprojesi.enums.Role;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,6 +56,9 @@ public class User implements Serializable, UserDetails {
 
     @Column(name = "balance")
     private Double balance = 0.0;
+
+    @Column(name="gender")
+    private Gender gender;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

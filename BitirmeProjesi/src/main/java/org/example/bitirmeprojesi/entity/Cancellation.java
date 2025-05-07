@@ -9,6 +9,7 @@ import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,12 +32,17 @@ public class Cancellation implements Serializable {
     @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
 
+    @Column(name="update_date")
+    private LocalDateTime upateDate;
+
     @OneToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
-    @OneToMany(mappedBy = "cancellation", cascade={CascadeType.PERSIST,CascadeType.MERGE})
-    private List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "cancellation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemCancellation> orderItemCancellations = new ArrayList<>();
+
 
     @Column(name = "cancel_amount")
     private double cancelAmount;
@@ -49,6 +55,11 @@ public class Cancellation implements Serializable {
     @PrePersist
     public void prePersist() {
         cancelDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        upateDate = LocalDateTime.now();
     }
 
 }

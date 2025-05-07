@@ -145,7 +145,16 @@ public class RefundService {
     }
 
 
+    public List<RefundDto> findAllByUserId(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
+        List<Refund> refunds = (List<Refund>) refundRepository.findAllByUserId(user.getId());
 
+        if (refunds.isEmpty()) {
+            throw new RefundNotFoundException(ErrorMesage.REFUND_NOT_FOUND_ERROR);
+        }
 
+        return refundMapper.toDtoList(refunds);
+    }
 }

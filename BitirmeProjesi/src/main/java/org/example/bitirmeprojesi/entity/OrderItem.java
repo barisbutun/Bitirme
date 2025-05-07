@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.Size;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,7 +41,6 @@ public class OrderItem {
     @Enumerated(EnumType.STRING)
     private PaymentState paymentState;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "user_id")
@@ -50,13 +50,11 @@ public class OrderItem {
     @Column(name = "size")
     private Size size;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "cancellation_id")
-    private Cancellation cancellation;
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemCancellation> orderItemCancellations = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Refund refund;
-
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "shopping_cart_item_id")

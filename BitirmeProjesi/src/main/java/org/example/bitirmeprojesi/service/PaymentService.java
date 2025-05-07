@@ -118,7 +118,7 @@ public class PaymentService {
         return dtoPage;
     }
 
-    @Transactional
+    /*@Transactional
     public PaymentDto update(PaymentDto paymentDto, UUID id, UUID userId) {
 
 
@@ -164,7 +164,7 @@ public class PaymentService {
         orderRepository.save(orders);
 
         return paymentMapper.toDto(payment);
-    }
+    }*/
 
     public void delete(UUID id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(ErrorMesage.PAYMENT_NOT_FOUND_ERROR));

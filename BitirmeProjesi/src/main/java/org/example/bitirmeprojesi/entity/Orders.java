@@ -60,8 +60,8 @@ public class Orders implements Serializable {
     private List<Refund> refunds;
 
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Cancellation cancellation;
+    @OneToOne(mappedBy = "order")
+    private Cancellation cancellations;
 
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

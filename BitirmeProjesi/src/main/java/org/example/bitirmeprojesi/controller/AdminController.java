@@ -40,27 +40,11 @@ public class AdminController {
         return ResponseEntity.ok(payments);
     }
 
-    @PutMapping("/v1/payment/{id}")
-    public ResponseEntity<PaymentDto> updatePayment(@PathVariable UUID id, @Valid @RequestBody PaymentDto paymentDto) {
-
-        UUID userId = JwtUtil.getUserIdFromToken();
-        PaymentDto updatedPayment = adminService.updatePayment(paymentDto, id, userId);
-        return ResponseEntity.ok(updatedPayment);
-    }
-
     @DeleteMapping("/v1/payment/{id}")
     public ResponseEntity<Void> deletePayment(@PathVariable UUID id) {
 
         adminService.deletePayment(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/v1/cancellation/{id}")
-    public ResponseEntity<CancellationDto> updateCancellation(@PathVariable Long id, @Valid @RequestBody CancellationDto cancellationDto) {
-
-        UUID userId = JwtUtil.getUserIdFromToken();
-        CancellationDto updatedCancellation = adminService.updateCancellation(cancellationDto, id,userId);
-        return ResponseEntity.ok(updatedCancellation);
     }
 
     @GetMapping("/v1/cancellation/all")

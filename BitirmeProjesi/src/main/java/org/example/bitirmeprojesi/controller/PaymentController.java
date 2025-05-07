@@ -22,6 +22,23 @@ public class PaymentController {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(paymentService.create(paymentDto, userId));
     }
+
+    @GetMapping("/v1/{id}")
+    public ResponseEntity<PaymentDto>findById(@PathVariable UUID id){
+        return ResponseEntity.ok(paymentService.findById(id));
+    }
+
+    @GetMapping("/v1")
+    public ResponseEntity<Page<PaymentDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+                                                             @RequestParam(required = false, defaultValue = "10") int size) {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(paymentService.findAllByUserId(userId, page, size));
+    }
+
+
+
+
+
 /*
     @GetMapping("/v1")
     public ResponseEntity<Page<PaymentDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,

@@ -48,7 +48,7 @@ public class ShoppingCartItemService {
 
         shoppingCartItemValidator.validateStockState(product,shoppingCartItemDto.getQuantity(),shoppingCartItemDto.getSize());
 
-        if(shoppingCartItemRepository.existsByUserIdAndProductId(user.getId(), product.getId())) {
+        if(shoppingCartItemRepository.existsByUserIdAndProductIdAndSize(user.getId(), product.getId(), shoppingCartItemDto.getSize())) {
             throw new ExistByShoppingCartItemException(ErrorMesage.EXIST_BY_SHOPPING_CART_ITEM_ERROR);
         }
 
@@ -104,10 +104,9 @@ public class ShoppingCartItemService {
     public void deleteAllByUserId(UUID userId) {
 
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
-        shoppingCartItems.forEach(shoppingCartItem ->
-                orderItemRepository.detachShoppingCartItem(shoppingCartItem.getId())
-        );
-
-        shoppingCartItemRepository.deleteAll(shoppingCartItems);}
-
+        for (ShoppingCartItem shoppingCartItem : shoppingCartItems) {
+            orderItemRepository.detachShoppingCartItem(shoppingCartItem.getId());
+        }
+        shoppingCartItemRepository.deleteAllByUserId(userId);
+    }
 }

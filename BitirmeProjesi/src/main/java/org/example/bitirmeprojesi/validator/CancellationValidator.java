@@ -1,8 +1,9 @@
 package org.example.bitirmeprojesi.validator;
 
 import lombok.RequiredArgsConstructor;
-import org.example.bitirmeprojesi.dto.CancellationDto;
-import org.example.bitirmeprojesi.entity.*;
+import org.example.bitirmeprojesi.entity.OrderItem;
+import org.example.bitirmeprojesi.entity.Orders;
+import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.enums.DeliveryStatus;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.Size;
@@ -38,15 +39,6 @@ public class CancellationValidator {
            throw new DeliveredOrderShouldBeRefundedException(ErrorMesage.DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR);
        }
    }
-
-    public void updateUserBalance(User user, OrderItem orderItem, Integer quantity) {
-        user.setBalance(user.getBalance() + quantity * orderItem.getProduct().getPrice());
-        userRepository.save(user);
-    }
-    public void amountCancelPrice(Cancellation cancellation, OrderItem orderItem, Integer quantity) {
-        cancellation.setCancelAmount(quantity * orderItem.getProduct().getPrice());
-        cancellationRepository.save(cancellation);
-    }
 
     public void cancelledOrderPayment(Orders orders) {
         orders.setPaymentState(PaymentState.CANCELLED);

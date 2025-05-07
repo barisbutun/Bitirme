@@ -116,10 +116,10 @@ public class ProductService {
     }
 
     public List<ProductDto> filterbyProduct(String name,
-                                            String category,
+                                            List<String> categories,
                                             Double minPrice,
                                             Double maxPrice) {
-        return productMapper.toDtoList(productRepository.findByFilters(name, category, minPrice, maxPrice));
+        return productMapper.toDtoList(productRepository.findByFilters(name,categories, minPrice, maxPrice));
     }
 
     @CacheEvict(value = "products", allEntries = true)

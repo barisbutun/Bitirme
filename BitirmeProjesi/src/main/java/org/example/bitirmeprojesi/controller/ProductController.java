@@ -62,7 +62,7 @@ public class ProductController {
 
     @GetMapping("/v1/filter")
     public ResponseEntity<List<ProductDto>> filter(@RequestParam(required = false) String name,
-                                                   @RequestParam(required = false) String category,
+                                                   @RequestParam(required = false) List<String> category,
                                                    @RequestParam(required = false) Double minPrice,
                                                    @RequestParam(required = false) Double maxPrice) {
         List<ProductDto> products = productService.filterbyProduct(name, category, minPrice, maxPrice);

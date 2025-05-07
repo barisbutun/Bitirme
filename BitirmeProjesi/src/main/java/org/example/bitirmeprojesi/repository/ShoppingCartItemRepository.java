@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.repository;
 
 import org.example.bitirmeprojesi.entity.ShoppingCartItem;
+import org.example.bitirmeprojesi.enums.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,7 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
 
     void deleteAllByUserId(UUID userId);
 
-    boolean existsByUserIdAndProductId(UUID userId, Long productId);
+    boolean existsByUserIdAndProductIdAndSize(UUID userId, Long productId, Size size);
 
     Page<ShoppingCartItem> findByUserId(UUID userId, Pageable pageable);
 

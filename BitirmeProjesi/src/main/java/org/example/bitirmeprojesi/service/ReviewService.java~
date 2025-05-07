@@ -90,7 +90,7 @@ public class ReviewService {
                 .average()
                 .orElse(0.0);
     }
-    @CacheEvict(value = "products", allEntries = true)
+
     public ReviewDto update(Long id, ReviewDto reviewDto) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException(ErrorMesage.REVIEW_NOT_FOUND_ERROR));

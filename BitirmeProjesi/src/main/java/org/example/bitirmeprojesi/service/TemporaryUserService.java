@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class TemproraryUserService {
+public class TemporaryUserService {
 
     private final TemproraryUserRepository temproraryUserRepository;
 

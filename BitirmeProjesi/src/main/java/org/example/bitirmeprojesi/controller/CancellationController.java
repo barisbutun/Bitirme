@@ -27,9 +27,17 @@ public class CancellationController {
 
     @PostMapping("v1/all")
     public ResponseEntity<CancellationDto> createAll(@RequestBody CancellationDto cancellationDtos) {
+        UUID userId = JwtUtil.getUserIdFromToken();
 
-        return ResponseEntity.ok(cancellationService.createAllOrdersCancellation(cancellationDtos));
+        return ResponseEntity.ok(cancellationService.createAllOrdersCancellation(cancellationDtos, userId));
     }
+
+    @PutMapping("/v1/{id}")
+    public ResponseEntity<CancellationDto> update(@PathVariable("id") Long id, @RequestBody CancellationDto cancellationDto) {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(cancellationService.update(id, cancellationDto, userId));
+    }
+
 
 
     @GetMapping("/v1/{id}")
@@ -37,19 +45,4 @@ public class CancellationController {
 
         return ResponseEntity.ok(cancellationService.findById(id));
     }
-
-    @PutMapping("/v1/{id}")
-    public ResponseEntity<CancellationDto> update(@PathVariable("id") Long id, @RequestBody CancellationDto cancellationDto) {
-
-        UUID userId = JwtUtil.getUserIdFromToken();
-        return ResponseEntity.ok(cancellationService.update(cancellationDto,id, userId));
-    }
-/*
-    @GetMapping("/v1")
-    public ResponseEntity<Page<CancellationDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,
-                                                         @RequestParam(required = false, defaultValue = "10") int size) {
-
-        UUID userId = JwtUtil.getUserIdFromToken();
-        return ResponseEntity.ok(cancellationService.findAllByUserId(userId,page, size));
-    }*/
 }

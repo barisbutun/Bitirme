@@ -17,10 +17,6 @@ public class ProductValidator {
 
         Map<Size, Integer> quantity = productDto.getQuantity();
 
-        if (quantity == null || quantity.isEmpty()) {
-            throw new InvalidProductInformationException(ErrorMesage.INVALID_PRODUCT_INFORMATION_ERROR);
-        }
-
         for (Map.Entry<Size, Integer> entry : quantity.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
                 throw new InvalidProductInformationException(ErrorMesage.INVALID_PRODUCT_INFORMATION_ERROR);

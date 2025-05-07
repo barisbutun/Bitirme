@@ -31,4 +31,5 @@ public class ErrorMesage {
     public static final String EXIST_BY_SHOPPING_CART_ITEM_ERROR="That product already exist in our system";
     public static final String PAYMENT_NOT_COMPLETED_ERROR="Requesting a refund for products whose payment was not successful.";
     public static final String REFUND_NOT_FOUND_ERROR="Refund does not exist in our systems";
+    public static final String CANCEL_QUANTITY_ERROR="Cancel quantity is not valid";
 }
