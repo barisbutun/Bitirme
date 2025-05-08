@@ -68,6 +68,7 @@ const HeaderComponent = ({
     <Header
       className="site-layout-header"
       style={{
+        marginLeft: collapsed ? 0 : 200,
         background: colorBgContainer,
         transition: "all 0.2s ease", // yumuşak geçiş
         zIndex: 1000,
@@ -89,7 +90,10 @@ const HeaderComponent = ({
       {/* SearchBar bileşenini buraya entegre ettik */}
       <SearchBar />
 
-      <div className="headerbuttons">
+      <div
+        className="headerbuttons"
+        style={{ marginRight: collapsed ? 0 : 220 }}
+      >
         <Menu
           mode="horizontal"
           defaultSelectedKeys={["2"]}

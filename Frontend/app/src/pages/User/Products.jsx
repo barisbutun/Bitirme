@@ -73,7 +73,7 @@ const Products = ({ setLoading }) => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="product-layout">
+      <Layout style={{ marginLeft: collapsed ? 0 : 0, transition: "all 0.2s" }}>
         <Header
           collapsed={collapsed}
           setCollapsed={setCollapsed}
@@ -98,9 +98,7 @@ const Products = ({ setLoading }) => {
               />
             ))
           ) : (
-            <p style={{ textAlign: "center", marginTop: "2rem" }}>
-              Ürün bulunamadı.
-            </p>
+            <p></p>
           )}
         </div>
         <Footer>

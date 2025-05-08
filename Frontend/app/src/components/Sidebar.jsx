@@ -8,6 +8,7 @@ import {
   AppstoreOutlined,
   CreditCardFilled,
   ShoppingOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -69,11 +70,16 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     },
     {
       key: "8",
+      icon: <WalletOutlined />,
+      label: <Link to="/user/WalletPage">Cüzdanım</Link>,
+    },
+    {
+      key: "9",
       icon: <CreditCardFilled />,
       label: <Link to="/user/Payment">Ödeme Bilgileri</Link>,
     },
     {
-      key: "9",
+      key: "10",
       icon: <SettingOutlined />,
       label: <Link to="/user/settings">Ayarlar</Link>,
     },
