@@ -33,6 +33,7 @@ const WalletPage = () => {
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetchBalance();
@@ -44,6 +45,7 @@ const WalletPage = () => {
       const result = await getUserBalance();
       setPrevBalance(balance || 0);
       setBalance(result?.balance || 0);
+      setUser(result);
     } catch {
       message.error("Bakiye alınamadı.");
     } finally {
@@ -113,7 +115,9 @@ const WalletPage = () => {
                     </Title>
                   </div>
                   <div className="card-holder">
-                    <Text style={{ color: "#fff" }}>Kullanıcı: John Doe</Text>
+                    <Text style={{ color: "#fff" }}>
+                      Kullanıcı: {user?.name || "Bilinmiyor"}
+                    </Text>
                   </div>
                 </div>
               </div>
