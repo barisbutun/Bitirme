@@ -18,7 +18,7 @@ export const addToCart = async (productData) => {
         product_id: productData.product_id,
         description:productData.description,
         quantity: productData.quantity,
-        Size:productData.Size,
+        size:productData.size,
       }),
       headers: {
         "Content-Type": "application/json",

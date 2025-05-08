@@ -230,7 +230,22 @@ function ProductCard({
           className="SepetButon"
           onClick={(e) => {
             e.stopPropagation();
-            addToCartHandler(e);
+            navigate(`/user/ProductDetails/${id}`, {
+              state: {
+                product: {
+                  id,
+                  name,
+                  image,
+                  price,
+                  quantity,
+                  stock_state,
+                  description,
+                  category_id,
+                  favorite_id,
+                  favorite,
+                },
+              },
+            });
           }}
           disabled={!isAvailable}
         >

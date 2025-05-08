@@ -78,6 +78,7 @@ const ProductDetailsCard = ({ product, images }) => {
 
   const addToCartHandler = async () => {
     try {
+      console.log("Seçilen Beden: ", selectedSize);
       const token = localStorage.getItem("token");
       if (!token) {
         notification.info({
@@ -87,8 +88,23 @@ const ProductDetailsCard = ({ product, images }) => {
         });
         return;
       }
+      if (!selectedSize) {
+        notification.warning({
+          message: "Beden Seçimi Gerekli",
+          description: "Lütfen sepete eklemeden önce bir beden seçin.",
+          placement: "topRight",
+        });
+        return;
+      }
 
-      await addToCart({ product_id: product.id, quantity: 1 });
+      await addToCart({
+        product_id: product.id,
+        size: selectedSize,
+        quantity: 1,
+        price: product.price,
+        name: product.name,
+      });
+
       notification.success({
         message: "Başarılı",
         description: "Ürün sepete eklendi.",
@@ -102,24 +118,19 @@ const ProductDetailsCard = ({ product, images }) => {
       });
     }
   };
-
-  const handleSizeClick = (size, count) => {
-    if (count > 0) {
-      setSelectedSize(size);
+  const availableSizes = React.useMemo(() => {
+    if (typeof product?.quantity === "object" && product.quantity !== null) {
+      const sizes = Object.entries(product.quantity)
+        .filter(([size, count]) => count > 0)
+        .map(([size, count]) => ({
+          size,
+          count,
+        }));
+      console.log("Available Sizes:", sizes); // Burada loglama yapıyoruz
+      return sizes;
     }
-  };
-
-  const getTotalQuantity = (qty) => {
-    if (typeof qty === "number") return qty;
-    if (typeof qty === "object") {
-      return Object.values(qty).reduce((acc, val) => acc + val, 0);
-    }
-    return 0;
-  };
-
-  const isAvailable =
-    product?.stock_state?.toUpperCase() === "AVAILABLE" &&
-    getTotalQuantity(product?.quantity) > 0;
+    return [];
+  }, [product]);
 
   return (
     <Card className="product-details-card">
@@ -159,21 +170,24 @@ const ProductDetailsCard = ({ product, images }) => {
 
           <p className="product-details-price">{product.price} TL</p>
 
-          {typeof product.quantity === "object" && (
-            <div className="product-sizes">
-              <h4 style={{ margin: "10px 0 5px" }}>Beden Seçimi</h4>
-              <div className="size-boxes">
-                {Object.entries(product.quantity).map(([size, count]) => (
-                  <div
+          {availableSizes.length > 0 && (
+            <div className="size-selection">
+              <p>Beden Seçin:</p>
+              <div className="size-buttons">
+                {availableSizes.map(({ size, count }) => (
+                  <Button
                     key={size}
-                    className={`size-box ${
-                      selectedSize === size ? "selected" : ""
-                    } ${count === 0 ? "out-of-stock" : ""}`}
-                    onClick={() => handleSizeClick(size, count)}
+                    type={selectedSize === size ? "primary" : "default"}
+                    disabled={count <= 0}
+                    onClick={(e) => {
+                      e.stopPropagation(); // kart yönlendirmesini engelle
+                      setSelectedSize(size);
+                      console.log("seçilen beden:", size);
+                    }}
+                    style={{ marginRight: "5px", marginBottom: "5px" }}
                   >
-                    <div className="size-label">{size}</div>
-                    {/* Stok bilgisi gösterilmiyor */}
-                  </div>
+                    {size}
+                  </Button>
                 ))}
               </div>
             </div>
