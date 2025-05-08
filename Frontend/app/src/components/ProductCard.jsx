@@ -188,13 +188,13 @@ function ProductCard({
         {name}
       </CardTitle>
 
-      <div className="image-container">
+      <div className="image-container" onClick={(e) => e.stopPropagation()}>
         {image ? (
           <Image
             className="image"
             src={image}
             placeholder={<Spin />}
-            preview={false}
+            preview={true}
           />
         ) : (
           <Skeleton.Image active style={{ width: "100%", height: "200px" }} />
@@ -223,27 +223,6 @@ function ProductCard({
             Toplam Kalan Miktar: {getTotalQuantity(quantity)}
           </CardText>
         </>
-      )}
-      {availableSizes.length > 0 && (
-        <div className="size-selection">
-          <p>Beden Seçin:</p>
-          <div className="size-buttons">
-            {availableSizes.map(([size, count]) => (
-              <Button
-                key={size}
-                type={selectedSize === size ? "primary" : "default"}
-                disabled={count <= 0}
-                onClick={(e) => {
-                  e.stopPropagation(); // kart yönlendirmesini engelle
-                  setSelectedSize(size);
-                }}
-                style={{ marginRight: "5px", marginBottom: "5px" }}
-              >
-                {size}
-              </Button>
-            ))}
-          </div>
-        </div>
       )}
 
       <div className="product-buttons">

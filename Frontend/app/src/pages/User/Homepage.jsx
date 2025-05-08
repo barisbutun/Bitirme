@@ -110,7 +110,7 @@ const Homepage = ({ setLoading }) => {
               />
             ))
           ) : (
-            <p>Ürün bulunamadı.</p>
+            <p></p>
           )}
         </div>
 
