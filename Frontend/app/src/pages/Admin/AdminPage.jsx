@@ -227,7 +227,15 @@ const AdminDashboard = () => {
                     />
                   ))}
                 </Pie>
-                <Legend />
+                <Legend
+                  layout="vertical" // Dikey olarak yerleştirme
+                  align="left" // Sol tarafta konumlandırma
+                  verticalAlign="middle" // Ortalar
+                  iconType="circle" // Yuvarlak renkler
+                  wrapperStyle={{
+                    paddingLeft: "10px", // Sol tarafta biraz boşluk bırakma
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </Card>
