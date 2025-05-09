@@ -92,7 +92,9 @@ const HeaderComponent = ({
 
       <div
         className="headerbuttons"
-        style={{ marginRight: collapsed ? 0 : 220 }}
+        style={{
+          marginRight: collapsed ? 20 : 220,
+        }}
       >
         <Menu
           mode="horizontal"

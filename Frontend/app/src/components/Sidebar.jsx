@@ -14,6 +14,7 @@ import { Layout, Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/Sidebar.css";
 import { logout } from "../services/UserService/AuthService";
+
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
@@ -95,7 +96,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       breakpoint="lg"
       collapsedWidth="0"
     >
-      <div className="demo-logo-vertical" style={{ background: "" }} />
       <Menu
         mode="inline"
         defaultSelectedKeys={["1"]}

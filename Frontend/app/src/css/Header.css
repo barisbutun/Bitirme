@@ -27,15 +27,15 @@
     margin-left: 20px;
   }
   .headerbuttons{
-    margin-right: 10px;
+    gap:15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .toggle-button {
-    font-size: 16px; /* Set a reasonable font size for the icon */
+    font-size: 20px; 
     text-align: center;
-    padding: 10px 0; /* Adjust padding as needed */
+    padding: 10px 0; 
    
   }
   .header-menu .ant-menu-submenu-popup {
