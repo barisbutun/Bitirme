@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import UserRoutes from "./routes/UserRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -12,15 +13,37 @@ import Homepage from "./pages/User/Homepage";
 import { decodeToken } from "./utils/auth";
 import { Spin, ConfigProvider } from "antd";
 import Chatbot from "./components/Chatbot";
+import RedirectHandler from "./components/RedirectHandler";
+
+const AppRoutes = ({ isAuthenticated, userRole, setLoadingState }) => {
+  return (
+    <Routes>
+      <Route path="/" element={<RedirectHandler />} />
+      <Route
+        path="/homepage"
+        element={<Homepage setLoading={setLoadingState} />}
+      />
+      <Route path="/login" element={<Login setLoading={setLoadingState} />} />
+      <Route path="/admin/*" element={<AdminRoutes />} />
+      <Route
+        path="/user/*"
+        element={<UserRoutes setLoading={setLoadingState} />}
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const setLoadingState = (state) => {
     setLoading(state);
   };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -30,78 +53,60 @@ const App = () => {
         setIsAuthenticated(true);
       }
     }
+    setAuthChecked(true);
   }, []);
 
   return (
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#fd702d", // Ana tema rengi
-          colorLink: "#fd702d", // Link rengi
+          colorPrimary: "#fd702d",
+          colorLink: "#fd702d",
         },
       }}
     >
-      <Router
-        future={{
-          v7_startTransition: false,
-          v7_relativeSplatPath: false,
-        }}
-      >
-        {loading && (
+      <Router>
+        {/* Loading ekranı */}
+        {(loading || !authChecked) && (
           <div
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               height: "100vh",
+              width: "100vw",
               position: "fixed",
-              width: "100%",
-              backgroundColor: "rgba(255, 255, 255, 0.8)", // Arka planı hafif saydam yap
-              zIndex: 9999, // Diğer bileşenlerin üstünde görünmesi için
+              top: 0,
+              left: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              zIndex: 9999,
             }}
           >
-            <Spin tip="Yükleniyor..." />
+            <Spin tip="Yükleniyor..." size="large" />
           </div>
         )}
-        <Routes>
-          {/* İlk sayfa (Homepage) */}
-          <Route path="/" element={<Homepage setLoading={setLoadingState} />} />
 
-          {/* Giriş yapılmışsa yönlendirme */}
-          <Route
-            path="/home"
-            element={
-              isAuthenticated ? (
-                userRole?.includes("ADMIN") ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Navigate to="/user" replace />
-                )
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
+        {/* Route'lar sadece auth kontrolü bittikten sonra gösterilir */}
+        {authChecked && (
+          <>
+            <AppRoutes
+              isAuthenticated={isAuthenticated}
+              userRole={userRole}
+              setLoadingState={setLoadingState}
+            />
 
-          {/* Giriş yapmamış kullanıcılar için Login */}
-          <Route
-            path="/login"
-            element={<Login setLoading={setLoadingState} />}
-          />
-
-          {/* Admin ve User alt rotaları */}
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route
-            path="/user/*"
-            element={<UserRoutes setLoading={setLoadingState} />}
-          />
-
-          {/* Bilinmeyen rotalar için */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 999 }}>
-          <Chatbot />
-        </div>
+            <div
+              style={{
+                position: "fixed",
+                bottom: 20,
+                right: 20,
+                zIndex: 999,
+              }}
+            >
+              <Chatbot />
+            </div>
+          </>
+        )}
       </Router>
     </ConfigProvider>
   );
