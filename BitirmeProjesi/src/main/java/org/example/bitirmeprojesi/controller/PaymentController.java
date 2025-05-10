@@ -35,15 +35,4 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.findAllByUserId(userId, page, size));
     }
 
-
-
-
-
-/*
-    @GetMapping("/v1")
-    public ResponseEntity<Page<PaymentDto>> findAll(@RequestParam(required = false, defaultValue = "0") int page,
-                                                     @RequestParam(required = false, defaultValue = "10") int size) {
-        UUID userId = JwtUtil.getUserIdFromToken();
-        return ResponseEntity.ok(paymentService.findAllByUserId(userId, page, size));
-    }*/
 }

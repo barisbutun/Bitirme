@@ -12,6 +12,7 @@ import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.CancellationMapper;
 import org.example.bitirmeprojesi.repository.*;
 import org.example.bitirmeprojesi.validator.CancellationValidator;
+import org.example.bitirmeprojesi.validator.OrderValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,8 @@ public class CancellationService {
     private final CancellationValidator cancellationValidator;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final OrderItemCancellationRepository orderItemCancellationRepository;
+    private final BalanceService balanceService;
+
 
     @Transactional
     public CancellationDto create(CancellationDto cancellationDto, UUID userId) {
@@ -56,9 +58,8 @@ public class CancellationService {
 
         updateProductsAndItems(itemCancellations);
 
-
+        order.setSumPrice(order.getSumPrice() - cancellation.getCancelAmount());
         order.setCancellations(cancellation);
-
         orderRepository.save(order);
 
         return cancellationMapper.toDto(cancellation);
@@ -108,8 +109,7 @@ public class CancellationService {
 
 
     public Double increaseUserBalance(User user, double refundAmount) {
-        user.setBalance(user.getBalance() + refundAmount);
-        userRepository.save(user);
+        balanceService.processTransaction(user.getId(), refundAmount, "İade işlemi");
         return user.getBalance();
     }
 
@@ -135,7 +135,7 @@ public class CancellationService {
         }
     }
 
-
+    //yenilenen order price hesaplaması
     public CancellationDto createAllOrdersCancellation(CancellationDto cancellationDto, UUID userId) {
 
         Orders order = orderRepository.findByIdForUpdate(cancellationDto.getOrderId())
@@ -167,7 +167,9 @@ public class CancellationService {
             refundAmount += cancelQty * orderItem.getProduct().getPrice();
             productRepository.save(product);
         }
-
+        order.setPaymentState(PaymentState.CANCELLED);
+        order.setSumPrice(order.getSumPrice() - refundAmount);
+        increaseUserBalance(user, refundAmount);
         cancellation.setCancelAmount(order.getSumPrice());
         cancellation.setOrder(order);
         cancellation.setUser(user);
@@ -197,8 +199,8 @@ public class CancellationService {
         for (OrderItemCancellationDto orderItemCancellationDto : orderItemCancellationDtos) {
             refundAmount += processOrderItemCancellation(orderItemCancellationDto, cancellation);
         }
-
-        user.setBalance(user.getBalance() + refundAmount);
+        cancellation.setCancelAmount(refundAmount);
+        increaseUserBalance(user, refundAmount);
         cancellation.setOrder(order);
         cancellation.setUser(user);
 
@@ -215,7 +217,19 @@ public class CancellationService {
 
         OrderItemCancellation existingCancellation = findExistingCancellation(orderItem, cancellation);
 
+        if(existingCancellation == null) {
+            OrderItemCancellation newCancellation = new OrderItemCancellation();
+            newCancellation.setCancellation(cancellation);
+            newCancellation.setCancelQuantity(0);
+            newCancellation.setOrderItem(orderItem);
+            orderItem.getOrderItemCancellations().add(newCancellation);
+            orderItemRepository.save(orderItem);
+            existingCancellation = newCancellation;
+        }
+
         int cancelQty = orderItemCancellationDto.getCancelQuantity() - existingCancellation.getCancelQuantity();
+
+
         if (cancelQty < 0) {
             throw new CancelQuantityException(ErrorMesage.CANCEL_QUANTITY_ERROR);
         }
@@ -224,7 +238,7 @@ public class CancellationService {
         updateProduct(orderItem, cancelQty);
 
         existingCancellation.setCancelQuantity(orderItemCancellationDto.getCancelQuantity());
-        orderItemCancellationRepository.save(existingCancellation);
+        //orderItemCancellationRepository.save(existingCancellation);
 
         return cancelQty * orderItem.getProduct().getPrice();
     }

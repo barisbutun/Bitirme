@@ -30,7 +30,6 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderValidator orderValidator;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
-    private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final OrderItemService orderItemService;
@@ -47,8 +46,15 @@ public class OrderService {
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
         orderRepository.save(orders);
 
+      if(shoppingCartItems==null || shoppingCartItems.isEmpty()){
+            throw new EntityNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR);
+        }
+
+
         Orders finalOrders = orders;
         List<OrderItem> orderItems = shoppingCartItems.stream().map(shoppingCartItem -> {
+            Product product= shoppingCartItem.getProduct();
+            product.setSaleCount(product.getSaleCount()+shoppingCartItem.getQuantity());
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(shoppingCartItem.getProduct());
             orderItem.setCategory(shoppingCartItem.getProduct().getCategory());

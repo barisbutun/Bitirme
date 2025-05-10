@@ -43,6 +43,11 @@ public class OrderItemService {
         return orderMapper.toOrderItemDtoList(orderItems);
 
     }
+    public List<OrderItemDto> findByUserId(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserIdNotFoundException(ErrorMesage.USER_ID_NOT_FOUND_ERROR));
+        List<OrderItem> orderItems = orderItemRepository.findByUserId(user.getId());
+        return orderMapper.toOrderItemDtoList(orderItems);
+    }
 
 
 

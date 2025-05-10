@@ -16,6 +16,7 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
     @Query("SELECT o FROM ShoppingCartItem o WHERE o.user.id = :userId")
     List<ShoppingCartItem> findByUserId(@Param("userId") UUID userId);
 
+    @Query("DELETE  FROM ShoppingCartItem o WHERE o.user.id = :userId")
     void deleteAllByUserId(UUID userId);
 
     boolean existsByUserIdAndProductIdAndSize(UUID userId, Long productId, Size size);

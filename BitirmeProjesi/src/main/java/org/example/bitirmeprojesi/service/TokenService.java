@@ -34,6 +34,7 @@ public class TokenService {
 
         String email = ((UserDetails) auth.getPrincipal()).getUsername();
         UUID userId = ((User) auth.getPrincipal()).getId();
+        String name = ((User) auth.getPrincipal()).getName();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
@@ -41,6 +42,7 @@ public class TokenService {
                 .subject(email)
                 .claim("roles", scope)
                 .claim("userId", String.valueOf(userId))
+                .claim("name", name)
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

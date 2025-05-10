@@ -57,7 +57,7 @@ public class ProductDto implements Serializable {
     private int saleCount;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private int sameCount;
+    private int sameCount=0;
 
 
     @JsonProperty("quantity")

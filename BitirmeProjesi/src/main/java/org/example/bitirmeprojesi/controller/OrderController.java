@@ -59,6 +59,13 @@ public class OrderController {
         return ResponseEntity.ok(orderItemService.findByOrderId(userId, id));
     }
 
+    @GetMapping("/v1/orderItem")
+    public ResponseEntity<List<OrderItemDto>> getOrderItemsByUserId() {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(orderItemService.findByUserId(userId));
+    }
+
+
 
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

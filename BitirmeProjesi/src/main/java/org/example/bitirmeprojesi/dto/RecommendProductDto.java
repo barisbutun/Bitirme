@@ -14,11 +14,9 @@ import java.util.List;
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-public class ChatBotUserDto implements Serializable {
+public class RecommendProductDto implements Serializable {
 
     private String name;
-
-    boolean registered;
 
     private String email;
 
@@ -32,20 +30,14 @@ public class ChatBotUserDto implements Serializable {
     private Double balance;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<ShoppingCartItemDto> shoppingCartItems;
+    private List<ProductDto> shoppingCartItems;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<OrdersDto> orders;
+    private List<ProductDto> orders;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<ReviewDto> reviews;
+    private List<ProductDto> reviews;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<FavouriteDto> favourites;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<PaymentDto> payment;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<CancellationDto> cancellation;
+    private List<ProductDto> favourites;
 }

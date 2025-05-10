@@ -63,6 +63,9 @@ public class Product implements Serializable {
     @Column(name="total_rating")
     private int totalRating=0;
 
+    @Column(name="sale_count")
+    private int saleCount=0;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 

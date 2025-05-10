@@ -35,7 +35,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final ShoppingCartItemService shoppingCartItemService;
     private final ProductRepository productRepository;
-
+    private final BalanceService balanceService;
     @Transactional
     public PaymentDto create(PaymentDto paymentDto, UUID userId) {
         // User kontrolü
@@ -50,8 +50,7 @@ public class PaymentService {
             throw new InsufficientBalanceError(ErrorMesage.INSUFFICIENT_BALANCE_ERROR);
         }
 
-        user.setBalance(user.getBalance() - orders.getSumPrice());
-        userRepository.save(user);
+        balanceService.processTransaction(userId, -orders.getSumPrice(), "Sipariş ödemesi");
 
         Payment payment = paymentMapper.toEntity(paymentDto);
         payment.setPaymentState(PaymentState.SUCCESS);
@@ -117,54 +116,6 @@ public class PaymentService {
         Page<PaymentDto> dtoPage = payments.map(paymentMapper::toDto);
         return dtoPage;
     }
-
-    /*@Transactional
-    public PaymentDto update(PaymentDto paymentDto, UUID id, UUID userId) {
-
-
-        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(ErrorMesage.PAYMENT_NOT_FOUND_ERROR));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
-
-        Orders orders = orderRepository.findById(paymentDto.getOrderId())
-                .orElseThrow(() -> new OrderNotFoundExceiption(ErrorMesage.ORDER_NOT_FOUND_ERROR));
-
-
-        if (orders.getSumPrice() > user.getBalance()) {
-            throw new InsufficientBalanceError(ErrorMesage.INSUFFICIENT_BALANCE_ERROR);
-        }
-        user.setBalance(user.getBalance() - orders.getSumPrice());
-        userRepository.save(user);
-
-
-        payment.setPaymentState(PaymentState.SUCCESS);
-
-
-        payment.setOrder(orders);
-        paymentMapper.update(paymentDto, payment);
-        paymentRepository.save(payment);
-
-        orders.setPayment(payment);
-
-        orders.getOrderItems().forEach(orderItem -> {
-            orderItem.setPaymentState(PaymentState.SUCCESS);
-            Product product = productRepository.findByIdForUpdate(orderItem.getProduct().getId())
-                    .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
-
-            Map<Size, Integer> productQuantities = getSizeIntegerMap(orderItem, product);
-            product.setQuantity(productQuantities);
-            productRepository.save(product);
-        });
-
-        Delivery delivery = orders.getDelivery();
-
-        delivery.setOrder(orders);
-        deliveryService.update(deliveryService.findById(delivery.getId()), delivery.getId());
-        orders.setDelivery(delivery);
-        orderRepository.save(orders);
-
-        return paymentMapper.toDto(payment);
-    }*/
 
     public void delete(UUID id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException(ErrorMesage.PAYMENT_NOT_FOUND_ERROR));

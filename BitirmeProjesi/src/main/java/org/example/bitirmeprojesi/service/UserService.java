@@ -34,6 +34,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final TemproraryUserRepository temproraryUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BalanceService balanceService;
 
     private final UserMapper userMapper;
 
@@ -88,9 +89,7 @@ public class UserService implements UserDetailsService {
 
     public UserDto uploadBalance(UUID id, UserDto userDto) {
         User user = userRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
-        double balance = userDto.getBalance();
-        user.setBalance(user.getBalance() + balance);
-        userRepository.save(user);
+        balanceService.processTransaction(user.getId(), userDto.getBalance(), "Bakiye yüklemesi");
         return userMapper.toDto(user);
     }
 

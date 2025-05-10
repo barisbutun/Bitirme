@@ -1,0 +1,64 @@
+package org.example.bitirmeprojesi.service;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.dto.BalanceTransactionResponseDto;
+import org.example.bitirmeprojesi.entity.BalanceTransaction;
+import org.example.bitirmeprojesi.entity.User;
+import org.example.bitirmeprojesi.exception.ErrorMesage;
+import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
+import org.example.bitirmeprojesi.exception.error.InsufficientBalanceError;
+import org.example.bitirmeprojesi.repository.BalanceTransactionRepository;
+import org.example.bitirmeprojesi.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class BalanceService {
+
+    private final BalanceTransactionRepository balanceTransactionRepository;
+    private final UserRepository userRepository;
+
+
+    @Transactional
+    public void processTransaction(UUID userId, double amount, String description) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+
+        double newBalance = user.getBalance() + amount;
+
+        if (newBalance < 0) {
+            throw new InsufficientBalanceError(ErrorMesage.INSUFFICIENT_BALANCE_ERROR);
+        }
+
+        user.setBalance(newBalance);
+
+        BalanceTransaction tx = new BalanceTransaction();
+        tx.setUser(user);
+        tx.setAmount(amount);
+        tx.setDescription(description);
+
+        balanceTransactionRepository.save(tx);
+        userRepository.save(user);
+    }
+
+    public Page<BalanceTransactionResponseDto> getBalanceHistory(UUID userId,int page,int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
+        Page<BalanceTransactionResponseDto> balanceTransactions = balanceTransactionRepository.findByUserId(user.getId(), pageable);
+
+        return balanceTransactions;
+    }
+
+
+
+
+
+}
