@@ -93,7 +93,7 @@ public class ShoppingCartItemService {
                 .orElseThrow(() -> new ShoppingCartItemNotFoundException(ErrorMesage.SHOPPING_CART_ITEM_NOT_FOUND_ERROR));
 
         shoppingCartItemValidator.validateShoppingState(shoppingCartItemDto, userId,id);
-        shoppingCartItemValidator.validateStockState(shoppingCartItem.getProduct(), shoppingCartItemDto.getQuantity(), shoppingCartItemDto.getSize());
+        shoppingCartItemValidator.validateStockState(shoppingCartItem.getProduct(), shoppingCartItemDto.getQuantity(), shoppingCartItem.getSize());
 
         shoppingCartItemMapper.update(shoppingCartItemDto, shoppingCartItem);
         return shoppingCartItemMapper.toDto(shoppingCartItemRepository.save(shoppingCartItem));
