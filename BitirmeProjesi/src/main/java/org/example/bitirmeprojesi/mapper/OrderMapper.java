@@ -15,7 +15,8 @@ import java.util.List;
 public interface OrderMapper {
     Orders toEntity(final OrdersDto ordersDto);
 
-    OrdersDto toDto(final Orders orders);
+    @Mapping(target = "orderItems", expression = "java(order.getOrderItems() != null ? order.getOrderItems().stream().map(this::toOrderItemDto).collect(java.util.stream.Collectors.toList()) : null)")
+    OrdersDto toDto(Orders order);
 
     List<OrdersDto> toDtoList(final List<Orders> ordersList);
 
@@ -23,11 +24,15 @@ public interface OrderMapper {
 
     Orders toEntity(final OrderGetOrderItemsDto ordersDto);
 
+    @Mapping(source = "productId", target = "product.id")
+    @Mapping(source = "orderId", target = "order.id")
     OrderItem toOrderItem(final OrderItemDto orderItemDto);
 
+    @Mapping(source = "order.id", target = "orderId")
+    @Mapping(source = "product.id", target = "productId")
     OrderItemDto toOrderItemDto(final OrderItem orderItem);
 
-    List<OrderItemDto> toOrderItemDtoList(final List<OrderItem>  orderItems);
+    List<OrderItemDto> toOrderItemDtoList(final List<OrderItem> orderItems);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(final OrdersDto ordersDto, @MappingTarget final Orders orders);

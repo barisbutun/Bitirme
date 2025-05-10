@@ -4,13 +4,17 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
+import org.example.bitirmeprojesi.dto.OrderItemDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
 import org.example.bitirmeprojesi.entity.*;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
 import org.example.bitirmeprojesi.exception.error.OrderNotFoundExceiption;
 import org.example.bitirmeprojesi.mapper.OrderMapper;
-import org.example.bitirmeprojesi.repository.*;
+import org.example.bitirmeprojesi.repository.OrderItemRepository;
+import org.example.bitirmeprojesi.repository.OrderRepository;
+import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.OrderValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 
 
 @Service
@@ -66,7 +71,20 @@ public class OrderService {
             return orderItemService.create(orderItem);
         }).collect(Collectors.toList());
 
+        List<OrderItemDto> orderItemDtos = orderItems.stream()
+                .map(orderItem -> {
+                            OrderItemDto orderItemDto = orderMapper.toOrderItemDto(orderItem);
+                            orderItemDto.setProductId(orderItem.getProduct().getId());
+                            orderItemDto.setOrderId(orderItem.getOrder().getId());
+                            orderItemDto.setPrice(orderItem.getProduct().getPrice() * orderItem.getQuantity());
+                            return orderItemDto;
+                        }
+                ).collect(Collectors.toList());
+
         orders.setOrderItems(orderItems);
+
+        ordersDto.setOrderItems(orderItemDtos);
+
         if(ordersDto.isSameAddress()){
             orders.setAddress(user.getAddress());
         }
@@ -107,7 +125,22 @@ public class OrderService {
     public Page<OrdersDto> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Orders> orders = orderRepository.findAll(pageable);
-        Page<OrdersDto> ordersDtos = orders.map(orderMapper::toDto);
+        Page<OrdersDto> ordersDtos = orders.map(order -> {
+            OrdersDto ordersDto = orderMapper.toDto(order);
+            if (order.getOrderItems() != null) {
+                List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+                        .map(orderItem -> {
+                            OrderItemDto orderItemDto = orderMapper.toOrderItemDto(orderItem);
+                            orderItemDto.setProductId(orderItem.getProduct().getId());
+                            orderItemDto.setOrderId(orderItem.getOrder().getId());
+                            orderItemDto.setPrice(orderItem.getProduct().getPrice() * orderItem.getQuantity());
+                            return orderItemDto;
+                        })
+                        .collect(Collectors.toList());
+                ordersDto.setOrderItems(orderItemDtos);
+            }
+            return ordersDto;
+        });
         return ordersDtos;
     }
 

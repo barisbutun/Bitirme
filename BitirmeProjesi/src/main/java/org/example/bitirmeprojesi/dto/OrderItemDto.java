@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Size;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -27,6 +28,10 @@ public class OrderItemDto implements Serializable {
     private long orderId;
     @JsonProperty("quantity")
     private Integer quantity;
+    @JsonProperty("total_price")
+    private Double price;
+    @JsonProperty("size")
+    private Size size;
     @JsonIgnore
     private UUID userId;
 }

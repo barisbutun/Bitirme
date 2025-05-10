@@ -13,6 +13,7 @@ import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -53,5 +54,7 @@ public class OrdersDto implements Serializable {
 
     @JsonIgnore
     private UUID userId;
+
+    private List<OrderItemDto> orderItems;
 
 }
