@@ -75,8 +75,9 @@ const Chatbot = () => {
             <div className="chat-messages">
               <List
                 dataSource={messages}
-                renderItem={(item) => (
+                renderItem={(item, index) => (
                   <List.Item
+                    key={index}
                     className={item.sender === "user" ? "user-msg" : "bot-msg"}
                   >
                     <Typography.Text

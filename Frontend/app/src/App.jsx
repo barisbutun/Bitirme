@@ -65,7 +65,12 @@ const App = () => {
         },
       }}
     >
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: false,
+          v7_relativeSplatPath: false,
+        }}
+      >
         {/* Loading ekranı */}
         {(loading || !authChecked) && (
           <div
