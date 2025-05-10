@@ -42,7 +42,6 @@ public class CancellationController {
 
     @GetMapping("/v1/{id}")
     public ResponseEntity<CancellationDto> findById(@PathVariable("id") Long id) {
-
         return ResponseEntity.ok(cancellationService.findById(id));
     }
 }

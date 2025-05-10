@@ -36,6 +36,7 @@ public class CancellationService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final BalanceService balanceService;
+    private final OrderValidator orderValidator;
 
 
     @Transactional
@@ -135,7 +136,7 @@ public class CancellationService {
         }
     }
 
-    //yenilenen order price hesaplaması
+    @Transactional
     public CancellationDto createAllOrdersCancellation(CancellationDto cancellationDto, UUID userId) {
 
         Orders order = orderRepository.findByIdForUpdate(cancellationDto.getOrderId())
@@ -146,17 +147,22 @@ public class CancellationService {
 
         List<OrderItem> orderItems = order.getOrderItems();
         Cancellation cancellation = cancellationMapper.toEntity(cancellationDto);
+        cancellation.setOrder(order);
+        cancellation.setUser(user);
+
+        cancellationValidator.validateOrderState(order);
+        Cancellation savedCancellation = cancellationRepository.save(cancellation);
+
         double refundAmount = 0;
 
         for (OrderItem orderItem : orderItems) {
-            orderItem.setPaymentState(PaymentState.CANCELLED);
             OrderItemCancellation orderItemCancellation = new OrderItemCancellation();
             orderItemCancellation.setOrderItem(orderItem);
             orderItemCancellation.setCancelQuantity(orderItem.getQuantity());
+            orderItemCancellation.setCancellation(savedCancellation);
             orderItem.getOrderItemCancellations().add(orderItemCancellation);
-            orderItemRepository.save(orderItem);
-            orderItemCancellation.setCancellation(cancellation);
-            cancellation.getOrderItemCancellations().add(orderItemCancellation);
+            orderItem.setPaymentState(PaymentState.CANCELLED);
+
             Product product = productRepository.findById(orderItem.getProduct().getId())
                     .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
             int cancelQty = orderItem.getQuantity();
@@ -166,19 +172,17 @@ public class CancellationService {
             );
             refundAmount += cancelQty * orderItem.getProduct().getPrice();
             productRepository.save(product);
+
+            orderItemRepository.save(orderItem);
         }
-        order.setPaymentState(PaymentState.CANCELLED);
+
+        cancellationValidator.cancelledOrderPayment(order);
         order.setSumPrice(order.getSumPrice() - refundAmount);
         increaseUserBalance(user, refundAmount);
-        cancellation.setCancelAmount(order.getSumPrice());
-        cancellation.setOrder(order);
-        cancellation.setUser(user);
-        cancellationValidator.validateOrderState(order);
-        cancellationValidator.validateOrderDeliveryState(order);
-        cancellationValidator.cancelledOrderPayment(order);
-        Cancellation savedCancellation = cancellationRepository.save(cancellationMapper.toEntity(cancellationDto));
+        savedCancellation.setCancelAmount(refundAmount);
         order.setCancellations(savedCancellation);
         orderRepository.save(order);
+
         return cancellationMapper.toDto(savedCancellation);
     }
 
@@ -246,8 +250,7 @@ public class CancellationService {
     private OrderItemCancellation findExistingCancellation(OrderItem orderItem, Cancellation cancellation) {
         return orderItem.getOrderItemCancellations().stream()
                 .filter(c -> c.getCancellation().equals(cancellation))
-                .findFirst()
-                .orElseThrow(() -> new CancelQuantityException(ErrorMesage.CANCEL_QUANTITY_ERROR));
+                .findFirst().orElse(null);
     }
 
     private void updateOrderItem(OrderItem orderItem, int cancelQty) {

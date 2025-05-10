@@ -25,10 +25,10 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     Optional<OrderItem> findByIdForUpdate(@Param("orderItemId") Long orderItemId);
 
 
-    @Transactional
     @Modifying
-    @Query("UPDATE OrderItem o SET o.shoppingCartItem = NULL WHERE o.shoppingCartItem = (SELECT s FROM ShoppingCartItem s WHERE s.id = :itemId)")
+    @Query("UPDATE OrderItem o SET o.shoppingCartItem = NULL WHERE o.shoppingCartItem.id = :itemId")
     void detachShoppingCartItem(@Param("itemId") Long itemId);
+
 
     OrderItem findByShoppingCartItemIdAndShoppingCartItemQuantity(long id, int quantity);
 }

@@ -102,14 +102,13 @@ public class ShoppingCartItemService {
 
     @Transactional
     public void deleteAllByUserId(UUID userId) {
-        System.out.println("deleteAllByUserId başladı.");
+
         List<ShoppingCartItem> shoppingCartItems = shoppingCartItemRepository.findByUserId(userId);
-        System.out.println("Bulunan ShoppingCartItem sayısı: " + shoppingCartItems.size());
+
         for (ShoppingCartItem shoppingCartItem : shoppingCartItems) {
-            System.out.println("ShoppingCartItem ID: " + shoppingCartItem.getId());
             orderItemRepository.detachShoppingCartItem(shoppingCartItem.getId());
         }
+        shoppingCartItemRepository.deleteAllByUserId(userId);
 
-        System.out.println("deleteAllByUserId tamamlandı.");
     }
 }

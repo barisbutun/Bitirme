@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.bitirmeprojesi.entity.Orders;
+import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
@@ -37,6 +38,9 @@ public class OrdersDto implements Serializable {
 
     @JsonProperty("sum_price")
     double sumPrice;
+
+    @JsonProperty("payment_state")
+    private PaymentState paymentState;
 
     @JsonProperty("address")
     String address;

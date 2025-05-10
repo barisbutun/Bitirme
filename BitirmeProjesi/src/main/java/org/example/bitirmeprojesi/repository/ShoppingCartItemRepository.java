@@ -5,6 +5,7 @@ import org.example.bitirmeprojesi.enums.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,8 +17,9 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
     @Query("SELECT o FROM ShoppingCartItem o WHERE o.user.id = :userId")
     List<ShoppingCartItem> findByUserId(@Param("userId") UUID userId);
 
-    @Query("DELETE  FROM ShoppingCartItem o WHERE o.user.id = :userId")
-    void deleteAllByUserId(UUID userId);
+    @Modifying
+    @Query("DELETE FROM ShoppingCartItem o WHERE o.user.id = :userId")
+    void deleteAllByUserId(@Param("userId") UUID userId);
 
     boolean existsByUserIdAndProductIdAndSize(UUID userId, Long productId, Size size);
 

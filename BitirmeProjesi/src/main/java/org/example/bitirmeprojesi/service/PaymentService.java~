@@ -1,6 +1,7 @@
 package org.example.bitirmeprojesi.service;
 
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,7 @@ import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.PaymentMapper;
-import org.example.bitirmeprojesi.repository.OrderRepository;
-import org.example.bitirmeprojesi.repository.PaymentRepository;
-import org.example.bitirmeprojesi.repository.ProductRepository;
-import org.example.bitirmeprojesi.repository.UserRepository;
+import org.example.bitirmeprojesi.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +38,7 @@ public class PaymentService {
     private final BalanceService balanceService;
     @Transactional
     public PaymentDto create(PaymentDto paymentDto, UUID userId) {
-
+        // User kontrolü
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
