@@ -15,7 +15,7 @@ public class ProductValidator {
 
     public void checkStockState(ProductDto productDto, Product product) {
 
-        Map<Size, Integer> quantity = productDto.getQuantity();
+        Map<Size, Integer> quantity = product.getQuantity();
 
         for (Map.Entry<Size, Integer> entry : quantity.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {

@@ -8,6 +8,7 @@ import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
 import org.example.bitirmeprojesi.exception.error.InsufficientBalanceError;
+import org.example.bitirmeprojesi.mapper.BalanceMapper;
 import org.example.bitirmeprojesi.repository.BalanceTransactionRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class BalanceService {
 
     private final BalanceTransactionRepository balanceTransactionRepository;
     private final UserRepository userRepository;
+    private final BalanceMapper balanceMapper;
 
 
     @Transactional
@@ -52,9 +54,12 @@ public class BalanceService {
         Pageable pageable = PageRequest.of(page, size);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
-        Page<BalanceTransactionResponseDto> balanceTransactions = balanceTransactionRepository.findByUserId(user.getId(), pageable);
 
-        return balanceTransactions;
+        Page<BalanceTransaction> balanceTransactions = balanceTransactionRepository.findByUserId(user.getId(), pageable);
+
+        Page<BalanceTransactionResponseDto> balanceTransactionResponseDtos = balanceTransactions.map(balanceMapper::toDto);
+
+        return balanceTransactionResponseDtos;
     }
 
 

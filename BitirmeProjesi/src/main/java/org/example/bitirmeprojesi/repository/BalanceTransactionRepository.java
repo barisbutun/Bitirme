@@ -10,5 +10,5 @@ import java.util.UUID;
 
 public interface BalanceTransactionRepository extends JpaRepository<BalanceTransaction, UUID> {
 
-    Page<BalanceTransactionResponseDto> findByUserId(UUID userId, Pageable pageable);
+    Page<BalanceTransaction> findByUserId(UUID userId, Pageable pageable);
 }
