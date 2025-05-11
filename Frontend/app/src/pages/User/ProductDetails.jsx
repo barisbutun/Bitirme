@@ -43,7 +43,12 @@ const ProductDetails = () => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="site-layout">
+      <Layout
+        className="site-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <div className="productdetails-content">

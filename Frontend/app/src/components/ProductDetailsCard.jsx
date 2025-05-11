@@ -147,7 +147,7 @@ const ProductDetailsCard = ({ product, images }) => {
                   style={{ width: 400, height: 400, borderRadius: "8px" }}
                 />
               }
-              preview={false}
+              preview={true}
             />
           ) : (
             <Skeleton.Image
