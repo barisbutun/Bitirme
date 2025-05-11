@@ -16,6 +16,9 @@ import {
   clearCartByUserId,
   updateCartItemQuantity,
 } from "../../services/ProductService/ShoppingCardService";
+import { createOrder } from "../../services/ProductService/OrdersService";
+import { fetchProductImages } from "../../services/ProductService/ProductService";
+import { getOrderItemsByUser } from "../../services/ProductService/OrdersService";
 
 const ShoppingCard = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -72,55 +75,58 @@ const ShoppingCard = () => {
         return;
       }
 
-      const content = data.map((item) => ({
-        id: item.id,
-        product_id: item.product.id,
-        name: item.product.name,
-        description: item.product.description,
-        price: item.product.price,
-        quantity: item.quantity,
-        Size: item.product.Size || "",
-      }));
+      const cartItems = await getCartByUserId(userId);
+      if (!cartItems || cartItems.length === 0) {
+        throw new Error("Sepet boş.");
+      }
+
+      const cartWithImages = await Promise.all(
+        cartItems.map(async (item) => {
+          const image = await fetchProductImages(item.product.id);
+          return {
+            productId: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price,
+            image,
+            size: item.size, // size bilgisi de burada ekleniyor
+          };
+        })
+      );
 
       const orderData = {
-        description: "Sipariş Açıklaması",
-        name: "Sipariş Adı",
-        sale_date: new Date().toISOString().slice(0, 19).replace("T", " "),
-        sum_price: data
-          .reduce(
-            (total, item) => total + item.product.price * item.quantity,
-            0
-          )
-          .toFixed(2),
-        stock_state: "AVAILABLE",
-        payment_state: "SUCCESS",
-        content: content,
+        userId,
+        description: "Sepet üzerinden sipariş oluşturuldu.",
+        sumPrice: cartWithImages.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ),
+        saleDate: new Date().toISOString(),
+        stockState: "Hazırlanıyor",
+        products: cartWithImages.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size, // size bilgisi burada da kullanılıyor
+        })),
       };
 
-      const response = await fetch("http://localhost:8082/api/order/v1", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify(orderData.content),
-      });
+      const response = createOrder(orderData);
 
-      if (!response.ok) throw new Error("Sipariş oluşturulamadı");
-
-      await clearCartByUserId();
+      if (!response.ok) {
+        throw new Error("Sipariş oluşturulamadı.");
+      }
 
       notification.success({
-        message: "Sipariş Başarılı",
+        message: "Başarılı",
         description: "Siparişiniz başarıyla oluşturuldu.",
         placement: "topRight",
       });
 
-      navigate("/Orders");
+      navigate("/user/orders");
     } catch (error) {
+      console.error("Sipariş oluşturma hatası:", error);
       notification.error({
         message: "Hata",
-        description: error.message || "Sipariş oluşturulurken bir hata oluştu.",
+        description: error.message || "Sipariş oluşturulurken hata oluştu.",
         placement: "topRight",
       });
     }
@@ -143,19 +149,23 @@ const ShoppingCard = () => {
       });
     }
   };
+  const handleQuantityChange = async (productId, size, change) => {
+    const item = data.find(
+      (product) => product.id === productId && product.size === size
+    );
 
-  const handleQuantityChange = async (itemId, change) => {
-    const item = data.find((product) => product.id === itemId);
     if (!item) {
       notification.error({
         message: "Hata",
-        description: "Ürün bulunamadı",
+        description: "Ürün ya da beden bilgisi bulunamadı",
         placement: "topRight",
       });
       return;
     }
 
-    const newQuantity = item.quantity + change;
+    const currentQuantity = item.quantity;
+    const newQuantity = currentQuantity + change;
+
     if (newQuantity < 1) {
       notification.error({
         message: "Hata",
@@ -166,7 +176,12 @@ const ShoppingCard = () => {
     }
 
     try {
-      await updateCartItemQuantity(itemId, newQuantity);
+      await updateCartItemQuantity(
+        item.id,
+        item.product.id,
+        item.size,
+        newQuantity
+      );
       notification.success({
         message: "Başarılı",
         description: "Ürün miktarı güncellendi",
@@ -176,7 +191,7 @@ const ShoppingCard = () => {
     } catch (error) {
       notification.error({
         message: "Hata",
-        description: "Miktar güncellenemedi: " + error.message,
+        description: "Miktar güncellenemedi",
         placement: "topRight",
       });
     }
@@ -204,15 +219,24 @@ const ShoppingCard = () => {
       dataIndex: ["product", "name"],
       key: "name",
     },
+
     {
       title: "Miktar",
       dataIndex: "quantity",
       key: "quantity",
       render: (quantity, record) => (
         <div>
-          <Button onClick={() => handleQuantityChange(record.id, -1)}>-</Button>
+          <Button
+            onClick={() => handleQuantityChange(record.id, record.size, -1)}
+          >
+            -
+          </Button>
           <span style={{ margin: "0 8px" }}>{quantity}</span>
-          <Button onClick={() => handleQuantityChange(record.id, 1)}>+</Button>
+          <Button
+            onClick={() => handleQuantityChange(record.id, record.size, +1)}
+          >
+            +
+          </Button>
         </div>
       ),
     },
@@ -261,7 +285,6 @@ const ShoppingCard = () => {
             </div>
           )}
         />
-
         <Footer />
       </Layout>
     </Layout>

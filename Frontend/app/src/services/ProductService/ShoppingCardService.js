@@ -18,7 +18,7 @@ export const addToCart = async (productData) => {
         product_id: productData.product_id,
         description:productData.description,
         quantity: productData.quantity,
-        size:productData.size,
+        Size:productData.size,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -189,14 +189,9 @@ export const getCartByUserId = async () => {
     throw error;
   }
 };
-
-
-// Yeni fonksiyon: updateCartItemQuantity
-export const updateCartItemQuantity = async (itemId, quantity) => {
+export const updateCartItemQuantity = async (itemId, product_id, size, newQuantity) => {
   const token = getToken();
-  if (!token) {
-    throw new Error("Kullanıcı girişi yapılmamış");
-  }
+  if (!token) throw new Error("Kullanıcı girişi yapılmamış");
 
   const response = await fetch(`http://localhost:8082/api/shoppingCartItem/v1/${itemId}`, {
     method: 'PUT',
@@ -204,11 +199,18 @@ export const updateCartItemQuantity = async (itemId, quantity) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ quantity }), // Yeni miktarı gönder
+    body: JSON.stringify({
+      productId: product_id,
+      quantity: newQuantity,
+      size: size,
+    }),
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Ürün miktarı güncellenemedi.");
+    throw new Error("Miktar güncellenemedi");
   }
+
+  return response.json();
 };
+
+
