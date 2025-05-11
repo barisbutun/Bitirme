@@ -177,7 +177,12 @@ const WalletPage = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="wallet-layout">
+      <Layout
+        className="wallet-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="wallet-content">
           <div className="wallet-main-layout">

@@ -264,7 +264,12 @@ const ShoppingCard = () => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="shopping-card-layout">
+      <Layout
+        className="shopping-card-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Table
           className="shopping-card-table"

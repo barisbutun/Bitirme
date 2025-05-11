@@ -80,7 +80,12 @@ const Products = ({ setLoading }) => {
           onFilterChange={handleApplyFilter}
         />
 
-        <div className="content">
+        <div
+          className="content"
+          style={{
+            marginLeft: collapsed ? 0 : 200,
+          }}
+        >
           {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <ProductCard

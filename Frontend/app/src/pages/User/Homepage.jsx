@@ -77,15 +77,6 @@ const Homepage = ({ setLoading }) => {
         collapsed={collapsed}
         setCollapsed={setCollapsed}
         trigger={null}
-        width={200}
-        style={{
-          position: "fixed", // Ekrana sabitlenir
-          height: "100vh",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 100, // Önde kalsın
-        }}
       />
       <Layout className="homepage-layout">
         <Header
@@ -94,7 +85,12 @@ const Homepage = ({ setLoading }) => {
           onFilterChange={handleApplyFilter}
         />
 
-        <div className="content">
+        <div
+          className="content"
+          style={{
+            marginLeft: collapsed ? 0 : 200,
+          }}
+        >
           {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <ProductCard

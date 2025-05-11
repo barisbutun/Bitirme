@@ -103,7 +103,12 @@ const Profile = ({ setLoading }) => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="Profile-layout">
+      <Layout
+        className="Profile-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
 
         <div style={{ padding: "24px" }}>
