@@ -33,6 +33,7 @@ public class ProductElasticService {
         if(queryRequest.getQuery()==null||queryRequest.getQuery().isBlank()){
             throw new QueryNotFoundException(ErrorMesage.QUERY_NOT_FOUND_ERROR);
         }
+
         List<ProductElastic> productElastics=productElasticRepository.findByAutocomplete(queryRequest.getQuery());
         List<ProductDto> ProductDto=productMapper.toDtoList(productElastics);
         return ProductDto;

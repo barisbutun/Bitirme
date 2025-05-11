@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Map;
 
-@Document(indexName = "products")
+@Document(indexName = "products_autocomplete")
 @Getter
 @Setter
 @AllArgsConstructor

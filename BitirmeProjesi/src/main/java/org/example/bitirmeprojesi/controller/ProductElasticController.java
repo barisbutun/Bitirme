@@ -20,7 +20,7 @@ public class ProductElasticController {
 
     @PostMapping("/v1/autocomplete")
     public ResponseEntity<List<ProductDto>> searchByQuery(@RequestBody QueryRequest query) {
-        List<ProductDto> products = productElasticService.searchByQuery(query.getQuery());
+        List<ProductDto> products = productElasticService.searchByQuery(query);
         return ResponseEntity.ok(products);
     }
     @PostMapping("/v1/searchByNameOrDescription")
