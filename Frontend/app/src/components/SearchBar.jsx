@@ -33,52 +33,46 @@ const SearchBar = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Arama sonuçları getirilemedi");
+        throw new Error("Arama başarısız");
       }
 
-      const products = await response.json(); // ürünlerin listesi geldi
+      const products = await response.json();
 
-      // Şimdi her ürün için görseli de ayrı çekelim
       const productsWithImages = await Promise.all(
         products.map(async (product) => {
           try {
             const imageResponse = await fetch(
               `http://localhost:8082/api/image/v1/infos/${product.id}`
             );
-            if (!imageResponse.ok) {
-              throw new Error("Resim getirilemedi");
-            }
+            if (!imageResponse.ok) throw new Error("Resim yüklenemedi");
             const imageData = await imageResponse.json();
             const images = imageData.map(
               (base64) => `data:image/jpeg;base64,${base64}`
             );
-
-            return {
-              ...product,
-              image: images[0] || null, // varsa ilk resmi alıyoruz
-            };
-          } catch (error) {
-            console.error(`Ürün resmi alınamadı (ID: ${product.id}):`, error);
-            return {
-              ...product,
-              image: null, // resim yoksa boş bırak
-            };
+            return { ...product, image: images[0] || null };
+          } catch {
+            return { ...product, image: null };
           }
         })
       );
 
       setResults(productsWithImages);
     } catch (error) {
-      console.error("Arama işlemi sırasında hata oluştu:", error);
-      setResults([]); // hata olursa sonuçları sıfırla
+      console.error("Arama hatası:", error);
+      setResults([]);
     } finally {
       setLoading(false);
     }
-  }, 300);
+  }, 500);
 
   const handleSearch = (value) => {
     setQuery(value);
     fetchResults(value);
+    setTimeout(() => {
+      if (results.length > 0) {
+        navigate(`/user/ProductDetails/${results[0].id}`);
+      }
+    }, 500);
   };
 
   const handleItemClick = async (id) => {
@@ -96,12 +90,11 @@ const SearchBar = () => {
 
       const productData = await response.json();
 
-      // Ürün bulunduysa detay sayfasına yönlendir
       navigate(`/user/ProductDetails/${id}`);
     } catch (error) {
       console.error("Ürün kontrol edilirken hata:", error);
       message.error("Ürün bulunamadı!");
-      navigate("/user/Products"); // ürünler sayfasına yönlendir
+      navigate("/user/Products");
     }
   };
 
@@ -110,6 +103,7 @@ const SearchBar = () => {
       <Search
         placeholder="Ürün ara..."
         onChange={(e) => handleSearch(e.target.value)}
+        onSearch={handleSearch}
         value={query}
         allowClear
         enterButton="Ara"

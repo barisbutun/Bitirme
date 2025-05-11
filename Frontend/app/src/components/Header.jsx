@@ -87,7 +87,6 @@ const HeaderComponent = ({
         className="toggle-button"
       />
 
-      {/* SearchBar bileşenini buraya entegre ettik */}
       <SearchBar />
 
       <div
