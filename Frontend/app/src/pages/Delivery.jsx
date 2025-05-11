@@ -15,7 +15,11 @@ const Delivery = () => {
       <Layout className="Delivery-layout">
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Content />
-        <Footer />
+        <Footer>
+          <div className="pagination-inside-footer">
+            <p className="footer-text">@Fashion Design</p>
+          </div>
+        </Footer>
       </Layout>
     </Layout>
   );

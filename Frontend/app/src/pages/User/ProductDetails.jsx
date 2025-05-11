@@ -54,7 +54,11 @@ const ProductDetails = () => {
           )}
         </div>
 
-        <Footer />
+        <Footer>
+          <div className="pagination-inside-footer">
+            <p className="footer-text">@Fashion Design</p>
+          </div>
+        </Footer>
       </Layout>
     </Layout>
   );
