@@ -1,3 +1,4 @@
+import { getAuthHeaders } from "../../utils/auth";
 
 //Bakiye bilgileri
 export const getUserBalance = async () => {
@@ -56,7 +57,7 @@ export const getUserBalance = async () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
-      });
+      }); 
   
       if (!response.ok) {
         throw new Error("Bakiye güncelleme başarısız");
@@ -69,3 +70,22 @@ export const getUserBalance = async () => {
     }
   };
   
+  // Geçmişi görüntüleme
+  export const getBalanceHistory=async(page=0,size=10)=>{
+    try{
+      const response = await fetch(`http://localhost:8082/api/balance/v1/history?page=${page}&size=${size}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      
+    
+    if (!response.ok) {
+      throw new Error("Bakiye geçmişi alınamadı");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("getBalanceHistory hatası:", error);
+    throw error;
+  }
+};

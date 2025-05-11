@@ -6,23 +6,19 @@ import {
   message,
   Spin,
   Typography,
-  List,
-  Card,
+  Table,
+  Flex,
 } from "antd";
-import {
-  PlusCircleOutlined,
-  EditOutlined,
-  CreditCardOutlined,
-} from "@ant-design/icons";
+import { PlusCircleOutlined, CreditCardOutlined } from "@ant-design/icons";
 import CountUp from "react-countup";
-import { motion } from "framer-motion"; // framer-motion import edildi
+import { motion } from "framer-motion";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import {
   loadBalance,
-  updateBalance,
   getUserBalance,
+  getBalanceHistory,
 } from "../../services/UserService/WalletService";
 import "../User/UserCss/WalletPage.css";
 
@@ -35,9 +31,15 @@ const WalletPage = () => {
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     fetchBalance();
+    fetchHistory(0);
   }, []);
 
   const fetchBalance = async () => {
@@ -54,6 +56,52 @@ const WalletPage = () => {
     }
   };
 
+  const fetchHistory = async (pageNum = 0) => {
+    try {
+      if (pageNum === 0) setLoadingHistory(true);
+      else setLoadingMore(true);
+
+      const data = await getBalanceHistory(pageNum, 3);
+
+      if (Array.isArray(data?.content)) {
+        const sortedData = data.content.sort(
+          (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
+        );
+
+        setHistory((prev) => {
+          // Yeni veriyi mevcut geçmişe ekleyin
+          const combinedData = [...prev, ...sortedData];
+
+          // Zaman sırasına göre sıralayın
+          const uniqueHistory = combinedData
+            .sort(
+              (a, b) =>
+                new Date(b.transaction_date) - new Date(a.transaction_date)
+            )
+            .filter(
+              (value, index, self) =>
+                index ===
+                self.findIndex(
+                  (t) => t.transaction_date === value.transaction_date
+                )
+            );
+
+          return uniqueHistory;
+        });
+
+        setHasMore(data?.last ? false : true);
+      } else {
+        console.error("Geçersiz tarih verisi:", data);
+        setHasMore(false);
+      }
+    } catch (error) {
+      message.error("Cüzdan geçmişi alınamadı.");
+    } finally {
+      setLoadingHistory(false);
+      setLoadingMore(false);
+    }
+  };
+
   const handleLoad = async () => {
     if (amount <= 0) {
       message.warning("Lütfen geçerli bir tutar giriniz.");
@@ -63,7 +111,31 @@ const WalletPage = () => {
       setLoading(true);
       await loadBalance({ balance: amount });
       message.success("Bakiye yüklendi.");
-      fetchBalance();
+
+      // Yeni işlemi history'ye ekleyin
+      const newTransaction = {
+        description: "Bakiye Yüklemesi",
+        amount: amount,
+        transaction_date: new Date().toISOString(),
+      };
+
+      // Add new transaction to the history without duplicates
+      setHistory((prev) => {
+        const updatedHistory = [newTransaction, ...prev];
+
+        // Remove duplicates by ensuring each transaction date is unique
+        const uniqueHistory = updatedHistory.filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex((t) => t.transaction_date === value.transaction_date)
+        );
+
+        return uniqueHistory.sort(
+          (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
+        );
+      });
+
+      fetchBalance(); // Bakiye güncellemesini al
     } catch {
       message.error("Yükleme başarısız.");
     } finally {
@@ -71,27 +143,35 @@ const WalletPage = () => {
     }
   };
 
-  const handleUpdate = async () => {
-    if (amount <= 0) {
-      message.warning("Lütfen geçerli bir tutar giriniz.");
-      return;
-    }
-    try {
-      setLoading(true);
-      await updateBalance({ balance: amount });
-      message.success("Bakiye güncellendi.");
-      fetchBalance();
-    } catch {
-      message.error("Güncelleme başarısız.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const walletHistory = [
-    { type: "Yükleme", amount: 100, date: "2024-05-01 12:30" },
-    { type: "Güncelleme", amount: 50, date: "2024-05-03 15:45" },
-    { type: "Yükleme", amount: 200, date: "2024-05-05 10:20" },
+  // Table columns for transaction history
+  const columns = [
+    {
+      title: "Açıklama",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Tutar (₺)",
+      dataIndex: "amount",
+      key: "amount",
+      render: (text) => `${text} ₺`,
+    },
+    {
+      title: "Tarih",
+      dataIndex: "transaction_date",
+      key: "transaction_date",
+      render: (date) =>
+        new Date(date).toLocaleString("tr-TR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      sorter: (a, b) => {
+        return new Date(b.transaction_date) - new Date(a.transaction_date);
+      },
+    },
   ];
 
   return (
@@ -146,8 +226,9 @@ const WalletPage = () => {
                   style={{ width: "100%", marginBottom: 16 }}
                   placeholder="Tutar giriniz"
                 />
-                <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ display: "flex", justifyContent: "center" }}>
                   <Button
+                    style={{ width: "400px" }}
                     className="bakiyebuton"
                     type="primary"
                     icon={<PlusCircleOutlined />}
@@ -155,18 +236,6 @@ const WalletPage = () => {
                     block
                   >
                     Bakiye Yükle
-                  </Button>
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={handleUpdate}
-                    style={{
-                      backgroundColor: "#ff9800",
-                      borderColor: "#ff9800",
-                      color: "#fff",
-                    }}
-                    block
-                  >
-                    Bakiye Güncelle
                   </Button>
                 </div>
               </div>
@@ -180,31 +249,31 @@ const WalletPage = () => {
 
             {/* Sağ panel - geçmiş */}
             <div className="wallet-right-panel">
-              <Title level={4}>Cüzdan Geçmişi</Title>
-              <List
-                grid={{ gutter: 16, column: 1 }}
-                dataSource={walletHistory}
-                renderItem={(item) => (
-                  <List.Item>
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }} // Başlangıç durumları
-                      animate={{ opacity: 1, y: 0 }} // Animasyon bitişi
-                      transition={{ duration: 1.0 }} // Animasyon süresi
-                    >
-                      <Card
-                        title={item.type}
-                        bordered
-                        style={{ backgroundColor: "#f9f9f9" }}
-                      >
-                        <Text>
-                          Tutar: <b>{item.amount} ₺</b>
-                        </Text>
-                        <br />
-                        <Text>Tarih: {item.date}</Text>
-                      </Card>
-                    </motion.div>
-                  </List.Item>
-                )}
+              <Flex
+                justify="space-between"
+                align="center"
+                style={{ marginBottom: 16 }}
+              >
+                <Title level={4} style={{ margin: 0 }}>
+                  Cüzdan Geçmişi
+                </Title>
+              </Flex>
+
+              <Table
+                columns={columns}
+                dataSource={history}
+                loading={loadingHistory}
+                pagination={{
+                  pageSize: 3,
+                  onChange: (page) => {
+                    setPage(page - 1);
+                    fetchHistory(page - 1);
+                  },
+                  total: hasMore ? (page + 2) * 3 : (page + 1) * 3,
+                }}
+                rowKey={(record, index) => index}
+                locale={{ emptyText: "Henüz bir işlem bulunmamaktadır." }}
+                scroll={false}
               />
             </div>
           </div>

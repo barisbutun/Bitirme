@@ -52,7 +52,9 @@
     background-color:#5e5b6f ;
     border-color: #403e48;
   }
-
+.bakiyebuton:hover{
+  background-color: #928dab !important;
+}
   .wallet-main-layout {
     display: flex;
     justify-content: space-between;
@@ -79,6 +81,8 @@
     margin-top: 0px;
 
   }
+
+
 
   
   
