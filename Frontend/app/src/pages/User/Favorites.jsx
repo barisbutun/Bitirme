@@ -115,7 +115,12 @@ const Favorites = () => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="favorites-layout">
+      <Layout
+        className="favorites-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="favorites-page">
           <h2>Favori Ürünlerim</h2>

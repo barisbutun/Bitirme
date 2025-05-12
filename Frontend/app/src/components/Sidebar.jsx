@@ -1,7 +1,6 @@
 import React from "react";
 import {
   UserOutlined,
-  SettingOutlined,
   HomeOutlined,
   ShoppingCartOutlined,
   LoginOutlined,
@@ -78,11 +77,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       key: "9",
       icon: <CreditCardFilled />,
       label: <Link to="/user/Payment">Ödeme Bilgileri</Link>,
-    },
-    {
-      key: "10",
-      icon: <SettingOutlined />,
-      label: <Link to="/user/settings">Ayarlar</Link>,
     },
   ].filter(Boolean); // undefined değerleri kaldırmak için filter(Boolean) kullanın
 
