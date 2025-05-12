@@ -11,6 +11,7 @@ import {
   Skeleton,
   Collapse,
 } from "antd";
+import { CardText, CardTitle } from "reactstrap";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import "../css/ProductDetailsCard.css";
 import { addToCart } from "../services/ProductService/ShoppingCardService";
@@ -166,6 +167,20 @@ const ProductDetailsCard = ({ product, images }) => {
               defaultValue={product.averageRating || 0}
             />
           </Tooltip>
+          <CardText className="product-info">
+            Açıklama:
+            <ul className="description-list">
+              {product.description
+                .split(".") // Noktaya göre ayır
+                .filter((item) => item.trim() !== "") // Boş cümleleri at
+                .map((item, index) => (
+                  <li key={index} className={`font-style-${index % 3}`}>
+                    {item.trim()}.
+                  </li>
+                ))}
+            </ul>
+          </CardText>
+
           <p style={{ marginTop: 4 }}>{reviewCount} yorum</p>
 
           <p className="product-details-price">{product.price} TL</p>
@@ -213,8 +228,12 @@ const ProductDetailsCard = ({ product, images }) => {
           <Collapse className="extra-collapse" bordered={false}>
             <Panel header="Model Bilgileri" key="1">
               <ul className="extra-info-list">
-                Modelin Üzerindeki Beden: S, Modelin Ölçüleri: Boy: 175 cm,
-                Göğüs: 86 cm, Bel: 60 cm, Basen: 90 cm"
+                <li>Modelin Üzerindeki Beden: S</li>
+                <li>Modelin Ölçüleri: </li>
+                <li>Boy: 175 cm</li>
+                <li> Göğüs: 86 cm </li>
+                <li>Bel: 60 cm</li>
+                <li>Basen: 90 cm</li>
               </ul>
             </Panel>
             <Panel header="Satış Şartları" key="2">

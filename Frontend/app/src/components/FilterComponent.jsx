@@ -21,16 +21,12 @@ const FilterComponent = ({ onApplyFilter }) => {
   const onFinish = (values) => {
     onApplyFilter({
       ...values,
-      category: values.category, // Sadece kategori adını gönderiyoruz
+      category: values.category,
     });
   };
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
-      <Form.Item name="name" label="Ürün Adı">
-        <Input placeholder="Ürün adı girin" />
-      </Form.Item>
-
       <Form.Item name="category" label="Kategori">
         <Select placeholder="Kategori seçin" allowClear>
           {categories.map((cat) => (

@@ -149,3 +149,28 @@ height: auto;
   color: #555;
   margin-bottom: 6px;
 }
+
+.description-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+/* Her maddeye farklı stil */
+.font-style-0 {
+  font-family: Georgia;
+  color: #333;
+  font-size: 13px;
+}
+
+.font-style-1 {
+  font-family: "Georgia";
+  color:#333;
+  font-size: 13px;
+}
+
+.font-style-2 {
+  font-family: Georgia;
+  color: #333;
+  font-size: 13px;
+}
