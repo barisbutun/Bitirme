@@ -8,47 +8,101 @@ import {
   Descriptions,
   notification,
   Space,
+  Input,
+  Checkbox,
 } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import "../User/UserCss/Orders.css";
-import { getToken } from "../../utils/auth";
+import {
+  fetchAllOrders,
+  getOrderItemsByUser,
+} from "../../services/ProductService/OrdersService";
+
+const API_BASE_URL = "http://localhost:8082";
 
 const Orders = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [productImageMap, setProductImageMap] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isSameAddress, setIsSameAddress] = useState(true);
+  const [newAddress, setNewAddress] = useState({
+    street: "",
+    city: "",
+    zip: "",
+  });
   const navigate = useNavigate();
 
+  const fetchProductImages = async (productId) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/image/v1/infos/${productId}`
+      );
+      if (!response.ok) throw new Error(`Resim alınamadı: ${productId}`);
+      const images = await response.json();
+      return images.length > 0 && images[0].data
+        ? `data:image/jpeg;base64,${images[0].data}`
+        : null;
+    } catch (error) {
+      console.error("Resim yüklenirken hata:", error);
+      return null;
+    }
+  };
+
+  const fetchOrderProducts = async (orderId) => {
+    try {
+      const items = await getOrderItemsByUser(orderId);
+      const updatedImageMap = { ...productImageMap };
+
+      const productsWithImages = await Promise.all(
+        items.map(async (item) => {
+          if (!updatedImageMap[item.product.id]) {
+            const img = await fetchProductImages(item.product.id);
+            updatedImageMap[item.product.id] = img;
+          }
+          return {
+            ...item.product,
+            quantity: item.quantity,
+            image: updatedImageMap[item.product.id],
+          };
+        })
+      );
+
+      setProductImageMap(updatedImageMap);
+      return productsWithImages;
+    } catch (error) {
+      console.error("Ürün detayları alınamadı", error);
+      return [];
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrdersWithProducts = async () => {
       try {
-        const response = await fetch("http://localhost:8082/api/order/v1", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`,
-          },
-        });
+        const pageData = await fetchAllOrders();
+        const data = pageData.content || pageData;
 
-        if (!response.ok) {
-          throw new Error("Siparişler alınamadı");
-        }
+        const formattedOrders = await Promise.all(
+          data.map(async (order, index) => {
+            const products = await fetchOrderProducts(order.id);
+            return {
+              ...order,
+              key: order.id || index,
+              products,
+              saleDate: order.sale_date,
+              sumPrice: order.sum_price.toFixed(2),
+              stockState: order.stock_state
+                ? order.stock_state.toString()
+                : "Bilinmiyor",
+            };
+          })
+        );
 
-        const data = await response.json();
-        console.log("Siparişler:", data);
-
-        // Eğer API'den dönen veri ID içermiyorsa, düzeltme yapalım
-        const formattedOrders = data.map((order, index) => ({
-          ...order,
-          key: order.id || index, // ID yoksa key olarak index kullan
-        }));
-
-        // Siparişleri en yeni sipariş en başta olacak şekilde ters çevir
         setOrders(formattedOrders.reverse());
       } catch (error) {
         console.error("Sipariş verileri alınamadı:", error);
@@ -62,7 +116,7 @@ const Orders = () => {
       }
     };
 
-    fetchOrders();
+    fetchOrdersWithProducts();
   }, []);
 
   const handleCheckout = (id) => {
@@ -73,12 +127,11 @@ const Orders = () => {
       });
       return;
     }
-    navigate(`/Payment?orderId=${id}`);
+    navigate(`/user/Payment?orderId=${id}`);
   };
 
-  const viewOrderDetails = async (id) => {
-    console.log("Görüntüle butonuna tıklanan sipariş ID'si:", id);
-    if (!id) {
+  const viewOrderDetails = async (order) => {
+    if (!order?.id) {
       notification.error({
         message: "Hata",
         description: "Sipariş ID'si bulunamadı!",
@@ -87,25 +140,8 @@ const Orders = () => {
     }
 
     try {
-      const response = await fetch(
-        ` http://localhost:8082/api/product/v1/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Sipariş detayları alınamadı");
-      }
-
-      const orderDetails = await response.json();
-      console.log("Sipariş Detayları:", orderDetails);
-
-      setSelectedOrder(orderDetails);
+      const products = await fetchOrderProducts(order.id);
+      setSelectedOrder({ ...order, products });
       setDrawerVisible(true);
     } catch (error) {
       console.error("Sipariş detayları alınamadı:", error);
@@ -117,45 +153,75 @@ const Orders = () => {
     }
   };
 
+  const handleAddressChange = (e) => {
+    setIsSameAddress(e.target.checked);
+  };
+
+  const handleNewAddressChange = (e) => {
+    const { name, value } = e.target;
+    setNewAddress((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const columns = [
     {
       title: "Sipariş ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => text || "Bilinmiyor",
     },
     {
       title: "Açıklama",
-      dataIndex: "name",
+      dataIndex: "description",
       key: "description",
     },
     {
       title: "Toplam Fiyat",
-      dataIndex: "sum_price",
-      key: "sum_price",
+      dataIndex: "sumPrice",
+      key: "sumPrice",
+      render: (text) => `${text} ₺`,
     },
     {
       title: "Durum",
-      dataIndex: "payment_state",
-      key: "payment_state",
+      dataIndex: "stockState",
+      key: "stockState",
+    },
+    {
+      title: "Ürünler",
+      key: "products",
+      render: (_, record) => (
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {record.products?.length > 0 ? (
+            record.products.map((product, index) => (
+              <img
+                key={index}
+                src={product.image}
+                alt={product.name}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  objectFit: "cover",
+                  borderRadius: "4px",
+                }}
+                onError={(e) => (e.target.style.display = "none")}
+              />
+            ))
+          ) : (
+            <span>Yok</span>
+          )}
+        </div>
+      ),
     },
     {
       title: "İşlemler",
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button
-            type="primary"
-            onClick={() => viewOrderDetails(record.id)}
-            disabled={!record.id}
-          >
+          <Button type="primary" onClick={() => viewOrderDetails(record)}>
             Görüntüle
           </Button>
-          <Button
-            type="primary"
-            onClick={() => handleCheckout(record.id)}
-            disabled={!record.id}
-          >
+          <Button type="primary" onClick={() => handleCheckout(record.id)}>
             Sipariş Et
           </Button>
         </Space>
@@ -166,9 +232,13 @@ const Orders = () => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout className="Orders-layout">
+      <Layout
+        className="Orders-layout"
+        style={{
+          marginLeft: collapsed ? 0 : 200,
+        }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
-
         <div className="orders-content">
           <Typography.Title level={2}>Siparişlerim</Typography.Title>
           <Table
@@ -180,44 +250,47 @@ const Orders = () => {
             className="order-table"
           />
         </div>
-
-        <Footer />
+        <Footer>
+          <div className="pagination-inside-footer">
+            <p className="footer-text">@Fashion Design</p>
+          </div>
+        </Footer>
       </Layout>
 
-      {/* Sipariş Detayları Drawer */}
       <Drawer
         title="Sipariş Detayları"
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={isDrawerVisible}
-        width={400}
+        width={450}
       >
         {selectedOrder && (
           <Descriptions bordered column={1}>
             <Descriptions.Item label="Sipariş ID">
-              {selectedOrder.id || "Bilinmiyor"}
+              {selectedOrder.id}
             </Descriptions.Item>
             <Descriptions.Item label="Tarih">
-              {selectedOrder.sale_date || "Bilinmiyor"}
+              {selectedOrder.saleDate}
             </Descriptions.Item>
             <Descriptions.Item label="Toplam Tutar">
-              {selectedOrder.sum_price || "Bilinmiyor"}
+              {selectedOrder.sumPrice} ₺
             </Descriptions.Item>
             <Descriptions.Item label="Durum">
-              {selectedOrder.payment_state || "Bilinmiyor"}
+              {selectedOrder.stockState}
             </Descriptions.Item>
             <Descriptions.Item label="Ürünler">
-              <ul>
-                {selectedOrder.products && selectedOrder.products.length > 0 ? (
+              <ul style={{ paddingLeft: "1rem" }}>
+                {selectedOrder.products?.length > 0 ? (
                   selectedOrder.products.map((product, index) => (
-                    <li key={product.id || index}>
+                    <li key={index} style={{ marginBottom: 10 }}>
                       <img
                         src={product.image}
                         alt={product.name}
-                        style={{ width: "50px", marginRight: "10px" }}
+                        style={{ width: 50, marginRight: 10 }}
+                        onError={(e) => (e.target.style.display = "none")}
                       />
-                      {product.name} - {product.price} TL (Adet:{" "}
-                      {product.quantity})
+                      {product.name || "İsimsiz ürün"} -{" "}
+                      {product.price || "???"} TL (Adet: {product.quantity})
                     </li>
                   ))
                 ) : (
@@ -227,6 +300,38 @@ const Orders = () => {
             </Descriptions.Item>
           </Descriptions>
         )}
+
+        <div className="address-selection" style={{ marginTop: "1rem" }}>
+          <Checkbox checked={isSameAddress} onChange={handleAddressChange}>
+            Kayıtlı adresi kullan
+          </Checkbox>
+
+          {!isSameAddress && (
+            <Space
+              direction="vertical"
+              style={{ marginTop: 10, width: "100%" }}
+            >
+              <Input
+                placeholder="Sokak Adresi"
+                name="street"
+                value={newAddress.street}
+                onChange={handleNewAddressChange}
+              />
+              <Input
+                placeholder="Şehir"
+                name="city"
+                value={newAddress.city}
+                onChange={handleNewAddressChange}
+              />
+              <Input
+                placeholder="Posta Kodu"
+                name="zip"
+                value={newAddress.zip}
+                onChange={handleNewAddressChange}
+              />
+            </Space>
+          )}
+        </div>
       </Drawer>
     </Layout>
   );
