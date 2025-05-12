@@ -10,7 +10,7 @@ import {
   notification,
   Spin,
 } from "antd";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -22,55 +22,80 @@ const Payment = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
+  const [form] = Form.useForm(); // form tanımlandı
+  const navigate = useNavigate();
 
   const orderId = searchParams.get("orderId");
   const { Title, Text } = Typography;
 
   const getToken = () => localStorage.getItem("token");
 
+  const fetchOrder = async () => {
+    // fetchOrder fonksiyonu tanımlandı
+    try {
+      const response = await fetch(
+        `http://localhost:8082/api/product/v1/${orderId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Sipariş alınamadı");
+
+      const data = await response.json();
+
+      const productsWithImages = await Promise.all(
+        data.products.map(async (product) => {
+          const imageRes = await fetch(
+            `http://localhost:8082/image/v1/infos/${product.id}`
+          );
+          const images = await imageRes.json();
+          return {
+            ...product,
+            image:
+              images?.length > 0 ? `data:image/jpeg;base64,${images[0]}` : null,
+          };
+        })
+      );
+
+      setOrder({ ...data, products: productsWithImages });
+      setLoading(false);
+    } catch (error) {
+      console.error("Sipariş verisi alınamadı:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8082/api/product/v1/${orderId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getToken()}`,
-            },
-          }
-        );
-
-        if (!response.ok) throw new Error("Sipariş alınamadı");
-
-        const data = await response.json();
-
-        const productsWithImages = await Promise.all(
-          data.products.map(async (product) => {
-            const imageRes = await fetch(
-              `http://localhost:8082/image/v1/infos/${product.id}`
-            );
-            const images = await imageRes.json();
-            return {
-              ...product,
-              image:
-                images?.length > 0
-                  ? `data:image/jpeg;base64,${images[0]}`
-                  : null,
-            };
-          })
-        );
-
-        setOrder({ ...data, products: productsWithImages });
-        setLoading(false);
-      } catch (error) {
-        console.error("Sipariş verisi alınamadı:", error);
-        setLoading(false);
-      }
-    };
-
     if (orderId) fetchOrder();
+    fetchUserData();
   }, [orderId]);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8082/api/user/v1/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Kullanıcı bilgileri alınamadı");
+
+      const userData = await response.json();
+      form.setFieldsValue({
+        fullName: userData.name,
+        address: userData.address,
+      });
+    } catch (error) {
+      console.error("Kullanıcı bilgileri alınamadı:", error);
+    }
+  };
 
   const totalPrice = order?.sum_price || 0;
 
@@ -82,6 +107,9 @@ const Payment = () => {
         description: "Siparişiniz başarıyla alındı. Teşekkür ederiz!",
         duration: 3,
       });
+      setTimeout(() => {
+        navigate("/thank-you"); // Teşekkür sayfasına yönlendirme
+      }, 3000);
     } else {
       notification.error({
         message: "Yetersiz Bakiye",
@@ -106,9 +134,13 @@ const Payment = () => {
             <Title level={2}>Ödeme Sayfası</Title>
 
             {loading ? (
-              <Spin size="large" />
+              <div className="loading-container">
+                <Spin size="large" />
+                <p>Ödemeniz yükleniyor...</p>
+              </div>
             ) : order ? (
               <Form
+                form={form} // form parametresi burada verildi
                 layout="vertical"
                 onFinish={handlePayment}
                 className="payment-form"
@@ -127,6 +159,7 @@ const Payment = () => {
                 <Form.Item
                   label="Adres"
                   name="address"
+                  initialValue={order?.address || ""}
                   rules={[
                     { required: true, message: "Lütfen adresinizi girin" },
                   ]}
@@ -173,6 +206,7 @@ const Payment = () => {
                     type="primary"
                     htmlType="submit"
                     className="payment-button"
+                    disabled={walletBalance < totalPrice} // Butonu devre dışı bırak
                   >
                     Ödemeyi Tamamla
                   </Button>

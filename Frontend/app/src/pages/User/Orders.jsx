@@ -81,10 +81,13 @@ const Orders = () => {
       const orderDto = {
         description: "sipariş",
         is_same_address: useSavedAddress,
+        address: useSavedAddress ? null : newAddress.trim(),
       };
 
       const created = await createOrder(orderDto);
+
       notification.success({ message: "Sipariş başarıyla oluşturuldu" });
+
       navigate("/user/Payment", { state: { cartItems, order: created } });
     } catch (err) {
       notification.error({
