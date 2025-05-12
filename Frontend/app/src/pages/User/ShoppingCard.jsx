@@ -105,7 +105,7 @@ const ShoppingCard = () => {
         products: cartWithImages.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
-          size: item.size, // size bilgisi burada da kullanılıyor
+          size: item.size,
         })),
       };
 
@@ -241,6 +241,11 @@ const ShoppingCard = () => {
       ),
     },
     {
+      title: "Beden",
+      dataIndex: "size",
+      key: "size",
+    },
+    {
       title: "Fiyat",
       dataIndex: ["product", "price"],
       key: "price",
@@ -282,7 +287,7 @@ const ShoppingCard = () => {
               <Button
                 className="SiparisButon"
                 type="primary"
-                onClick={handleOrder}
+                onClick={() => navigate("/user/Orders", { state: data })}
                 disabled={data.length === 0}
               >
                 Sepeti Onayla
@@ -290,6 +295,7 @@ const ShoppingCard = () => {
             </div>
           )}
         />
+
         <Footer>
           <div className="pagination-inside-footer">
             <p className="footer-text">@Fashion Design</p>

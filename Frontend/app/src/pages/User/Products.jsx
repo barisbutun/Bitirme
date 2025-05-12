@@ -30,7 +30,7 @@ const Products = ({ setLoading }) => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        setLoading(true);
+        setLoading(false);
 
         const response = await fetchProducts(page - 1, size); // page-1, çünkü backend genellikle sıfırdan başlar
 

@@ -17,20 +17,23 @@ export const fetchAllOrders = async () => {
   return await response.json();
 };
 
-//Sipariş Oluşturma
-export const createOrder = async (orderData,page=0,size=10) => {
-    const response = await fetch(` http://localhost:8082/api/order/v1?
-    page=${page}&size=${size}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-      body: JSON.stringify(orderData),
-    });
-    if (!response.ok) throw new Error("Sipariş oluşturulamadı.");
-    return await response.json();
-  };
+export const createOrder = async (orderData) => {
+  const response = await fetch("http://localhost:8082/api/order/v1", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(orderData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error( "Sipariş oluşturulamadı.");
+  }
+
+  return response.json();
+};
 
 //Sipariş Güncelleme
 export const updateOrder = async (id, updatedData) => {

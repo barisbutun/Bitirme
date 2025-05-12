@@ -115,14 +115,13 @@ export const clearCartByUserId = async () => {
 
 
 
-// Sepetteki tüm ürünleri getirme
 export const getCartByUserId = async () => {
   const token = getToken();
 
   if (!token) {
     message.warning({
       content: "Kullanıcı girişi yapılmamış",
-      key: "login-warning", 
+      key: "login-warning",
     });
     return;
   }
@@ -140,25 +139,28 @@ export const getCartByUserId = async () => {
     }
 
     const cartItems = await response.json();
-    console.log("Backend'den gelen ham sepet verisi:", cartItems);
-
+    console.log("✅ Backend'den gelen ham sepet verisi:", cartItems);
+    
     if (!cartItems.content || !Array.isArray(cartItems.content)) {
       throw new Error("Geçersiz sepet verisi");
     }
 
     if (cartItems.content.length === 0) {
-      console.log("Sepetiniz boş.");
+      console.log("ℹ️ Sepetiniz boş.");
       return [];
     }
 
     const cartItemsWithImages = await Promise.all(
-      cartItems.content.map(async (item) => {
+      cartItems.content.map(async (item, index) => {
+        console.log(`🔹 [${index}] Ürün verisi:`, item);
+
         try {
           const images = await fetchProductImages(item.product_id);
 
           return {
             id: item.id,
             quantity: item.quantity,
+            size: item.size, // ✅ burada size ekleniyor
             product: {
               id: item.product_id,
               name: item.name,
@@ -167,10 +169,12 @@ export const getCartByUserId = async () => {
             },
           };
         } catch (error) {
-          console.error(`Ürün ${item.product_id} için resim alınamadı:`, error);
+          console.error(`❌ Ürün ${item.product_id} için resim alınamadı:`, error);
+
           return {
             id: item.id,
             quantity: item.quantity,
+            size: item.size, // hata durumunda da size'ı ekliyoruz
             product: {
               id: item.product_id,
               name: item.name,
@@ -182,13 +186,14 @@ export const getCartByUserId = async () => {
       })
     );
 
-    console.log("Resimlerle birlikte sepet verisi:", cartItemsWithImages);
+    console.log("🧾 Resimlerle birlikte zenginleştirilmiş sepet verisi:", cartItemsWithImages);
     return cartItemsWithImages;
   } catch (error) {
-    console.error("Sepet verisi alınamadı:", error);
+    console.error("🚨 Sepet verisi alınamadı:", error);
     throw error;
   }
 };
+
 export const updateCartItemQuantity = async (itemId, product_id, size, newQuantity) => {
   const token = getToken();
   if (!token) throw new Error("Kullanıcı girişi yapılmamış");
