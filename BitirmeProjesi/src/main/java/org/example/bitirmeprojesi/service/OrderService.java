@@ -16,6 +16,7 @@ import org.example.bitirmeprojesi.repository.OrderRepository;
 import org.example.bitirmeprojesi.repository.ShoppingCartItemRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.validator.OrderValidator;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,7 @@ public class OrderService {
     private final OrderItemService orderItemService;
 
     @Transactional
+    @CacheEvict(value="products",allEntries = true)
     public OrdersDto create(OrdersDto ordersDto, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));

@@ -42,11 +42,17 @@ public class ChatBotService {
         String token = JwtUtil.getToken();
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("sender", JwtUtil.getUserIdFromToken().toString());
-        requestBody.put("message", questionDto.getQuestion());
 
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("Authorization", "Bearer " + token);
+        if(!(token ==null)){
+            metadata.put("Authorization", "Bearer " + token);
+            requestBody.put("sender", JwtUtil.getUserIdFromToken().toString());
+        }
+        else{
+            requestBody.put("sender", "guest");
+        }
+
+        requestBody.put("message", questionDto.getQuestion());
         requestBody.put("metadata", metadata);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -83,8 +89,9 @@ public class ChatBotService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
-        headers.setBearerAuth(JwtUtil.getToken());
-
+        if(!(JwtUtil.getToken() == null)){
+            headers.setBearerAuth(JwtUtil.getToken());
+        }
         return headers;
     }
 

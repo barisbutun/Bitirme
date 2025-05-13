@@ -14,7 +14,7 @@ public class JwtUtil {
     public static UUID getUserIdFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
-           return null;
+            throw new JwtNotFoundException(ErrorMesage.JWT_TOKEN_NOT_FOUND_ERROR);
         }
         Jwt jwt = (Jwt) authentication.getPrincipal();
         return UUID.fromString(jwt.getClaimAsString("userId"));
@@ -23,7 +23,7 @@ public class JwtUtil {
     public static String getToken(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
-            return null;
+            throw new JwtNotFoundException(ErrorMesage.JWT_TOKEN_NOT_FOUND_ERROR);
         }
         Jwt jwt = (Jwt) authentication.getPrincipal();
 

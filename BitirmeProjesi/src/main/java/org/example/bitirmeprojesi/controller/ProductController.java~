@@ -62,12 +62,13 @@ public class ProductController {
 
     @GetMapping("/v1/filter")
     public ResponseEntity<Page<ProductDto>> filter(@RequestParam(required = false,defaultValue = "0" ) int page,
-                                                   @RequestParam(required = false,defaultValue = "12") int size,
+                                                    @RequestParam(required = false,defaultValue = "12") int size,
+                                                   @RequestParam(required = false) String name,
                                                    @RequestParam(required = false) List<String> category,
                                                    @RequestParam(required = false) Double minPrice,
                                                    @RequestParam(required = false) Double maxPrice
     ,@RequestParam(required = false,defaultValue = "asc") String sortBy) {
-        Page<ProductDto> products = productService.filterbyProduct(page,size, category, minPrice, maxPrice, sortBy);
+        Page<ProductDto> products = productService.filterbyProduct(page,size,name, category, minPrice, maxPrice, sortBy);
         return ResponseEntity.ok(products);
     }
 

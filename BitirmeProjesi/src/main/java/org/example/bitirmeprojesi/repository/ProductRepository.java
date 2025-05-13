@@ -5,6 +5,7 @@ import jakarta.persistence.LockModeType;
 import org.example.bitirmeprojesi.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
@@ -21,15 +22,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
 
     @Query("SELECT p FROM Product p WHERE " +
-            "( :category IS NULL OR p.category.name IN :categories ) AND " +
-            "( :name IS NULL OR p.name = :name ) AND " +
-            "( :minPrice IS NULL OR p.price >= :minPrice ) AND " +
-            "( :maxPrice IS NULL OR p.price <= :maxPrice ) " +
-            "ORDER BY p.price ASC")
-    List<Product> findByFilters(@Param("name") String name,
-                                @Param("categories") List<String> category,
+            "(:categories IS NULL OR p.category.name IN :categories) AND " +
+            "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
+            "(:maxPrice IS NULL OR p.price <= :maxPrice)")
+    Page<Product> findByFilters(@Param("categories") List<String> category,
                                 @Param("minPrice") Double minPrice,
-                                @Param("maxPrice") Double maxPrice);
+                                @Param("maxPrice") Double maxPrice,
+                                Pageable pageable);
 
     @Query("SELECT p.category.id FROM Product p WHERE p.id = :productId")
     Long findCategoryIdByProductId(Long productId);

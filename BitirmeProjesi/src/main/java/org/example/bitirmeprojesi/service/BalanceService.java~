@@ -52,7 +52,7 @@ public class BalanceService {
 
     public Page<BalanceTransactionResponseDto> getBalanceHistory(UUID userId,int page,int size){
 
-        Sort sort = Sort.by(Sort.Order.desc("transactionDate"));
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
 
         Pageable pageable = PageRequest.of(page, size, sort);
         User user = userRepository.findById(userId)

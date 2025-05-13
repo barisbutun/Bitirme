@@ -7,11 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.entity.Product;
-import org.example.bitirmeprojesi.enums.Size;
-import org.example.bitirmeprojesi.enums.StockState;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.CategoryNotFoundException;
-import org.example.bitirmeprojesi.exception.error.InvalidProductInformationException;
 import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
 import org.example.bitirmeprojesi.mapper.ProductMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
@@ -27,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -115,11 +111,19 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    public List<ProductDto> filterbyProduct(String name,
+    public Page<ProductDto> filterbyProduct(int page,
+                                            int size,
                                             List<String> categories,
                                             Double minPrice,
-                                            Double maxPrice) {
-        return productMapper.toDtoList(productRepository.findByFilters(name,categories, minPrice, maxPrice));
+                                            Double maxPrice
+                                            ,String orderBy) {
+
+        Sort sort = Sort.by(orderBy.equalsIgnoreCase("desc") ? Sort.Order.desc("price") : Sort.Order.asc("price"));
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Product> productPage = productRepository.findByFilters(categories, minPrice, maxPrice, pageable);
+        Page<ProductDto> dtoPage = productPage.map(productMapper::toDto);
+        return dtoPage;
     }
 
     @CacheEvict(value = "products", allEntries = true)

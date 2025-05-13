@@ -27,7 +27,7 @@ public class FavouriteController {
 
     @GetMapping("/v1/getAllByUserId")
     public ResponseEntity<Page<FavouriteDto>> getlAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
-                                                              @RequestParam(required = false, defaultValue = "50") int size) {
+                                                              @RequestParam(required = false, defaultValue = "10") int size) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(favouriteService.getlAllByUserId(userId, page, size));
     }
