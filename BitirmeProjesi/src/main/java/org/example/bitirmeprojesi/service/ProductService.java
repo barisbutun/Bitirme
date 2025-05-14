@@ -17,6 +17,7 @@ import org.example.bitirmeprojesi.repository.ReviewRepository;
 import org.example.bitirmeprojesi.validator.ProductValidator;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,10 @@ public class ProductService {
 
 
     @Transactional
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public ProductDto create(ProductDto productDto) throws Exception {
         if (productDto.getCategoryId() == null) {
             throw new CategoryNotFoundException(ErrorMesage.CATEGORY_NOT_FOUND_ERROR);
@@ -99,8 +103,16 @@ public class ProductService {
         log.info("Product Page: {}", dtoPage);
         return dtoPage;
     }
+    @Cacheable(value = "products_list", key = "'all'")
+    public List<ProductDto> findAll() {
+        List<Product> products = productRepository.findAll();
+        return productMapper.toDtoList(products);
+    }
 
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public ProductDto update(ProductDto productDto, long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
@@ -126,7 +138,10 @@ public class ProductService {
         return dtoPage;
     }
 
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public void delete(long id) {
         productRepository.deleteById(id);
     }

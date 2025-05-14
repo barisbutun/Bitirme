@@ -70,6 +70,11 @@ public class ProductController {
         Page<ProductDto> products = productService.filterbyProduct(page,size, category, minPrice, maxPrice, sortBy);
         return ResponseEntity.ok(products);
     }
+    @GetMapping("/v1/all")
+    public ResponseEntity<List<ProductDto>> findAll() {
+        List<ProductDto> products = productService.findAll();
+        return ResponseEntity.ok(products);
+    }
 
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {

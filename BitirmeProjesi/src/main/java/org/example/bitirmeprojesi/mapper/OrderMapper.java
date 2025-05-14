@@ -1,5 +1,6 @@
 package org.example.bitirmeprojesi.mapper;
 
+import org.example.bitirmeprojesi.dto.DeliveryDto;
 import org.example.bitirmeprojesi.dto.OrderGetOrderItemsDto;
 import org.example.bitirmeprojesi.dto.OrderItemDto;
 import org.example.bitirmeprojesi.dto.OrdersDto;
@@ -11,11 +12,13 @@ import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+uses = {DeliveryMapper.class})
 public interface OrderMapper {
     Orders toEntity(final OrdersDto ordersDto);
 
     @Mapping(target = "orderItems", expression = "java(order.getOrderItems() != null ? order.getOrderItems().stream().map(this::toOrderItemDto).collect(java.util.stream.Collectors.toList()) : null)")
+    @Mapping(target = "delivery", expression = "java(order.getDelivery() != null ? order.getDelivery().toDto() : null)")
     OrdersDto toDto(Orders order);
 
     List<OrdersDto> toDtoList(final List<Orders> ordersList);

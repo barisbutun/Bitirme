@@ -17,6 +17,7 @@ import org.example.bitirmeprojesi.repository.ReviewRepository;
 import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +34,10 @@ public class ReviewService {
 
 
     @Transactional
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public ReviewDto create(ReviewDto reviewDto) {
         UUID userId = JwtUtil.getUserIdFromToken();
         Review review = reviewMapper.toEntity(reviewDto);
@@ -90,7 +94,10 @@ public class ReviewService {
                 .average()
                 .orElse(0.0);
     }
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public ReviewDto update(Long id, ReviewDto reviewDto) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException(ErrorMesage.REVIEW_NOT_FOUND_ERROR));
@@ -103,7 +110,10 @@ public class ReviewService {
 
         return reviewMapper.toDto(review);
     }
-    @CacheEvict(value = "products", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "products_list", allEntries = true)
+    })
     public void delete(Long id) {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new ReviewNotFoundException(ErrorMesage.REVIEW_NOT_FOUND_ERROR));
         reviewRepository.deleteById(id);

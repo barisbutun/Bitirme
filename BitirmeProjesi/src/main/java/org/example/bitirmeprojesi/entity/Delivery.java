@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.dto.DeliveryDto;
 import org.example.bitirmeprojesi.enums.DeliveryStatus;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -40,10 +41,26 @@ public class Delivery {
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
         this.deliveryDate = LocalDateTime.now();
     }
 
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt= LocalDateTime.now();
+    }
+
+    public DeliveryDto toDto() {
+        DeliveryDto deliveryDto = new DeliveryDto();
+        deliveryDto.setId(this.id);
+        deliveryDto.setCompanyName(this.companyName);
+        deliveryDto.setDeliveryState(this.deliveryState);
+        deliveryDto.setDeliveryDate(this.deliveryDate);
+        deliveryDto.setUpdatedAt(this.updatedAt);
+        return deliveryDto;
+    }
 }

@@ -5,6 +5,8 @@ import org.example.bitirmeprojesi.dto.CategoryDto;
 import org.example.bitirmeprojesi.entity.Category;
 import org.example.bitirmeprojesi.mapper.CategoryMapper;
 import org.example.bitirmeprojesi.repository.CategoryRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,6 +20,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryDto create(CategoryDto categoryDto) {
         Category category = categoryMapper.toEntity(categoryDto);
          categoryRepository.save(category);
@@ -27,6 +30,7 @@ public class CategoryService {
         Category category=categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
         return categoryMapper.toDto(category);
     }
+    @Cacheable(value = "categories", key = "'all'")
     public List<CategoryDto> findAll(){
         return categoryRepository.findAll().stream().map(categoryMapper::toDto).toList();
     }
@@ -43,7 +47,7 @@ public class CategoryService {
         return categoryCountMap;
     }
 
-
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryDto update(CategoryDto categoryDto, long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
         categoryMapper.update(categoryDto, category);
@@ -51,7 +55,7 @@ public class CategoryService {
         return categoryMapper.toDto(category);
 
     }
-
+    @CacheEvict(value = "categories", allEntries = true)
     public void delete(long id) {
         categoryRepository.deleteById(id);
     }

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.entity.Delivery;
 import org.example.bitirmeprojesi.entity.Orders;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.StockState;
@@ -54,6 +55,9 @@ public class OrdersDto implements Serializable {
 
     @JsonIgnore
     private UUID userId;
+
+    @JsonProperty(value = "delivery",access = JsonProperty.Access.READ_ONLY)
+    private DeliveryDto delivery;
 
     private List<OrderItemDto> orderItems;
 

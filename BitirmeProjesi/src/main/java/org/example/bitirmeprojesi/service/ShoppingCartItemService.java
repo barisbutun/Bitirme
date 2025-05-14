@@ -77,7 +77,7 @@ public class ShoppingCartItemService {
         Page<ShoppingCartItemDto> shoppingCartItemsDto=shoppingCartItems.map(shoppingCartItemMapper::toDto);
         return shoppingCartItemsDto;
     }
-
+    @Transactional
     public void delete(UUID userId,Long id) {
 
         ShoppingCartItem shoppingCartItem =
