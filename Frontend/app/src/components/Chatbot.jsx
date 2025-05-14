@@ -48,6 +48,28 @@ const Chatbot = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const parseLinks = (text) => {
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(linkRegex);
+
+    return parts.map((part, index) => {
+      if (linkRegex.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#1677ff", wordBreak: "break-word" }}
+          >
+            {part}
+          </a>
+        );
+      }
+      return <React.Fragment key={index}>{part}</React.Fragment>;
+    });
+  };
+
   return (
     <Draggable>
       <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
@@ -92,7 +114,7 @@ const Chatbot = () => {
                         wordBreak: "break-word",
                       }}
                     >
-                      {item.text}
+                      {parseLinks(item.text)}
                     </Typography.Text>
                   </List.Item>
                 )}
