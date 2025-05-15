@@ -48,6 +48,7 @@ const Chatbot = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Sadece kullanıcı mesajlarındaki linkleri parse ederiz, bot zaten HTML olarak geliyor
   const parseLinks = (text) => {
     const linkRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(linkRegex);
@@ -94,28 +95,50 @@ const Chatbot = () => {
             </div>
 
             {/* Mesajlar */}
-            <div className="chat-messages">
+            <div
+              className="chat-messages"
+              style={{ flex: 1, overflowY: "auto", padding: "0 16px" }}
+            >
               <List
                 dataSource={messages}
                 renderItem={(item, index) => (
                   <List.Item
                     key={index}
                     className={item.sender === "user" ? "user-msg" : "bot-msg"}
+                    style={{
+                      justifyContent:
+                        item.sender === "user" ? "flex-end" : "flex-start",
+                    }}
                   >
-                    <Typography.Text
-                      style={{
-                        backgroundColor:
-                          item.sender === "user" ? "#fd702d" : "#f1f1f1",
-                        color: item.sender === "user" ? "#fff" : "#000",
-                        padding: "6px 12px",
-                        borderRadius: 16,
-                        maxWidth: "80%",
-                        display: "inline-block",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {parseLinks(item.text)}
-                    </Typography.Text>
+                    {item.sender === "user" ? (
+                      <Typography.Text
+                        style={{
+                          backgroundColor: "#fd702d",
+                          color: "#fff",
+                          padding: "6px 12px",
+                          borderRadius: 16,
+                          maxWidth: "80%",
+                          display: "inline-block",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {parseLinks(item.text)}
+                      </Typography.Text>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#f1f1f1",
+                          color: "#000",
+                          padding: "6px 12px",
+                          borderRadius: 16,
+                          maxWidth: "80%",
+                          display: "inline-block",
+                          wordBreak: "break-word",
+                          userSelect: "text",
+                        }}
+                        dangerouslySetInnerHTML={{ __html: item.text }}
+                      />
+                    )}
                   </List.Item>
                 )}
               />
@@ -123,13 +146,17 @@ const Chatbot = () => {
             </div>
 
             {/* Giriş alanı */}
-            <div className="chatbot-input">
+            <div
+              className="chatbot-input"
+              style={{ padding: "10px 16px", borderTop: "1px solid #f0f0f0" }}
+            >
               <Input.Search
                 placeholder="Mesaj yazın..."
                 enterButton="Gönder"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onSearch={handleSend}
+                allowClear
               />
             </div>
           </Card>
