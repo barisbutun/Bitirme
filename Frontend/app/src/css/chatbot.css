@@ -1,4 +1,11 @@
 .chatbot-card {
+  cursor: move;
+  font-weight: bold;
+  padding: 8px 16px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
     max-width: 500px;
     width: 100%;
     border-radius: 12px;
@@ -35,5 +42,11 @@
     padding: 10px 12px;
     border-top: 1px solid #f0f0f0;
     background-color: #fff;
+  }
+  @media (max-width: 480px) {
+    .chatbot-card {
+      width: 90vw !important;
+      height: 70vh !important;
+    }
   }
   
