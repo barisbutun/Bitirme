@@ -1,42 +1,59 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Card, Input, List, Typography } from "antd";
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
-import { fetchChatHistory, sendMessageToBot } from "../services/chatbotService";
+import { sendMessageToBot } from "../services/chatbotService";
 import Draggable from "react-draggable";
 import "../css/chatbot.css";
+
+const CHAT_HISTORY_KEY = "chatbot_messages";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [dragDisabled, setDragDisabled] = useState(false); // Yeni state
   const messageEndRef = useRef(null);
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
   };
 
-  const loadHistory = async () => {
-    const history = await fetchChatHistory();
-    setMessages(history);
+  const loadHistory = () => {
+    const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
   };
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => {
+      const updated = [...prev, userMessage];
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
+      return updated;
+    });
     setInput("");
 
     try {
       const botResponse = await sendMessageToBot(input);
       const botMessage = { sender: "bot", text: botResponse.reply };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) => {
+        const updated = [...prev, botMessage];
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
+        return updated;
+      });
     } catch (error) {
       const errorMessage = {
         sender: "bot",
         text: "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => {
+        const updated = [...prev, errorMessage];
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
+        return updated;
+      });
     }
   };
 
@@ -48,7 +65,6 @@ const Chatbot = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Sadece kullanıcı mesajlarındaki linkleri parse ederiz, bot zaten HTML olarak geliyor
   const parseLinks = (text) => {
     const linkRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(linkRegex);
@@ -71,9 +87,25 @@ const Chatbot = () => {
     });
   };
 
+  // Kullanıcı metin seçimi başladığında çağrılır
+  const handleMouseDown = () => {
+    setDragDisabled(true);
+  };
+
+  // Kullanıcı metin seçimini bırakınca çağrılır
+  const handleMouseUp = () => {
+    setDragDisabled(false);
+  };
+
   return (
-    <Draggable>
-      <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
+    <Draggable disabled={dragDisabled}>
+      <div
+        style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}
+        onMouseDown={handleMouseDown} // Metin seçimi için
+        onMouseUp={handleMouseUp}
+        onTouchStart={handleMouseDown} // Dokunmatik cihazlar için
+        onTouchEnd={handleMouseUp}
+      >
         {isOpen ? (
           <Card
             className="chatbot-card"
@@ -84,7 +116,6 @@ const Chatbot = () => {
               height: 500,
             }}
           >
-            {/* Başlık */}
             <div className="chatbot-header">
               Canlı Destek
               <Button
@@ -94,7 +125,6 @@ const Chatbot = () => {
               />
             </div>
 
-            {/* Mesajlar */}
             <div
               className="chat-messages"
               style={{ flex: 1, overflowY: "auto", padding: "0 16px" }}
@@ -120,6 +150,7 @@ const Chatbot = () => {
                           maxWidth: "80%",
                           display: "inline-block",
                           wordBreak: "break-word",
+                          userSelect: "text",
                         }}
                       >
                         {parseLinks(item.text)}
@@ -136,8 +167,21 @@ const Chatbot = () => {
                           wordBreak: "break-word",
                           userSelect: "text",
                         }}
-                        dangerouslySetInnerHTML={{ __html: item.text }}
-                      />
+                      >
+                        <div dangerouslySetInnerHTML={{ __html: item.text }} />
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt="Ürün resmi"
+                            style={{
+                              marginTop: 8,
+                              maxWidth: 150,
+                              borderRadius: 8,
+                              display: "block",
+                            }}
+                          />
+                        )}
+                      </div>
                     )}
                   </List.Item>
                 )}
@@ -145,7 +189,6 @@ const Chatbot = () => {
               <div ref={messageEndRef} />
             </div>
 
-            {/* Giriş alanı */}
             <div
               className="chatbot-input"
               style={{ padding: "10px 16px", borderTop: "1px solid #f0f0f0" }}
