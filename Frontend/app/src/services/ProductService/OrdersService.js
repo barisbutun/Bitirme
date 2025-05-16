@@ -2,8 +2,8 @@
 import { getToken } from "../../utils/auth";
 
 // Tüm siparişleri getir
-export const fetchAllOrders = async () => {
-  const response = await fetch(`http://localhost:8082/api/order/v1`, {
+export const fetchAllOrders = async (page = 0, size = 100) => {
+  const response = await fetch(`http://localhost:8082/api/order/v1?page=${page}&size=${size}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${getToken()}`,
@@ -14,9 +14,16 @@ export const fetchAllOrders = async () => {
     throw new Error("Siparişler alınamadı.");
   }
 
-  return await response.json();
+  const data = await response.json();
+  return {
+    content: data.content,          // sipariş listesi
+    totalElements: data.totalElements, // toplam sipariş sayısı
+    totalPages: data.totalPages,
+    currentPage: data.number,
+  };
 };
 
+// Sipariş oluşturma
 export const createOrder = async (orderData) => {
   const response = await fetch("http://localhost:8082/api/order/v1", {
     method: "POST",
@@ -34,6 +41,18 @@ export const createOrder = async (orderData) => {
 
   return response.json();
 };
+
+//Belirli Siparişin Ürünleri(Kullanıcıya Özel)
+export const getOrderItemsByUser= async () => {
+  const response = await fetch(` http://localhost:8082/api/order/v1`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  if (!response.ok) throw new Error("Sipariş ürünleri getirilemedi.");
+  return await response.json();
+};
+
 
 //Sipariş Güncelleme
 export const updateOrder = async (id, updatedData) => {
@@ -71,40 +90,11 @@ export const getOrderItemSummary = async (orderId) => {
     return await response.json();
   };
   
-//Belirli Siparişin Ürünleri(Kullanıcıya Özel)
-export const getOrderItemsByUser= async (orderId) => {
-    const response = await fetch(` http://localhost:8082/api/order/v1/orderItems/${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    if (!response.ok) throw new Error("Sipariş ürünleri getirilemedi.");
-    return await response.json();
-  };
-  
+
 // Kullanıcı ID'sine göre siparişleri filtrele
-export const fetchOrdersByUserId = async (userId) => {
-  const response = await fetch(
-    `http://localhost:8082/api/order/v1/${userId}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Kullanıcı ID'sine göre siparişler alınamadı.");
-  }
-
-  return await response.json();
-};
-
-// Sipariş durumuna göre siparişleri filtrele
-// export const fetchOrdersByStatus = async (status) => {
+// export const fetchOrdersByUserId = async (orderId) => {
 //   const response = await fetch(
-//     `${API_BASE_URL}/api/order/v1/filter/byStatus?status=${status}`,
+//     `http://localhost:8082/api/order/v1/`,
 //     {
 //       headers: {
 //         "Content-Type": "application/json",
@@ -114,47 +104,13 @@ export const fetchOrdersByUserId = async (userId) => {
 //   );
 
 //   if (!response.ok) {
-//     throw new Error("Sipariş durumu ile filtreleme başarısız.");
+//     throw new Error("Kullanıcı ID'sine göre siparişler alınamadı.");
 //   }
 
 //   return await response.json();
 // };
 
-// Ürün adına göre siparişleri filtrele
-// export const fetchOrdersByProductName = async (productName) => {
-//   const response = await fetch(
-//     `${API_BASE_URL}/api/order/v1/filter/byProductName?productName=${encodeURIComponent(productName)}`,
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${getToken()}`,
-//       },
-//     }
-//   );
 
-//   if (!response.ok) {
-//     throw new Error("Ürün adına göre siparişler alınamadı.");
-//   }
 
-//   return await response.json();
-// };
 
-// Tarih aralığına göre siparişleri filtrele
-// export const fetchOrdersByDateRange = async (startDate, endDate) => {
-//   const response = await fetch(
-//     `${API_BASE_URL}/api/order/v1/filter/byDateRange?startDate=${startDate}&endDate=${endDate}`,
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${getToken()}`,
-//       },
-//     }
-//   );
-
-//   if (!response.ok) {
-//     throw new Error("Tarih aralığına göre siparişler alınamadı.");
-//   }
-
-//   return await response.json();
-// };
 

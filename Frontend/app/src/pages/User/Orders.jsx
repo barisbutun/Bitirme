@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Layout,
   Button,
@@ -19,7 +19,7 @@ import { getUserIdFromToken } from "../../utils/auth";
 
 const Orders = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { state: cartItems = [] } = useLocation();
+  const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
 
   const [useSavedAddress, setUseSavedAddress] = useState(true);
@@ -27,6 +27,11 @@ const Orders = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userId = getUserIdFromToken();
+
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem("orderCart")) || [];
+    setCartItems(storedItems);
+  }, []);
 
   const columns = [
     {
@@ -57,12 +62,16 @@ const Orders = () => {
 
   const dataSource = cartItems.map((item, idx) => ({
     key: idx,
-    image: item.product.images?.[0] || "",
-    name: item.product.name,
+    image:
+      Array.isArray(item.product?.images) && item.product.images.length > 0
+        ? item.product.images[0]
+        : "", // veya bir placeholder url'si
+    name: item.product?.name || "Ürün ismi yok",
     quantity: item.quantity,
     size: item.size,
-    price: item.product.price,
-    total: item.quantity * item.product.price,
+    price: item.product?.price || 0,
+    total: item.quantity * (item.product?.price || 0),
+    productId: item.product?.id || null,
   }));
 
   const handleConfirmOrder = () => {
@@ -78,21 +87,35 @@ const Orders = () => {
 
   const handleSubmitOrder = async () => {
     try {
-      const orderDto = {
-        description: "sipariş",
-        is_same_address: useSavedAddress,
-        address: useSavedAddress ? null : newAddress.trim(),
+      const orderData = {
+        userId,
+        description: useSavedAddress
+          ? "Kayıtlı adres ile sipariş"
+          : `Yeni adres: ${newAddress}`,
+        sumPrice: dataSource.reduce((sum, item) => sum + item.total, 0),
+        saleDate: new Date().toISOString(),
+        stockState: "Hazırlanıyor",
+        products: dataSource.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,
+        })),
       };
 
-      const created = await createOrder(orderDto);
+      const response = await createOrder(orderData);
 
-      notification.success({ message: "Sipariş başarıyla oluşturuldu" });
+      notification.success({
+        message: "Sipariş Oluşturuldu",
+        description: "Siparişiniz başarıyla kaydedildi.",
+      });
 
-      navigate("/user/Payment", { state: { cartItems, order: created } });
-    } catch (err) {
+      setIsModalOpen(false);
+      navigate("/user/OrdersList");
+    } catch (error) {
+      console.error("Sipariş oluşturma hatası:", error);
       notification.error({
         message: "Hata",
-        description: err.message || "Sipariş oluşturulurken hata oluştu",
+        description: error.message || "Sipariş sırasında bir hata oluştu.",
       });
     }
   };
@@ -100,68 +123,71 @@ const Orders = () => {
   return (
     <Layout>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <Layout style={{ marginLeft: collapsed ? 0 : 200 }}>
+      <Layout
+        className="orders-layout"
+        style={{ marginLeft: collapsed ? 0 : 200, marginTop: 140 }}
+      >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
-        <div style={{ padding: 24 }}>
-          <h2>Sipariş Onayı</h2>
+        <div className="orders-container">
+          <h2>Sipariş Verilen Ürünler</h2>
           <Table
-            dataSource={dataSource}
             columns={columns}
+            dataSource={dataSource}
             pagination={false}
             bordered
-            style={{ marginBottom: 24 }}
           />
-
-          <Radio.Group
-            onChange={(e) => setUseSavedAddress(e.target.value)}
-            value={useSavedAddress}
-          >
-            <Space direction="vertical">
+          <div className="address-section">
+            <h3>Adres Seçimi</h3>
+            <Radio.Group
+              value={useSavedAddress}
+              onChange={(e) => setUseSavedAddress(e.target.value)}
+            >
               <Radio value={true}>Kayıtlı adresi kullan</Radio>
               <Radio value={false}>Yeni adres gir</Radio>
-            </Space>
-          </Radio.Group>
+            </Radio.Group>
+            {!useSavedAddress && (
+              <Input.TextArea
+                rows={3}
+                placeholder="Yeni adresinizi girin..."
+                value={newAddress}
+                onChange={(e) => setNewAddress(e.target.value)}
+                style={{ marginTop: 10 }}
+              />
+            )}
 
-          {!useSavedAddress && (
-            <Input.TextArea
-              rows={4}
-              placeholder="Yeni adresinizi girin"
-              value={newAddress}
-              onChange={(e) => setNewAddress(e.target.value)}
-              style={{ marginTop: 12 }}
-            />
-          )}
+            <Button
+              type="primary"
+              onClick={handleConfirmOrder}
+              style={{ marginTop: 20 }}
+            >
+              Siparişi Onayla
+            </Button>
 
-          <Button
-            type="primary"
-            onClick={handleConfirmOrder}
-            style={{ marginTop: 20 }}
-          >
-            Siparişi Onayla
-          </Button>
-
-          <Modal
-            title="Sipariş Özeti"
-            open={isModalOpen}
-            onCancel={() => setIsModalOpen(false)}
-            onOk={handleSubmitOrder}
-            okText="Tamamla"
-            cancelText="İptal"
-            width={800}
-          >
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={false}
-              bordered
-            />
-          </Modal>
+            <Button
+              type="default"
+              onClick={() => navigate("/user/OrdersList")}
+              style={{ marginTop: 20, marginLeft: 40, marginRight: 10 }}
+            >
+              Kayıtlı Siparişlerim
+            </Button>
+          </div>
         </div>
         <Footer>
           <div className="pagination-inside-footer">
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>
+
+        <Modal
+          title="Siparişi Onayla"
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          onOk={handleSubmitOrder}
+          okText="Evet, Siparişi Ver"
+          cancelText="İptal"
+        >
+          <p>Siparişi onaylamak istediğinize emin misiniz?</p>
+        </Modal>
       </Layout>
     </Layout>
   );

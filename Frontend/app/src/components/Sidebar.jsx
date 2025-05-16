@@ -67,6 +67,12 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       key: "7",
       icon: <ShoppingOutlined />,
       label: <Link to="/user/Orders">Siparişlerim</Link>,
+      children: [
+        {
+          key: "71",
+          label: <Link to="/user/OrdersList">Kayıtlı Siparişlerim</Link>,
+        },
+      ],
     },
     {
       key: "8",
@@ -78,7 +84,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       icon: <CreditCardFilled />,
       label: <Link to="/user/Payment">Ödeme Bilgileri</Link>,
     },
-  ].filter(Boolean); // undefined değerleri kaldırmak için filter(Boolean) kullanın
+  ].filter(Boolean);
 
   return (
     <Sider

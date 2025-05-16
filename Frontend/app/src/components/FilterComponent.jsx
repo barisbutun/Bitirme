@@ -20,15 +20,29 @@ const FilterComponent = ({ onApplyFilter }) => {
 
   const onFinish = (values) => {
     onApplyFilter({
-      ...values,
-      category: values.category,
+      category: values.category || [], // Çoklu kategori için dizi
+      name: values.name || null,
+      minPrice: values.minPrice || null,
+      maxPrice: values.maxPrice || null,
+      page: values.page || 0,
+      size: values.size || 12,
+      sortBy: values.sortBy || "asc",
     });
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={onFinish}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onFinish}
+      initialValues={{ page: 0, size: 12, sortBy: "asc" }}
+    >
       <Form.Item name="category" label="Kategori">
-        <Select placeholder="Kategori seçin" allowClear>
+        <Select
+          mode="multiple" // Çoklu seçim aktif
+          placeholder="Kategori seçin"
+          allowClear
+        >
           {categories.map((cat) => (
             <Option key={cat.id} value={cat.name}>
               {cat.name}
@@ -37,12 +51,31 @@ const FilterComponent = ({ onApplyFilter }) => {
         </Select>
       </Form.Item>
 
+      <Form.Item name="name" label="Ürün Adı">
+        <Input placeholder="Ürün adını girin" />
+      </Form.Item>
+
       <Form.Item name="minPrice" label="Min Fiyat">
         <Input type="number" placeholder="Minimum fiyat" />
       </Form.Item>
 
       <Form.Item name="maxPrice" label="Max Fiyat">
         <Input type="number" placeholder="Maksimum fiyat" />
+      </Form.Item>
+
+      <Form.Item name="page" label="Sayfa Numarası">
+        <Input type="number" min={0} placeholder="Sayfa numarası" />
+      </Form.Item>
+
+      <Form.Item name="size" label="Sayfa Boyutu">
+        <Input type="number" min={1} placeholder="Sayfa başına ürün sayısı" />
+      </Form.Item>
+
+      <Form.Item name="sortBy" label="Sıralama">
+        <Select>
+          <Option value="asc">Artan</Option>
+          <Option value="desc">Azalan</Option>
+        </Select>
       </Form.Item>
 
       <Form.Item>

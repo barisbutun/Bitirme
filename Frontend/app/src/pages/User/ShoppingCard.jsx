@@ -105,6 +105,7 @@ const ShoppingCard = () => {
         products: cartWithImages.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
+          size: item.size, // size bilgisi burada da kullanılıyor
           size: item.size,
         })),
       };
@@ -287,7 +288,10 @@ const ShoppingCard = () => {
               <Button
                 className="SiparisButon"
                 type="primary"
-                onClick={() => navigate("/user/Orders", { state: data })}
+                onClick={() => {
+                  localStorage.setItem("orderCart", JSON.stringify(data));
+                  navigate("/user/Orders");
+                }}
                 disabled={data.length === 0}
               >
                 Sepeti Onayla
