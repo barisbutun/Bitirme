@@ -226,6 +226,12 @@ public class AdminController {
         return ResponseEntity.ok(adminService.findAllReviews());
     }
 
+    @GetMapping("/v1/comment/findAll")
+    public ResponseEntity<Page<CommentDto>> findAllComment(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size){
+
+        return ResponseEntity.ok(adminService.findAllComment(page, size));
+    }
 
 }
 

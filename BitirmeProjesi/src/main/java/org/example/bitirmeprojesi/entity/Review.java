@@ -31,6 +31,9 @@ public class Review implements Serializable {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
     @Min(1) @Max(5)
     @Column(name = "rating", nullable = false)

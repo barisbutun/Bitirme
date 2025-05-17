@@ -32,4 +32,5 @@ public class ErrorMesage {
     public static final String PAYMENT_NOT_COMPLETED_ERROR="Requesting a refund for products whose payment was not successful.";
     public static final String REFUND_NOT_FOUND_ERROR="Refund does not exist in our systems";
     public static final String CANCEL_QUANTITY_ERROR="Cancel quantity is not valid";
+    public static final String ACCESS_DENIED_ERROR = "You do not have permission to access this comment.";
 }

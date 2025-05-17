@@ -217,7 +217,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> cancelQuantityExceptionHandler(Exception ex) {
         log.error(ex.getLocalizedMessage(), ex);
 
-        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.INSUFFICIENT_STOCK_ERROR, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.CANCEL_QUANTITY_ERROR, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(CommentAccessDeniedException.class)
+    public ResponseEntity<Object> commentAccessDeniedExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.ACCESS_DENIED_ERROR, HttpStatus.BAD_REQUEST);
     }
 
 

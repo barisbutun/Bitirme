@@ -36,8 +36,10 @@ public class OrderController {
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<Page<OrdersDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
-                                                           @RequestParam(required = false, defaultValue = "10") int size) {
+    public ResponseEntity<Page<OrdersDto>> findAllByUserId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(orderService.findAllByUserId(userId, page, size));
     }
@@ -64,8 +66,6 @@ public class OrderController {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok(orderItemService.findByUserId(userId));
     }
-
-
 
     @DeleteMapping("/v1/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

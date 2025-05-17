@@ -142,7 +142,7 @@ public class ProductService {
             @CacheEvict(value = "products", allEntries = true),
             @CacheEvict(value = "products_list", allEntries = true)
     })
-    public void delete(Long id) {
+    public void delete(long id) {
         productRepository.deleteById(id);
     }
 

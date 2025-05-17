@@ -23,6 +23,7 @@ public class AdminService {
     private final ReviewService reviewService;
     private final PaymentService paymentService;
     private final CancellationService cancellationService;
+    private final CommentService commentService;
 
     public Page<PaymentDto> findAllPayment(int page, int size) {
         return paymentService.findAll(page, size);
@@ -137,6 +138,13 @@ public class AdminService {
     public List<ReviewDto> findAllReviews() {
         return reviewService.findAll();
     }
+    public Page<CommentDto> findAllComment(int page,int size){
+        return commentService.findAll(page,size);
+    }
+
+
+
+
 
 
 }

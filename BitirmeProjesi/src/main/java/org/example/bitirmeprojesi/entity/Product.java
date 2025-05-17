@@ -78,6 +78,10 @@ public class Product implements Serializable {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ShoppingCartItem> shoppingCartItems;
 
     @JsonManagedReference

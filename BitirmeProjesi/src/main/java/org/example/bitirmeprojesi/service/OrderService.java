@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -155,13 +156,30 @@ public class OrderService {
     }
 
     public Page<OrdersDto> findAllByUserId(UUID userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+
+        Sort sort  = Sort.by(Sort.Order.desc("saleDate"));
+
+        Pageable pageable = PageRequest.of(page, size,sort);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccountNotFoundException(ErrorMesage.ACCOUNT_NOT_FOUND_ERROR));
 
         Page<Orders> ordersList = orderRepository.findAllByUserId(user.getId(), pageable);
-        Page<OrdersDto> ordersDtos = ordersList.map(orderMapper::toDto);
 
-        return ordersDtos;
+        return ordersList.map(order -> {
+            OrdersDto ordersDto = orderMapper.toDto(order);
+            if (order.getOrderItems() != null) {
+                List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+                        .map(orderItem -> {
+                            OrderItemDto orderItemDto = orderMapper.toOrderItemDto(orderItem);
+                            orderItemDto.setProductId(orderItem.getProduct().getId());
+                            orderItemDto.setOrderId(orderItem.getOrder().getId());
+                            orderItemDto.setPrice(orderItem.getProduct().getPrice() * orderItem.getQuantity());
+                            return orderItemDto;
+                        })
+                        .collect(Collectors.toList());
+                ordersDto.setOrderItems(orderItemDtos);
+            }
+            return ordersDto;
+        });
     }
 }

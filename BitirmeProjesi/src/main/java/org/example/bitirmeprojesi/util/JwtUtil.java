@@ -1,7 +1,6 @@
 package org.example.bitirmeprojesi.util;
 
-import org.example.bitirmeprojesi.exception.ErrorMesage;
-import org.example.bitirmeprojesi.exception.error.JwtNotFoundException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;

@@ -118,6 +118,7 @@ public class ChatBotService {
 
         // İncelemelerden ürünleri topla
         List<ProductDto> productsReviews = user.getReviews().stream()
+                .filter(review -> review.getRating()>=3)
                 .map(review -> productMapper.toDto(review.getProduct()))
                 .collect(Collectors.toMap(
                         ProductDto::getId,

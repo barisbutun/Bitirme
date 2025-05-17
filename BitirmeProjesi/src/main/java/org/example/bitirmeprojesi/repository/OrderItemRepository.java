@@ -1,7 +1,6 @@
 package org.example.bitirmeprojesi.repository;
 
 import jakarta.persistence.LockModeType;
-import jakarta.transaction.Transactional;
 import org.example.bitirmeprojesi.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -29,6 +28,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("UPDATE OrderItem o SET o.shoppingCartItem = NULL WHERE o.shoppingCartItem.id = :itemId")
     void detachShoppingCartItem(@Param("itemId") Long itemId);
 
+    boolean existsByUserIdAndProductId(UUID userId, Long productId);
 
     OrderItem findByShoppingCartItemIdAndShoppingCartItemQuantity(long id, int quantity);
 }

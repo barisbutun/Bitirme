@@ -41,6 +41,9 @@ public class User implements Serializable, UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "userName", nullable = false,unique = true,updatable = true)
+    private String userName;
+
     @Column(name = "email", unique = true)
     private String email;
 
@@ -76,6 +79,9 @@ public class User implements Serializable, UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Favourite> favourites;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
