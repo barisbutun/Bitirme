@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Table, Typography, notification, Button } from "antd";
+import { Layout, Table, Typography, notification, Button, Select } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "../User/UserCss/Orders.css";
 
 const { Text } = Typography;
+const { Option } = Select;
 
 const OrderList = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -20,12 +21,8 @@ const OrderList = () => {
     shipping: [],
     delivered: [],
   });
-  const [paginationStates, setPaginationStates] = useState({
-    pending: { current: 1, pageSize: 5 },
-    preparing: { current: 1, pageSize: 5 },
-    shipping: { current: 1, pageSize: 5 },
-    delivered: { current: 1, pageSize: 5 },
-  });
+  const [selectedCategory, setSelectedCategory] = useState("pending");
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [loading, setLoading] = useState(false);
   const [productImagesMap, setProductImagesMap] = useState({});
   const navigate = useNavigate();
@@ -73,31 +70,32 @@ const OrderList = () => {
         const deliveryState = order.delivery?.delivery_state;
 
         if (
-          !paymentState ||
+          paymentState === null ||
           paymentState === "FAILED" ||
           paymentState === "CANCELLED" ||
           paymentState === "REFUNDED"
         ) {
-          // null, başarısız, iptal edilmiş, iade edilmiş ödemeler
+          // Ödeme bilgisi yok veya başarısız ise ödeme bekleyen
           pending.push(order);
         } else if (paymentState === "SUCCESS") {
-          if (deliveryState === "Hazırlanıyor") {
+          // Ödeme başarılı ise ve sipariş durumu pending ise hazırlananlara at
+          if (deliveryState === "pending" || deliveryState === "Hazırlanıyor") {
             preparing.push(order);
           } else if (deliveryState === "Teslimatta") {
             shipping.push(order);
           } else if (deliveryState === "Teslim Edildi") {
             delivered.push(order);
           } else {
-            // payment SUCCESS ama teslimat durumu belirsizse, yine pending'e alalım istersen
-            pending.push(order);
+            // Eğer deliveryState yoksa veya tanımlanmamışsa da preparing'e atabiliriz
+            preparing.push(order);
           }
         } else {
-          // Diğer bilinmeyen durumlar da pending'e
           pending.push(order);
         }
       });
 
       setCategorizedOrders({ pending, preparing, shipping, delivered });
+      setPagination({ current: 1, pageSize: 5 });
     };
 
     if (orders.length > 0) {
@@ -184,9 +182,18 @@ const OrderList = () => {
     },
     {
       title: "Adres",
-      dataIndex: "address",
       key: "address",
-      render: (addr) => addr || <Text type="secondary">Adres yok</Text>,
+      render: (_, record) => {
+        const isSame = record.delivery?.is_same_address;
+        const addressToShow =
+          isSame === false ? record.delivery?.delivery_address : record.address;
+
+        return addressToShow ? (
+          addressToShow
+        ) : (
+          <Text type="secondary">Adres yok</Text>
+        );
+      },
       ellipsis: true,
     },
     {
@@ -264,46 +271,15 @@ const OrderList = () => {
     );
   };
 
-  const handlePaginationChange = (category) => (pagination) => {
-    setPaginationStates((prev) => ({
-      ...prev,
-      [category]: {
-        current: pagination.current,
-        pageSize: pagination.pageSize,
-      },
-    }));
+  const handlePaginationChange = (pagination) => {
+    setPagination({
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    });
   };
 
-  const renderCategory = (title, data, categoryKey) => {
-    const { current, pageSize } = paginationStates[categoryKey];
-    const paginatedData = data.slice(
-      (current - 1) * pageSize,
-      current * pageSize
-    );
-
-    return (
-      <div className="orders-category">
-        <h2>{title}</h2>
-        <Table
-          columns={generateColumns(categoryKey)}
-          dataSource={paginatedData}
-          loading={loading}
-          rowKey={(record) => record.id}
-          expandable={{ expandedRowRender }}
-          pagination={{
-            current,
-            pageSize,
-            total: data.length,
-            showSizeChanger: true,
-            pageSizeOptions: ["5", "10", "20"],
-          }}
-          onChange={handlePaginationChange(categoryKey)}
-          bordered
-          locale={{ emptyText: "Bu kategoriye ait sipariş yok" }}
-        />
-      </div>
-    );
-  };
+  // Tek tabloda seçilen kategoriye göre veriyi getiriyoruz
+  const currentData = categorizedOrders[selectedCategory] || [];
 
   return (
     <Layout>
@@ -314,26 +290,40 @@ const OrderList = () => {
       >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="orders-container">
-          {renderCategory(
-            "🕒 Ödeme Bekleyen Siparişler",
-            categorizedOrders.pending,
-            "pending"
-          )}
-          {renderCategory(
-            "🛠 Hazırlanıyor",
-            categorizedOrders.preparing,
-            "preparing"
-          )}
-          {renderCategory(
-            "🚚 Teslimatta",
-            categorizedOrders.shipping,
-            "shipping"
-          )}
-          {renderCategory(
-            "📦 Teslim Edildi",
-            categorizedOrders.delivered,
-            "delivered"
-          )}
+          <div style={{ marginBottom: 16, maxWidth: 300 }}>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => {
+                setSelectedCategory(value);
+                setPagination({ current: 1, pageSize: 5 });
+              }}
+              style={{ width: "100%" }}
+              placeholder="Kategori Seçiniz"
+            >
+              <Option value="pending">🕒 Ödeme Bekleyen Siparişler</Option>
+              <Option value="preparing">🛠 Hazırlanıyor</Option>
+              <Option value="shipping">🚚 Teslimatta</Option>
+              <Option value="delivered">📦 Teslim Edildi</Option>
+            </Select>
+          </div>
+
+          <Table
+            columns={generateColumns(selectedCategory)}
+            dataSource={currentData}
+            loading={loading}
+            rowKey={(record) => record.id}
+            expandable={{ expandedRowRender }}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: currentData.length,
+              showSizeChanger: true,
+              pageSizeOptions: ["5", "10", "20"],
+            }}
+            onChange={handlePaginationChange}
+            bordered
+            locale={{ emptyText: "Bu kategoriye ait sipariş yok" }}
+          />
         </div>
         <Footer>
           <div className="pagination-inside-footer">

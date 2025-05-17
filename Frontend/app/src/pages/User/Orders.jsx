@@ -89,9 +89,9 @@ const Orders = () => {
     try {
       const orderData = {
         userId,
-        description: useSavedAddress
-          ? "Kayıtlı adres ile sipariş"
-          : `Yeni adres: ${newAddress}`,
+        address: useSavedAddress ? "Kayıtlı adres" : newAddress,
+        is_same_address: useSavedAddress,
+        description: "sipariş",
         sumPrice: dataSource.reduce((sum, item) => sum + item.total, 0),
         saleDate: new Date().toISOString(),
         stockState: "Hazırlanıyor",
