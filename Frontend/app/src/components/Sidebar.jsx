@@ -88,7 +88,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
 
   return (
     <Sider
-      style={{ background: "#46494e" }}
       className="sidebar"
       collapsible
       collapsed={collapsed}

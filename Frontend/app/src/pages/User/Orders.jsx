@@ -125,7 +125,11 @@ const Orders = () => {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout
         className="orders-layout"
-        style={{ marginLeft: collapsed ? 0 : 200, marginTop: 140 }}
+        style={{
+          marginLeft: collapsed ? 20 : 220,
+          marginTop: 140,
+          marginRight: collapsed ? 20 : 20,
+        }}
       >
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <div className="orders-container">

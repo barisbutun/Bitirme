@@ -8,7 +8,11 @@ import { fetchProductImages } from "../../services/ProductService/ProductService
 import ImageCollage from "../../components/ImageCollage";
 import { useNavigate } from "react-router-dom";
 import "../User/UserCss/Orders.css";
-
+import {
+  cancelOrder,
+  cancelOrderItem,
+} from "../../services/ProductService/OrdersService";
+// ... diğer importlar ...
 const { Text } = Typography;
 const { Option } = Select;
 
@@ -20,11 +24,13 @@ const OrderList = () => {
     preparing: [],
     shipping: [],
     delivered: [],
+    cancelled: [], // ✅ Yeni kategori
   });
   const [selectedCategory, setSelectedCategory] = useState("pending");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [loading, setLoading] = useState(false);
   const [productImagesMap, setProductImagesMap] = useState({});
+  const [selectedItemsMap, setSelectedItemsMap] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,21 +70,21 @@ const OrderList = () => {
       const preparing = [];
       const shipping = [];
       const delivered = [];
+      const cancelled = []; // ✅
 
       orders.forEach((order) => {
         const paymentState = order.payment_state;
         const deliveryState = order.delivery?.delivery_state;
 
-        if (
+        if (paymentState === "CANCELLED" || deliveryState === "İptal Edildi") {
+          cancelled.push(order); // ✅
+        } else if (
           paymentState === null ||
           paymentState === "FAILED" ||
-          paymentState === "CANCELLED" ||
           paymentState === "REFUNDED"
         ) {
-          // Ödeme bilgisi yok veya başarısız ise ödeme bekleyen
           pending.push(order);
         } else if (paymentState === "SUCCESS") {
-          // Ödeme başarılı ise ve sipariş durumu pending ise hazırlananlara at
           if (deliveryState === "pending" || deliveryState === "Hazırlanıyor") {
             preparing.push(order);
           } else if (deliveryState === "Teslimatta") {
@@ -86,7 +92,6 @@ const OrderList = () => {
           } else if (deliveryState === "Teslim Edildi") {
             delivered.push(order);
           } else {
-            // Eğer deliveryState yoksa veya tanımlanmamışsa da preparing'e atabiliriz
             preparing.push(order);
           }
         } else {
@@ -94,7 +99,13 @@ const OrderList = () => {
         }
       });
 
-      setCategorizedOrders({ pending, preparing, shipping, delivered });
+      setCategorizedOrders({
+        pending,
+        preparing,
+        shipping,
+        delivered,
+        cancelled,
+      }); // ✅
       setPagination({ current: 1, pageSize: 5 });
     };
 
@@ -139,6 +150,62 @@ const OrderList = () => {
 
   const handlePayment = (orderId) => {
     navigate(`/user/Payment?orderId=${orderId}`);
+  };
+
+  const handleItemSelection = (orderId, selectedRowKeys) => {
+    setSelectedItemsMap((prev) => ({ ...prev, [orderId]: selectedRowKeys }));
+  };
+
+  const handleCancelOrder = async (order) => {
+    try {
+      const order_items = order.orderItems.map((item) => ({
+        id: item.id,
+        product_id: item.product_id,
+        cancel_quantity: item.quantity,
+      }));
+
+      await cancelOrder({
+        order_id: order.id,
+        description: order.description,
+        order_items: order_items,
+      });
+
+      notification.success({ message: "Sipariş iptal edildi" });
+      setOrders((prev) => prev.filter((o) => o.id !== order.id));
+    } catch (error) {
+      notification.error({ message: "Sipariş iptal edilemedi" });
+      console.error(error);
+    }
+  };
+
+  const handleCancelSelectedItems = async (orderId) => {
+    const selectedKeys = selectedItemsMap[orderId] || [];
+    const productIds = selectedKeys.map((key) => key.split(`${orderId}-`)[1]);
+
+    try {
+      await cancelOrderItem(orderId, productIds);
+      notification.success({
+        message: "Seçili ürünler iptal edildi",
+      });
+
+      // Frontend'te siparişten çıkar
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => {
+          if (order.id === orderId) {
+            const updatedItems = order.orderItems.filter(
+              (item) => !productIds.includes(item.product_id.toString())
+            );
+            return { ...order, orderItems: updatedItems };
+          }
+          return order;
+        })
+      );
+
+      // Seçimi temizle
+      setSelectedItemsMap((prev) => ({ ...prev, [orderId]: [] }));
+    } catch (error) {
+      notification.error({ message: "Ürünler iptal edilemedi" });
+    }
   };
 
   const generateColumns = (categoryKey) => [
@@ -225,6 +292,27 @@ const OrderList = () => {
           },
         ]
       : []),
+
+    ...(categoryKey === "preparing"
+      ? [
+          {
+            title: "İşlem",
+            key: "action",
+            width: 120,
+            align: "center",
+            render: (_, order) => (
+              <Button
+                danger
+                block
+                onClick={() => handleCancelOrder(order)}
+                style={{ fontWeight: "normal" }}
+              >
+                İptal Et
+              </Button>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const expandedRowRender = (order) => {
@@ -260,13 +348,36 @@ const OrderList = () => {
       },
     ];
 
+    const rowSelection = {
+      selectedRowKeys: selectedItemsMap[order.id] || [],
+      onChange: (selectedRowKeys) =>
+        handleItemSelection(order.id, selectedRowKeys),
+    };
+
     return (
       <Table
         columns={itemColumns}
-        dataSource={order.orderItems}
+        dataSource={order.orderItems.map((item) => ({
+          ...item,
+          key: `${order.id}-${item.product_id}`,
+        }))}
         pagination={false}
-        rowKey={(record) => `${order.id}-${record.product_id}`}
-        locale={{ emptyText: "Sipariş ürünü bulunamadı" }}
+        size="small"
+        rowSelection={{
+          type: "checkbox",
+          ...rowSelection,
+        }}
+        footer={() =>
+          selectedItemsMap[order.id]?.length > 0 && (
+            <Button
+              danger
+              onClick={() => handleCancelSelectedItems(order.id)}
+              style={{ fontWeight: "normal" }}
+            >
+              Seçili Ürünleri İptal Et
+            </Button>
+          )
+        }
       />
     );
   };
@@ -278,7 +389,6 @@ const OrderList = () => {
     });
   };
 
-  // Tek tabloda seçilen kategoriye göre veriyi getiriyoruz
   const currentData = categorizedOrders[selectedCategory] || [];
 
   return (
@@ -304,6 +414,7 @@ const OrderList = () => {
               <Option value="preparing">🛠 Hazırlanıyor</Option>
               <Option value="shipping">🚚 Teslimatta</Option>
               <Option value="delivered">📦 Teslim Edildi</Option>
+              <Option value="cancelled">❌ İptal Edilen Siparişler</Option>
             </Select>
           </div>
 

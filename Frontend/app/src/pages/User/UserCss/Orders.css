@@ -1,8 +1,9 @@
 /* Orders sayfası düzeni */
 .orders-layout {
-    min-height: 100vh;
-    background: #f0f2f5;
+    min-height: 100vh ;
+    background: #f0f2f5 ;
     margin-top: 80px;
+
   }
   
   /* Siparişlerim içeriği */

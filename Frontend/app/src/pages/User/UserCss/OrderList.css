@@ -1,0 +1,12 @@
+.orders-page-content {
+    padding: 24px;
+    background-color: #fff;
+    min-height: 100vh;
+   
+    margin-top: 80px;
+  }
+  
+  .orders-category-selector {
+    margin-bottom: 16px;
+  }
+  
