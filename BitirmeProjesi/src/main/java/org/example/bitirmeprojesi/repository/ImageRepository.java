@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
-
     Optional<Image> findByName(String name);
     @Query("SELECT i FROM Image i WHERE i.name = :name")
     List<Image> findByNames(@Param("name") String name);

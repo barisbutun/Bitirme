@@ -60,9 +60,11 @@ public class CommentService {
             review.setUser(user);
             review.setProduct(product);
 
-            comment.setReview(review); // iki yönlü bağlantı
+            comment.setReview(review);
         }
-
+        if(commentRepository.CountByUserIdAndProductId(userId, comment.getProduct().getId()) > 5) {
+            throw new CommentAccessDeniedException(ErrorMesage.COMMENT_LIMIT_EXCEEDED_ERROR);
+        }
 
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toDto(savedComment);

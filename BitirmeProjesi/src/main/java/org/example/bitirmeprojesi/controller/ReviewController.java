@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ReviewDto;
 import org.example.bitirmeprojesi.service.ReviewService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,13 +29,16 @@ public class ReviewController {
 
 
     @GetMapping("/v1/product/{productId}")
-    public ResponseEntity<List<ReviewDto>> findAllByProductId(@PathVariable Long productId) {
-        return ResponseEntity.ok(reviewService.findAllByProductId(productId));
+    public ResponseEntity<Page<ReviewDto>> findAllByProductId(@PathVariable Long productId,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(reviewService.findAllByProductId(productId, page, size));
     }
 
     @GetMapping("/v1/user")
-    public ResponseEntity<List<ReviewDto>> findAllByUserId() {
-        return ResponseEntity.ok(reviewService.findAllByUserId());
+    public ResponseEntity<Page<ReviewDto>> findAllByUserId(@RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(reviewService.findAllByUserId(page, size));
     }
 
 

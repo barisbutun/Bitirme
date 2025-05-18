@@ -21,6 +21,9 @@ import org.example.bitirmeprojesi.repository.UserRepository;
 import org.example.bitirmeprojesi.util.JwtUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,11 +56,6 @@ public class ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
 
-        boolean userHasReviewed = reviewRepository.existsByProductIdAndUserId(productId, userId);
-
-        if (userHasReviewed) {
-            throw new DuplicateReviewException(ErrorMesage.INVALID_REVIEW_INFORMATION_ERROR);
-        }
 
         double averageRating = calculateAverageRating(productId);
 
@@ -88,13 +86,23 @@ public class ReviewService {
     }
 
 
-    public List<ReviewDto> findAllByProductId(Long productId) {
-        return reviewMapper.toDtoList(reviewRepository.findAllByProductId(productId));
+    public Page<ReviewDto> findAllByProductId(Long productId,int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorMesage.PRODUCT_NOT_FOUND_ERROR));
+        return reviewRepository.findAllByProductId(product.getId(),pageable)
+                .map(reviewMapper::toDto);
     }
 
-    public List<ReviewDto> findAllByUserId() {
+    public Page<ReviewDto> findAllByUserId(int page , int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
         UUID userId = JwtUtil.getUserIdFromToken();
-        return reviewMapper.toDtoList(reviewRepository.findAllByUserId(userId));
+        return reviewRepository.findAllByUserId(userId,pageable)
+                .map(reviewMapper::toDto);
     }
 
     private double calculateAverageRating(Long productId) {

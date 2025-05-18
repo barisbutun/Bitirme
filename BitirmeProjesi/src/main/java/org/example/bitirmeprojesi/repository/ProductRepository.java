@@ -5,7 +5,6 @@ import jakarta.persistence.LockModeType;
 import org.example.bitirmeprojesi.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
@@ -17,9 +16,6 @@ import java.util.Optional;
 
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
-
-    void findByName(String name);
-
 
     @Query("SELECT p FROM Product p WHERE " +
             "(:categories IS NULL OR p.category.name IN :categories) AND " +

@@ -2,8 +2,6 @@ package org.example.bitirmeprojesi.repository;
 
 
 import org.example.bitirmeprojesi.entity.Review;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,12 +15,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     int countByProductId(@Param("productId") Long productId);
 
     @Query("SELECT r FROM Review r WHERE r.product.id = :productId")
-    Page<Review> findAllByProductId(Long productId,Pageable pageable);
-
     List<Review> findAllByProductId(Long productId);
 
     @Query("SELECT r FROM Review r WHERE r.user.id = :userId")
-    Page<Review> findAllByUserId(UUID userId, Pageable pageable);
+    List<Review> findAllByUserId(UUID userId);
+
 
     boolean existsByProductIdAndUserId(Long productId,UUID userId);
 }

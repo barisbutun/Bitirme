@@ -26,6 +26,7 @@ public class DeliveryController {
         return ResponseEntity.ok(deliveryService.findAll());
     }
 
+
     @PutMapping("/v1/{id}")
     public ResponseEntity<DeliveryDto> update(@RequestBody DeliveryDto deliveryDto,@PathVariable UUID id) {
 

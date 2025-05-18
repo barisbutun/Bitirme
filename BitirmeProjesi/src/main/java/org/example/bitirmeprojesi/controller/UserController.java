@@ -50,8 +50,6 @@ public class UserController {
     }
 
 
-
-
     @PutMapping("/v1/balance")
     public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
         UUID userId = JwtUtil.getUserIdFromToken();

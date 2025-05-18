@@ -225,6 +225,12 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.ACCESS_DENIED_ERROR, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(CommentLimitExceededException.class)
+    public ResponseEntity<Object> commentLimitExceededExceptionHandler(Exception ex) {
+        log.error(ex.getLocalizedMessage(), ex);
+
+        return buildErrorResponse(Objects.nonNull(ex.getLocalizedMessage()) ? ex.getLocalizedMessage() : ErrorMesage.COMMENT_LIMIT_EXCEEDED_ERROR, HttpStatus.BAD_REQUEST);
+    }
 
 
     private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {

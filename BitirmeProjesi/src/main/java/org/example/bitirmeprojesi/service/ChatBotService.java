@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.ProductDto;
 import org.example.bitirmeprojesi.dto.QuestionDto;
 import org.example.bitirmeprojesi.dto.RecommendProductDto;
+import org.example.bitirmeprojesi.entity.Review;
 import org.example.bitirmeprojesi.entity.User;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
@@ -118,19 +119,29 @@ public class ChatBotService {
 
         // İncelemelerden ürünleri topla
         List<ProductDto> productsReviews = user.getReviews().stream()
-                .filter(review -> review.getRating()>=3)
-                .map(review -> productMapper.toDto(review.getProduct()))
-                .collect(Collectors.toMap(
-                        ProductDto::getId,
-                        productDto -> productDto,
-                        (existing, duplicate) -> {
-                            existing.setSameCount(existing.getSameCount() + 1);
-                            return existing;
-                        }
+                .filter(review -> review.getRating() >= 3)
+                .collect(Collectors.groupingBy(
+                        review -> review.getProduct().getId()
                 ))
-                .values()
+                .entrySet()
                 .stream()
+                .map(entry -> {
+                    Long productId = entry.getKey();
+                    List<Review> reviews = entry.getValue();
+
+                    ProductDto dto = productMapper.toDto(reviews.get(0).getProduct()); // Aynı ürün, herhangi biri yeter
+                    dto.setSameCount(reviews.size());
+
+                    double averageRating = reviews.stream()
+                            .mapToInt(Review::getRating)
+                            .average()
+                            .orElse(0.0);
+                    dto.setAverageRating(averageRating);
+
+                    return dto;
+                })
                 .toList();
+
 
         // Alışveriş sepetinden ürünleri topla
         List<ProductDto> productsShoppingCartItems = user.getShoppingCartItems().stream()

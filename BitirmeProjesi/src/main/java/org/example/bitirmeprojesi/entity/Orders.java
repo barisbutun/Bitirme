@@ -36,10 +36,6 @@ public class Orders implements Serializable {
     @Column(name = "sum_price")
     private double sumPrice;
 
-    @ToString.Exclude
-    @Enumerated(EnumType.STRING)
-    private StockState stockState = StockState.AVAILABLE;
-
     @Column(name = "address")
     private String address;
 

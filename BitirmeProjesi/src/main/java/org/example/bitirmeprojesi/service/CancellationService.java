@@ -210,6 +210,7 @@ public class CancellationService {
 
         Cancellation savedCancellation = cancellationRepository.save(cancellation);
         order.setCancellations(savedCancellation);
+        order.setSumPrice(order.getSumPrice() - refundAmount);
         orderRepository.save(order);
 
         return cancellationMapper.toDto(savedCancellation);

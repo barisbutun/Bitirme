@@ -41,8 +41,8 @@ public class User implements Serializable, UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "userName", nullable = false,unique = true,updatable = true)
-    private String userName;
+    @Column(name = "user_name", nullable = false,unique = true,updatable = true)
+    private String userName="user"+id;
 
     @Column(name = "email", unique = true)
     private String email;
@@ -61,6 +61,7 @@ public class User implements Serializable, UserDetails {
     private Double balance = 0.0;
 
     @Column(name="gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @JsonManagedReference
