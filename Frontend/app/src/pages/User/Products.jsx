@@ -17,15 +17,16 @@ const Products = ({ setLoading }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [page, setPage] = useState(1); // Sayfa başlangıç değeri
-  const [size, setSize] = useState(10); // Sayfa başına gösterilecek ürün sayısı
-  const [total, setTotal] = useState(0); // Toplam ürün sayısı
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [total, setTotal] = useState(0);
 
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
     setSize(pageSize);
   };
 
+  // Ürünleri getir (resimsiz)
   useEffect(() => {
     const fetchAllProducts = async () => {
       setLoading(true);
@@ -37,13 +38,7 @@ const Products = ({ setLoading }) => {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        const productsWithImages = await Promise.all(
-          productList.map(async (product) => {
-            const images = await fetchProductImages(product.id);
-            return { ...product, images };
-          })
-        );
-        setProducts(productsWithImages);
+        setProducts(productList);
         setTotal(productsData.totalElements);
       } catch (error) {
         setError(error.message);
@@ -56,17 +51,59 @@ const Products = ({ setLoading }) => {
     fetchAllProducts();
   }, [page, size]);
 
-  if (error) return <div>Hata: {error}</div>;
+  // Ürünler geldikten sonra resimleri lazy olarak getir
+  useEffect(() => {
+    const loadImages = async () => {
+      for (const product of products) {
+        try {
+          const images = await fetchProductImages(product.id);
+          setProducts((prev) =>
+            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
+          );
+        } catch (error) {
+          console.error(
+            `Ürün resmi alınırken hata (ID: ${product.id}):`,
+            error
+          );
+        }
+      }
+    };
 
+    if (products.length > 0) {
+      loadImages();
+    }
+  }, [products]);
+
+  // Filtreleme
   const handleApplyFilter = async (filters) => {
     console.log("filtreleme kriterleri:", filters);
+    setLoading(true);
     try {
       const data = await fetchFilteredProducts(filters);
-      setProducts(data); // Artık products üzerinden devam ediyoruz
+      setProducts(data); // İlk başta resimsiz gelir
+
+      // Resimleri ayrı yükle
+      for (const product of data) {
+        try {
+          const images = await fetchProductImages(product.id);
+          setProducts((prev) =>
+            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
+          );
+        } catch (error) {
+          console.error(
+            `Filtre sonrası ürün resmi hatası (ID: ${product.id}):`,
+            error
+          );
+        }
+      }
     } catch (error) {
       console.error("Filtreleme sırasında hata:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (error) return <div>Hata: {error}</div>;
 
   return (
     <Layout>
@@ -102,6 +139,7 @@ const Products = ({ setLoading }) => {
             <p></p>
           )}
         </div>
+
         <Footer>
           <div
             className="pagination-inside-footer"
