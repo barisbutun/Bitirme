@@ -268,7 +268,7 @@ const ShoppingCard = () => {
   ];
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: "100vh" }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout
         className="shopping-card-layout"
@@ -301,7 +301,10 @@ const ShoppingCard = () => {
         />
 
         <Footer>
-          <div className="pagination-inside-footer">
+          <div
+            className="pagination-inside-footer"
+            style={{ marginTop: 330, marginLeft: collapsed ? 80 : 180 }}
+          >
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>

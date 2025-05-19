@@ -284,7 +284,10 @@ const WalletPage = () => {
           </div>
         </div>
         <Footer>
-          <div className="pagination-inside-footer">
+          <div
+            className="pagination-inside-footer"
+            style={{ marginTop: 110, marginLeft: collapsed ? 80 : 180 }}
+          >
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>

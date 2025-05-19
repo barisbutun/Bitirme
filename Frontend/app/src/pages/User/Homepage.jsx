@@ -111,7 +111,10 @@ const Homepage = ({ setLoading }) => {
         </div>
 
         <Footer>
-          <div className="pagination-inside-footer">
+          <div
+            className="pagination-inside-footer"
+            style={{ marginLeft: collapsed ? 0 : 180 }}
+          >
             <Pagination
               current={page}
               pageSize={size}

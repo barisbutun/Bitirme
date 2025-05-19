@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import "../User/UserCss/Profile.css";
+import "../../css/Footer.css";
 import { getUserRoleFromToken } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +23,7 @@ const Profile = ({ setLoading }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       setLoading(true);
@@ -68,6 +70,7 @@ const Profile = ({ setLoading }) => {
 
     fetchUserProfile();
   }, []);
+
   const handleDeleteAccount = async () => {
     const confirm = window.confirm(
       "Hesabınızı silmek istediğinize emin misiniz?"
@@ -165,7 +168,10 @@ const Profile = ({ setLoading }) => {
         </div>
 
         <Footer>
-          <div className="pagination-inside-footer">
+          <div
+            className="pagination-inside-footer"
+            style={{ marginTop: 100, marginLeft: collapsed ? 80 : 180 }}
+          >
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>

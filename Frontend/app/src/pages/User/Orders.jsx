@@ -121,7 +121,7 @@ const Orders = () => {
   };
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: "100vh" }}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Layout
         className="orders-layout"
@@ -177,11 +177,13 @@ const Orders = () => {
           </div>
         </div>
         <Footer>
-          <div className="pagination-inside-footer">
+          <div
+            className="pagination-inside-footer"
+            style={{ marginTop: 340, marginLeft: collapsed ? 80 : 180 }}
+          >
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>
-
         <Modal
           title="Siparişi Onayla"
           open={isModalOpen}
