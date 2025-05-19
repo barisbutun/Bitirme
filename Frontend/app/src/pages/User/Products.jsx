@@ -8,13 +8,12 @@ import ProductCard from "../../components/ProductCard";
 import {
   fetchProducts,
   fetchProductImages,
-  fetchFilteredProductsWithImages,
+  fetchFilteredProducts,
 } from "../../services/ProductService/ProductService";
 import { fetchFavorites } from "../../services/ProductService/FavoriteService";
 
 const Products = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
@@ -29,24 +28,23 @@ const Products = ({ setLoading }) => {
 
   useEffect(() => {
     const fetchAllProducts = async () => {
+      setLoading(true);
       try {
-        setLoading(false);
+        const productsData = await fetchProducts(page - 1, size);
+        const productList = productsData.content;
 
-        const response = await fetchProducts(page - 1, size); // page-1, çünkü backend genellikle sıfırdan başlar
-
-        const { content = [], totalElements = 0 } = response;
-
-        setTotal(totalElements); // Toplam öğe sayısını güncelle
-        setProducts(content); // Ürünleri ayarla
-        setFilteredProducts(content); // Filtrelenen ürünleri ayarla
-
-        // Resimleri yükle
-        for (const product of content) {
-          const images = await fetchProductImages(product.id);
-          setFilteredProducts((prev) =>
-            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
-          );
+        if (!Array.isArray(productList)) {
+          throw new Error("Ürün verisi dizisi bekleniyor.");
         }
+
+        const productsWithImages = await Promise.all(
+          productList.map(async (product) => {
+            const images = await fetchProductImages(product.id);
+            return { ...product, images };
+          })
+        );
+        setProducts(productsWithImages);
+        setTotal(productsData.totalElements);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -63,8 +61,8 @@ const Products = ({ setLoading }) => {
   const handleApplyFilter = async (filters) => {
     console.log("filtreleme kriterleri:", filters);
     try {
-      const dataWithImages = await fetchFilteredProductsWithImages(filters);
-      setFilteredProducts(dataWithImages);
+      const data = await fetchFilteredProducts(filters);
+      setProducts(data); // Artık products üzerinden devam ediyoruz
     } catch (error) {
       console.error("Filtreleme sırasında hata:", error);
     }
@@ -86,8 +84,8 @@ const Products = ({ setLoading }) => {
             marginLeft: collapsed ? 0 : 200,
           }}
         >
-          {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
+          {Array.isArray(products) && products.length > 0 ? (
+            products.map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
@@ -98,8 +96,6 @@ const Products = ({ setLoading }) => {
                 quantity={product.quantity}
                 stock_state={product.stock_state}
                 category_id={product.category_id}
-                categoryId={product.categoryId}
-                favorites={favorites}
               />
             ))
           ) : (

@@ -12,7 +12,7 @@ import {
 } from "../../services/ProductService/ProductService";
 const Homepage = ({ setLoading }) => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  // const [filteredProducts, setFilteredProducts] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -28,8 +28,6 @@ const Homepage = ({ setLoading }) => {
       setLoading(true);
       try {
         const productsData = await fetchProducts(page - 1, size);
-        // console.log("API'den dönen ürünler:", productsData); // Veriyi kontrol et
-
         const productList = productsData.content;
 
         if (!Array.isArray(productList)) {
@@ -43,7 +41,6 @@ const Homepage = ({ setLoading }) => {
           })
         );
         setProducts(productsWithImages);
-        setFilteredProducts(productsWithImages);
         setTotal(productsData.totalElements);
       } catch (error) {
         setError(error.message);
@@ -61,12 +58,11 @@ const Homepage = ({ setLoading }) => {
     console.log("filtreleme kriterleri:", filters);
     try {
       const data = await fetchFilteredProducts(filters);
-      setFilteredProducts(data);
+      setProducts(data); // Artık products üzerinden devam ediyoruz
     } catch (error) {
       console.error("Filtreleme sırasında hata:", error);
     }
   };
-
   return (
     <Layout
       style={{
@@ -91,8 +87,8 @@ const Homepage = ({ setLoading }) => {
             marginLeft: collapsed ? 0 : 200,
           }}
         >
-          {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
+          {Array.isArray(products) && products.length > 0 ? (
+            products.map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
