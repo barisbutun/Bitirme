@@ -34,7 +34,7 @@ const HeaderComponent = ({
     {
       key: "1",
       icon: <UserOutlined />,
-      label: <Link to="/">Giriş Yap</Link>,
+      label: <Link to="">Giriş Yap</Link>,
       children: [
         {
           key: "11",

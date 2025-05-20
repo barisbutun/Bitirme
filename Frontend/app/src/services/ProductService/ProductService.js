@@ -1,8 +1,52 @@
 import{getAuthHeaders} from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:8082/api";
+
+// Tüm ürünleri sayfa sayfa çekme
+export const fetchAllProducts = async () => {
+  const size = 10; // Her sayfada kaç ürün olsun
+  let page = 0;
+  let allProducts = [];
+  let totalElements = 0;
+  let isLastPage = false;
+
+  try {
+    while (!isLastPage) {
+      const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Ürünler getirilemedi.");
+      }
+
+      const data = await response.json();
+
+      const formattedProducts = data.content.map(product => ({
+        ...product,
+        category_id: product.category_id,
+      }));
+
+      allProducts = [...allProducts, ...formattedProducts];
+      totalElements = data.totalElements;
+
+      // Sayfa sonuna geldik mi kontrol et
+      isLastPage = data.last || allProducts.length >= totalElements;
+      page += 1;
+    }
+
+    return allProducts;
+  } catch (error) {
+    console.error("fetchAllProducts Error:", error);
+    throw error;
+  }
+};
+
 //ürünleri çekme
-export const fetchProducts = async (page = 0, size = 10) => {
+export const fetchProducts = async (page = 0, size = 100) => {
   try {
     const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
       method: "GET",
@@ -68,18 +112,38 @@ export const fetchFilteredProducts = async (filters) => {
   try {
     const queryParams = new URLSearchParams();
 
-    if (filters.name) queryParams.append("name", filters.name);
-    if (filters.category) queryParams.append("category", filters.category);
-    if (filters.minPrice) queryParams.append("minPrice", filters.minPrice);
-    if (filters.maxPrice) queryParams.append("maxPrice", filters.maxPrice);
+    // Sayfalama ve sıralama
+    queryParams.append("page", filters.page ?? 0);
+    queryParams.append("size", filters.size ?? 12);
+    queryParams.append("sortBy", filters.sortBy ?? "asc");
+
+    // Fiyat aralığı
+    if (filters.minPrice !== null && filters.minPrice !== undefined) {
+      queryParams.append("minPrice", filters.minPrice);
+    }
+
+    if (filters.maxPrice !== null && filters.maxPrice !== undefined) {
+      queryParams.append("maxPrice", filters.maxPrice);
+    }
+
+    // Kategoriler (çoklu)
+    if (filters.category && filters.category.length > 0) {
+      filters.category.forEach((cat) => queryParams.append("category", cat));
+    }
 
     const response = await fetch(
       `http://localhost:8082/api/product/v1/filter?${queryParams.toString()}`
     );
+
+    if (!response.ok) {
+      throw new Error("Filtrelenmiş ürünler alınamadı");
+    }
+
     const data = await response.json();
-    return data;
+    return data.content; 
   } catch (error) {
     console.error("Filtrelenmiş ürünler alınamadı", error);
+    throw error;
   }
 };
 

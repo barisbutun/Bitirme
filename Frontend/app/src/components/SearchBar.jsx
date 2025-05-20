@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Input, List, Spin, message } from "antd";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +12,17 @@ const SearchBar = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchResults = debounce(async (searchQuery) => {
-    if (!searchQuery) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+  const lastQueryRef = useRef(""); // aynı sorguya tekrar fetch atmayı engellemek için
+
+  const fetchResults = async (searchQuery) => {
+    // if (!searchQuery || searchQuery.length < 2) {
+    //   setResults([]);
+    //   setLoading(false);
+    //   return;
+    // }
+
+    if (lastQueryRef.current === searchQuery) return; // aynı sorgu tekrar gönderilmesin
+    lastQueryRef.current = searchQuery;
 
     setLoading(true);
     try {
@@ -32,9 +37,7 @@ const SearchBar = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Arama başarısız");
-      }
+      if (!response.ok) throw new Error("Arama başarısız");
 
       const products = await response.json();
 
@@ -45,6 +48,7 @@ const SearchBar = () => {
               `http://localhost:8082/api/image/v1/infos/${product.id}`
             );
             if (!imageResponse.ok) throw new Error("Resim yüklenemedi");
+
             const imageData = await imageResponse.json();
             const images = imageData.map(
               (base64) => `data:image/jpeg;base64,${base64}`
@@ -59,37 +63,92 @@ const SearchBar = () => {
       setResults(productsWithImages);
     } catch (error) {
       console.error("Arama hatası:", error);
+      message.error("Arama sırasında bir hata oluştu!");
       setResults([]);
     } finally {
       setLoading(false);
     }
-  }, 500);
+  };
 
-  const handleSearch = (value) => {
+  const debouncedFetchResults = useRef(
+    debounce((value) => fetchResults(value), 500)
+  ).current;
+
+  const handleSearch = async (value) => {
     setQuery(value);
-    fetchResults(value);
-    setTimeout(() => {
-      if (results.length > 0) {
-        navigate(`/user/ProductDetails/${results[0].id}`);
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8082/api/productElastic/v1/autocomplete",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: value }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Arama başarısız");
+
+      const products = await response.json();
+
+      const productsWithImages = await Promise.all(
+        products.map(async (product) => {
+          try {
+            const imageResponse = await fetch(
+              `http://localhost:8082/api/image/v1/infos/${product.id}`
+            );
+            const imageData = await imageResponse.json();
+            const images = imageData.map(
+              (base64) => `data:image/jpeg;base64,${base64}`
+            );
+            return { ...product, image: images[0] || null };
+          } catch {
+            return { ...product, image: null };
+          }
+        })
+      );
+
+      // Tam eşleşme varsa detay sayfasına yönlendir
+      const matchedProduct = productsWithImages.find(
+        (product) => product.name.toLowerCase() === value.toLowerCase()
+      );
+
+      if (matchedProduct) {
+        navigate(`/user/ProductDetails/${matchedProduct.id}`);
+      } else {
+        navigate("/user/SearchResults", {
+          state: { results: productsWithImages },
+        });
       }
-    }, 500);
+    } catch (error) {
+      console.error("Autocomplete arama hatası:", error);
+      message.error("Arama sırasında bir hata oluştu!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedFetchResults(value); // yazarken debounce ile çalışır
   };
 
   const handleItemClick = async (id) => {
-    console.log("Seçilen ürün ID:", id);
     setQuery("");
     setResults([]);
+    lastQueryRef.current = ""; // yeni aramalar yapılabilsin
 
     try {
       const response = await fetch(
         `http://localhost:8082/api/product/v1/${id}`
       );
-      if (!response.ok) {
-        throw new Error("Ürün bulunamadı");
-      }
+      if (!response.ok) throw new Error("Ürün bulunamadı");
 
-      const productData = await response.json();
-
+      await response.json(); // Detay gerekiyorsa burada işlenebilir
       navigate(`/user/ProductDetails/${id}`);
     } catch (error) {
       console.error("Ürün kontrol edilirken hata:", error);
@@ -102,7 +161,7 @@ const SearchBar = () => {
     <div className="search-container">
       <Search
         placeholder="Ürün ara..."
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={handleChange}
         onSearch={handleSearch}
         value={query}
         allowClear

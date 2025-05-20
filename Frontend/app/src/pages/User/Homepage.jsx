@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Layout, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
@@ -6,7 +6,7 @@ import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import ProductCard from "../../components/ProductCard";
 import {
-  fetchProducts,
+  fetchAllProducts,
   fetchProductImages,
   fetchFilteredProducts,
 } from "../../services/ProductService/ProductService";
@@ -19,25 +19,29 @@ const Homepage = ({ setLoading }) => {
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
 
+  // useRef ile sadece bir kere resimler yüklensin diye flag
+  const isImageLoaded = useRef(false);
+
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
     setSize(pageSize);
   };
 
-  // İlk aşamada sadece ürün verisi (resimsiz) çekilir
   useEffect(() => {
-    const fetchAllProducts = async () => {
+    const loadAllProducts = async () => {
       setLoading(true);
+      setError(null);
+      isImageLoaded.current = false; // Yeni ürünler yüklendiği için sıfırlanır
+
       try {
-        const productsData = await fetchProducts(page - 1, size);
-        const productList = productsData.content;
+        const productList = await fetchAllProducts();
 
         if (!Array.isArray(productList)) {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList);
-        setTotal(productsData.totalElements);
+        setProducts(productList.slice((page - 1) * size, page * size));
+        setTotal(productList.length);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -45,10 +49,10 @@ const Homepage = ({ setLoading }) => {
         setLoading(false);
       }
     };
-    fetchAllProducts();
+
+    loadAllProducts();
   }, [page, size]);
 
-  // Ürünler geldikten sonra resimler ayrı yüklenir
   useEffect(() => {
     const loadImages = async () => {
       for (const product of products) {
@@ -64,9 +68,10 @@ const Homepage = ({ setLoading }) => {
           );
         }
       }
+      isImageLoaded.current = true;
     };
 
-    if (products.length > 0) {
+    if (products.length > 0 && !isImageLoaded.current) {
       loadImages();
     }
   }, [products]);

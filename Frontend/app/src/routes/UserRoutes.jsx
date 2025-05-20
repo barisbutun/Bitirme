@@ -15,6 +15,7 @@ import EmailVerification from "../pages/User/EmailVerification";
 import ResetPassword from "../pages/User/ResetPassword";
 import WalletPage from "../pages/User/WalletPage";
 import OrdersList from "../pages/User/OrdersList";
+import SearchResults from "../pages/User/SearchResults";
 
 const UserRoutes = ({ setLoading }) => {
   return (
@@ -48,6 +49,10 @@ const UserRoutes = ({ setLoading }) => {
       <Route
         path="OrdersList"
         element={<OrdersList setLoading={setLoading} />}
+      />
+      <Route
+        path="SearchResults"
+        element={<SearchResults setLoading={setLoading} />}
       />
       <Route path="Favorites" element={<Favorites setLoading={setLoading} />} />
       <Route

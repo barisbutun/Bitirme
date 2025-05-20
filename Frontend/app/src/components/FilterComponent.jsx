@@ -20,8 +20,7 @@ const FilterComponent = ({ onApplyFilter }) => {
 
   const onFinish = (values) => {
     onApplyFilter({
-      category: values.category || [], // Çoklu kategori için dizi
-      name: values.name || null,
+      category: values.category || [],
       minPrice: values.minPrice || null,
       maxPrice: values.maxPrice || null,
       page: values.page || 0,
@@ -38,21 +37,13 @@ const FilterComponent = ({ onApplyFilter }) => {
       initialValues={{ page: 0, size: 12, sortBy: "asc" }}
     >
       <Form.Item name="category" label="Kategori">
-        <Select
-          mode="multiple" // Çoklu seçim aktif
-          placeholder="Kategori seçin"
-          allowClear
-        >
+        <Select mode="multiple" placeholder="Kategori seçin" allowClear>
           {categories.map((cat) => (
             <Option key={cat.id} value={cat.name}>
               {cat.name}
             </Option>
           ))}
         </Select>
-      </Form.Item>
-
-      <Form.Item name="name" label="Ürün Adı">
-        <Input placeholder="Ürün adını girin" />
       </Form.Item>
 
       <Form.Item name="minPrice" label="Min Fiyat">
