@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
@@ -6,7 +6,7 @@ import Footer from "../../components/Footer";
 import "../User/UserCss/Products.css";
 import ProductCard from "../../components/ProductCard";
 import {
-  fetchAllProducts,
+  fetchProducts,
   fetchProductImages,
   fetchFilteredProducts,
 } from "../../services/ProductService/ProductService";
@@ -17,33 +17,30 @@ const Products = ({ setLoading }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
+
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-
-  // useRef ile sadece bir kere resimler yüklensin diye flag
-  const isImageLoaded = useRef(false);
 
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
     setSize(pageSize);
   };
 
+  // Ürünleri getir (resimsiz)
   useEffect(() => {
-    const loadAllProducts = async () => {
+    const fetchAllProducts = async () => {
       setLoading(true);
-      setError(null);
-      isImageLoaded.current = false; // Yeni ürünler yüklendiği için sıfırlanır
-
       try {
-        const productList = await fetchAllProducts();
+        const productsData = await fetchProducts(page - 1, size);
+        const productList = productsData.content;
 
         if (!Array.isArray(productList)) {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList.slice((page - 1) * size, page * size));
-        setTotal(productList.length);
+        setProducts(productList);
+        setTotal(productsData.totalElements);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -52,7 +49,7 @@ const Products = ({ setLoading }) => {
       }
     };
 
-    loadAllProducts();
+    fetchAllProducts();
   }, [page, size]);
 
   useEffect(() => {
@@ -70,19 +67,20 @@ const Products = ({ setLoading }) => {
           );
         }
       }
-      isImageLoaded.current = true;
     };
 
-    if (products.length > 0 && !isImageLoaded.current) {
+    if (products.length > 0) {
       loadImages();
     }
   }, [products]);
+
   // Filtreleme
   const handleApplyFilter = async (filters) => {
     console.log("filtreleme kriterleri:", filters);
     setLoading(true);
     try {
       const data = await fetchFilteredProducts(filters);
+
       setProducts(data); // İlk başta resimsiz gelir
 
       // Resimleri ayrı yükle

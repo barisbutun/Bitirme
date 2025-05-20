@@ -2,51 +2,35 @@ import{getAuthHeaders} from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:8082/api";
 
-// Tüm ürünleri sayfa sayfa çekme
-export const fetchAllProducts = async () => {
-  const size = 10; // Her sayfada kaç ürün olsun
-  let page = 0;
-  let allProducts = [];
-  let totalElements = 0;
-  let isLastPage = false;
-
+export const fetchAllProducts = async (page = 0, size = 10) => {
   try {
-    while (!isLastPage) {
-      const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error("Ürünler getirilemedi.");
-      }
-
-      const data = await response.json();
-
-      const formattedProducts = data.content.map(product => ({
-        ...product,
-        category_id: product.category_id,
-      }));
-
-      allProducts = [...allProducts, ...formattedProducts];
-      totalElements = data.totalElements;
-
-      // Sayfa sonuna geldik mi kontrol et
-      isLastPage = data.last || allProducts.length >= totalElements;
-      page += 1;
+    if (!response.ok) {
+      throw new Error("Ürünler getirilemedi.");
     }
 
-    return allProducts;
+    const data = await response.json();
+    const products = data.content || [];
+
+    // ✅ totalElements artık doğru yerden alınıyor
+    const total = data.page?.totalElements ?? products.length;
+
+    return { products, total };
   } catch (error) {
     console.error("fetchAllProducts Error:", error);
     throw error;
   }
 };
 
+
 //ürünleri çekme
-export const fetchProducts = async (page = 0, size = 100) => {
+export const fetchProducts = async (page = 0, size = 10) => {
   try {
     const response = await fetch(`${API_BASE_URL}/product/v1/home?page=${page}&size=${size}`, {
       method: "GET",

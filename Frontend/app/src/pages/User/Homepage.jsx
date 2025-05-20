@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Layout, Pagination } from "antd";
+import React, { useEffect, useState } from "react";
+import { Layout, Spin, Pagination } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "../User/UserCss/Homepage.css";
 import ProductCard from "../../components/ProductCard";
 import {
-  fetchAllProducts,
+  fetchProducts,
   fetchProductImages,
   fetchFilteredProducts,
 } from "../../services/ProductService/ProductService";
@@ -19,29 +19,30 @@ const Homepage = ({ setLoading }) => {
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
 
-  // useRef ile sadece bir kere resimler yüklensin diye flag
-  const isImageLoaded = useRef(false);
-
   const handlePageChange = (pageNumber, pageSize) => {
-    setPage(pageNumber);
-    setSize(pageSize);
+    if (pageSize !== size) {
+      setPage(1); // Yeni boyut seçildiğinde sayfa 1'e sıfırlanır
+      setSize(pageSize);
+    } else {
+      setPage(pageNumber);
+    }
   };
-
+  // İlk aşamada sadece ürün verisi (resimsiz) çekilir
   useEffect(() => {
-    const loadAllProducts = async () => {
+    const fetchAllProducts = async () => {
       setLoading(true);
-      setError(null);
-      isImageLoaded.current = false; // Yeni ürünler yüklendiği için sıfırlanır
-
       try {
-        const productList = await fetchAllProducts();
+        const productsData = await fetchProducts(page - 1, size);
+        const productList = productsData.content;
 
         if (!Array.isArray(productList)) {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList.slice((page - 1) * size, page * size));
-        setTotal(productList.length);
+        setProducts(productList); // ilk yükleme, resim henüz yok
+        setTotal(
+          productsData.page?.totalElements || productsData.totalElements
+        );
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -50,28 +51,32 @@ const Homepage = ({ setLoading }) => {
       }
     };
 
-    loadAllProducts();
+    fetchAllProducts();
   }, [page, size]);
 
   useEffect(() => {
     const loadImages = async () => {
-      for (const product of products) {
-        try {
-          const images = await fetchProductImages(product.id);
-          setProducts((prev) =>
-            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
-          );
-        } catch (error) {
-          console.error(
-            `Ürün resmi alınırken hata (ID: ${product.id}):`,
-            error
-          );
-        }
-      }
-      isImageLoaded.current = true;
+      const updated = await Promise.all(
+        products.map(async (product) => {
+          if (product.images) return product; // image varsa tekrar çekme
+
+          try {
+            const images = await fetchProductImages(product.id);
+            return { ...product, images };
+          } catch (error) {
+            console.error(
+              "Ürün resmi alınırken hata (ID: ${product.id}):",
+              error
+            );
+            return product; // resim alınamasa da ürünü geri döndür
+          }
+        })
+      );
+
+      setProducts(updated); // burada yeni state set edilir, döngü oluşmaz
     };
 
-    if (products.length > 0 && !isImageLoaded.current) {
+    if (products.length > 0 && !products.every((p) => p.images)) {
       loadImages();
     }
   }, [products]);
@@ -81,6 +86,7 @@ const Homepage = ({ setLoading }) => {
     setLoading(true);
     try {
       const data = await fetchFilteredProducts(filters);
+
       setProducts(data);
 
       // Resimleri filtre sonrası ayrı yükle
@@ -153,11 +159,15 @@ const Homepage = ({ setLoading }) => {
             <Pagination
               current={page}
               pageSize={size}
-              onChange={handlePageChange}
+              total={total}
+              onChange={(pageNumber, pageSize) => {
+                setPage(pageNumber);
+                setSize(pageSize);
+              }}
               showSizeChanger
               pageSizeOptions={["5", "10", "20", "50"]}
-              total={total}
             />
+
             <p className="footer-text">@Fashion Design</p>
           </div>
         </Footer>
