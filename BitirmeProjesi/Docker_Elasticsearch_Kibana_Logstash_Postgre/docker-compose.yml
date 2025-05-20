@@ -17,6 +17,8 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  ollama_models:
+    driver: local
 
 
 
@@ -162,8 +164,30 @@ services:
           test: ["CMD-SHELL", "pg_isready -U barishafize -d BitirmeProjesi"]
           interval: 10s
           timeout: 5s
-          retries: 5  
-          
+          retries: 5
+
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_models:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fs http://localhost:11434/api/models || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+
   kibana:
     depends_on:
       es01:

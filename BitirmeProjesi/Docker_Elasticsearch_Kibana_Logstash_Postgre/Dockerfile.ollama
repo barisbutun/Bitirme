@@ -1,0 +1,35 @@
+FROM nvidia/cuda:12.2.2-base-ubuntu22.04
+
+# Gerekli paketler
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      ca-certificates \
+      libglib2.0-0 \
+      libstdc++6 \
+      libgcc-s1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Ollama sürümü
+ENV OLLAMA_VERSION=0.1.33
+
+# Ollama binary dosyasını indir
+RUN curl -fL https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/ollama-linux-amd64 \
+    -o /usr/local/bin/ollama && \
+    chmod +x /usr/local/bin/ollama
+
+# CUDA araçları (opsiyonel ama gerekliyse)
+RUN apt-get update && apt-get install -y --no-install-recommends cuda-toolkit-12-2 && \
+    rm -rf /var/lib/apt/lists/*
+
+# NVIDIA ayarları
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# Çalışma dizini, port ve volume
+WORKDIR /root
+VOLUME ["/root/.ollama"]
+EXPOSE 11434
+
+# Entrypoint (parametreleri doğrudan geçiriyoruz)
+ENTRYPOINT ["/usr/local/bin/ollama", "run", "--port", "11434", "--listen", "0.0.0.0"]

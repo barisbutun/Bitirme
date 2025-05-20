@@ -138,6 +138,7 @@ public class SecurityConfiguration {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Arrays.asList(
+                "http://172.31.13.238:3000",
                 "http://localhost:3000",
                 "http://localhost:5055/webhook",
                 "http://localhost:5005/webhooks/rest/webhook",

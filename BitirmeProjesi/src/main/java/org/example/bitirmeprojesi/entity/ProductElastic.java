@@ -31,10 +31,10 @@ public class ProductElastic {
     @Field(type = FieldType.Double, name = "price")
     private double price;
 
-    @Field(type = FieldType.Keyword, name = "stockState")
+    @Field(type = FieldType.Keyword, name = "stock_state")
     private String stockState;
 
-    @Field(type = FieldType.Long, name = "categoryId")
+    @Field(type = FieldType.Long, name = "category_id")
     private Long categoryId;
 
     @Field(type = FieldType.Object, name = "quantity")
