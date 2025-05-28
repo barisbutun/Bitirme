@@ -50,9 +50,6 @@ public class OrdersDto implements Serializable {
     @JsonProperty("is_same_address")
     boolean isSameAddress;
 
-    @JsonProperty("stock_state")
-    StockState stockState;
-
     @JsonIgnore
     private UUID userId;
 

@@ -1,4 +1,4 @@
-package org.example.bitirmeprojesi.configuration;
+package org.example.bitirmeprojesi.config;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -7,6 +7,8 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.example.bitirmeprojesi.config.ratelimiting.RateLimitFilter;
+import org.example.bitirmeprojesi.config.ratelimiting.RateLimitService;
 import org.example.bitirmeprojesi.enums.Role;
 import org.example.bitirmeprojesi.util.RSAkeyProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,13 +34,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -47,6 +49,7 @@ import java.util.List;
 public class SecurityConfiguration {
 
     private final RSAkeyProperties keys;
+    private final RateLimitService rateLimitService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,6 +64,11 @@ public class SecurityConfiguration {
         daoProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoProvider);
     }
+    @Bean
+    public RateLimitFilter rateLimitFilter() {
+        return new RateLimitFilter(rateLimitService);
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -82,6 +90,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/api/payment/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name());
                     auth.anyRequest().permitAll();
                 });
+        http.addFilterBefore(rateLimitFilter(), UsernamePasswordAuthenticationFilter.class);
+
         http.oauth2ResourceServer(
                 o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         http.sessionManagement(

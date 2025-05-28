@@ -60,7 +60,7 @@ spring:
   docker:
     compose:
       enabled: true
-      file: C:\Users\Baris\OneDrive - ktun.edu.tr\Masaustu\SpringBoot\Bitirme Projesi\Bitirme\BitirmeProjesi\Docker_Elasticsearch_Kibana_Logstash_Postgre\docker-compose.yml
+      file: ./Docker_Elasticsearch_Kibana_Logstash_Postgre/docker-compose.yml
       services:
         - postgres
         - elasticsearch
@@ -80,7 +80,7 @@ spring:
         enabled: true
         key-store: C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/keystore.p12
         key-store-password: 123456B
-        trust-store: C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/truststore.jks
+        trust-store:  C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/truststore.jks
         trust-store-password: 123456B
         key-store-type: PKCS12
         key-alias: es01
@@ -120,7 +120,7 @@ logging:
     - name: org.springframework.web
       level: ERROR
   file:
-    path: C:\Users\Baris\OneDrive - ktun.edu.tr\Masaustu\SpringBoot\Bitirme Projesi\Bitirme\BitirmeProjesi\logs
+    path: ./logs
 
 admin:
   email: f211220005@ktun.edu.tr

@@ -24,6 +24,7 @@ public class AdminService {
     private final PaymentService paymentService;
     private final CancellationService cancellationService;
     private final CommentService commentService;
+    private final RefundService refundService;
 
     public Page<PaymentDto> findAllPayment(int page, int size) {
         return paymentService.findAll(page, size);
@@ -125,6 +126,10 @@ public class AdminService {
 
     public Page<FavouriteDto> getAllFavouritesByUserId(UUID userId,int page,int size) {
         return favouriteService.getlAllByUserId(userId, page, size);
+    }
+
+    public RefundDto updateRefund(RefundDto refundDto, UUID id,UUID userId) {
+        return refundService.update(refundDto, id,userId);
     }
 
     public FavouriteDto updateFavourite(FavouriteDto favouriteDto, Long id) {

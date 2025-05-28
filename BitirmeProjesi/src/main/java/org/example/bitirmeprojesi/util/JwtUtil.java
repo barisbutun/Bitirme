@@ -28,6 +28,15 @@ public class JwtUtil {
 
         return jwt.getTokenValue();
     }
+    public static String getRoleFromToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
+            return null;
+        }
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        return jwt.getClaimAsString("roles");
+    }
+
 
 
 

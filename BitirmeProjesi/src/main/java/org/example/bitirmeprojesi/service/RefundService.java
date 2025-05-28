@@ -10,12 +10,14 @@ import org.example.bitirmeprojesi.enums.RefundStatus;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.*;
 import org.example.bitirmeprojesi.mapper.RefundMapper;
-import org.example.bitirmeprojesi.repository.*;
+import org.example.bitirmeprojesi.repository.OrderItemRepository;
+import org.example.bitirmeprojesi.repository.OrderRepository;
+import org.example.bitirmeprojesi.repository.RefundRepository;
+import org.example.bitirmeprojesi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -26,7 +28,6 @@ public class RefundService {
     private final RefundMapper refundMapper;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
 
     public RefundDto create(RefundDto refundDto, UUID userId) {
@@ -38,7 +39,7 @@ public class RefundService {
             throw new PaymentNotCompletedException(ErrorMesage.PAYMENT_NOT_COMPLETED_ERROR);
         }
         Delivery delivery = orders.getDelivery();
-        if (delivery != null && delivery.getDeliveryState().equals(DeliveryStatus.PENDING)&&delivery.getDeliveryState().equals(DeliveryStatus.PROCESSING)) {
+        if (delivery != null && (delivery.getDeliveryState().equals(DeliveryStatus.PENDING) || delivery.getDeliveryState().equals(DeliveryStatus.PROCESSING))) {
             throw new DeliveredOrderShouldBeRefundedException(ErrorMesage.DELIVERED_ORDER_SHOULD_BE_REFUNDED_ERROR);
         }
 
@@ -77,6 +78,21 @@ public class RefundService {
     }
 
     public RefundDto update(RefundDto refundDto,UUID id,UUID userId) {
+
+        Refund refund = refundRepository.findById(id)
+                .orElseThrow(() -> new RefundNotFoundException(ErrorMesage.REFUND_NOT_FOUND_ERROR));
+
+        if (!refund.getUser().getId().equals(userId)) {
+            throw new RefundNotFoundException(ErrorMesage.REFUND_NOT_FOUND_ERROR);
+        }
+
+        refundMapper.update(refundDto, refund);
+        refundRepository.save(refund);
+        return refundMapper.toDto(refund);
+    }
+
+
+    /*public RefundDto update(RefundDto refundDto,UUID id,UUID userId) {
 
         Refund refund = refundRepository.findById(id)
                 .orElseThrow(() -> new RefundNotFoundException(ErrorMesage.REFUND_NOT_FOUND_ERROR));
@@ -129,7 +145,7 @@ public class RefundService {
                 orderItem.setPaymentState(PaymentState.UPDATED);
             }
         });
-    }
+    }*/
 
     public RefundDto findById(UUID id) {
         Refund refund = refundRepository.findById(id)

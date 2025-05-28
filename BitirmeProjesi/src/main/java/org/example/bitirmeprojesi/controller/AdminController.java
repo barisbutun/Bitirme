@@ -220,6 +220,12 @@ public class AdminController {
         return ResponseEntity.ok(adminService.countFavouriteByUserId(id));
     }
 
+    @PutMapping("/v1/refund/{id}")
+    public ResponseEntity<RefundDto> updateRefund(@RequestBody RefundDto refundDto, @PathVariable UUID id) {
+        UUID userId = JwtUtil.getUserIdFromToken();
+        return ResponseEntity.ok(adminService.updateRefund(refundDto, id, userId));
+    }
+
 
     @GetMapping("/v1/reviews/findall")
     public ResponseEntity<List<ReviewDto>> findAllReviews() {

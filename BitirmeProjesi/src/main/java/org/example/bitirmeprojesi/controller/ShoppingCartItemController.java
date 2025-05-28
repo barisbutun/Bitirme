@@ -21,7 +21,7 @@ public class ShoppingCartItemController {
 
 
     @PostMapping("/v1")
-    private ResponseEntity<Void> create(@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
+    public ResponseEntity<Void> create(@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
         UUID userId = JwtUtil.getUserIdFromToken();
         shoppingCartItemService.create(shoppingCartItemDto, userId);
         return ResponseEntity.ok().build();
@@ -29,14 +29,14 @@ public class ShoppingCartItemController {
 
 
     @DeleteMapping("/v1/{id}")
-    private ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         UUID userId = JwtUtil.getUserIdFromToken();
         shoppingCartItemService.delete(userId,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/v1/user")
-    private ResponseEntity<Page<ShoppingCartItemDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
+    public ResponseEntity<Page<ShoppingCartItemDto>> findAllByUserId(@RequestParam(required = false, defaultValue = "0") int page,
                                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok().body(shoppingCartItemService.findAllByUserId(userId, page, size));
@@ -44,18 +44,18 @@ public class ShoppingCartItemController {
 
 
     @PutMapping("/v1/{id}")
-    private ResponseEntity<ShoppingCartItemDto> update(@PathVariable Long id,@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
+    public ResponseEntity<ShoppingCartItemDto> update(@PathVariable Long id,@RequestBody ShoppingCartItemDto shoppingCartItemDto) {
         UUID userId = JwtUtil.getUserIdFromToken();
         return ResponseEntity.ok().body(shoppingCartItemService.update(shoppingCartItemDto,id,userId));
     }
 
     @GetMapping("/v1/{id}")
-    private ResponseEntity<ShoppingCartItemDto> findById(long id) {
+    public ResponseEntity<ShoppingCartItemDto> findById(long id) {
         return ResponseEntity.ok().body(shoppingCartItemService.findById(id));
     }
 
     @DeleteMapping("/v1/user")
-    private ResponseEntity<ShoppingCartItemDto> deleteAllByUserId() {
+    public ResponseEntity<ShoppingCartItemDto> deleteAllByUserId() {
         UUID userId = JwtUtil.getUserIdFromToken();
         shoppingCartItemService.deleteAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

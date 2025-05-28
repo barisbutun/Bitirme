@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bitirmeprojesi.dto.CancellationDto;
 import org.example.bitirmeprojesi.dto.OrderItemCancellationDto;
 import org.example.bitirmeprojesi.entity.*;
+import org.example.bitirmeprojesi.enums.DeliveryStatus;
 import org.example.bitirmeprojesi.enums.PaymentState;
 import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
@@ -180,6 +181,7 @@ public class CancellationService {
         order.setSumPrice(order.getSumPrice() - refundAmount);
         increaseUserBalance(user, refundAmount);
         savedCancellation.setCancelAmount(refundAmount);
+        order.getDelivery().setDeliveryState(DeliveryStatus.CANCELLED);
         order.setCancellations(savedCancellation);
         orderRepository.save(order);
 

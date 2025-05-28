@@ -167,24 +167,25 @@ services:
           retries: 5
 
   ollama:
-    container_name: ollama
-    image: ollama/ollama:latest
-    ports:
-      - '11434:11434'
-    volumes:
-      - ollama_models:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -fs http://localhost:11434/api/models || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      container_name: ollama
+      image: ollama/ollama:latest
+      ports:
+        - '11434:11434'
+      volumes:
+        - ollama_models:/root/.ollama
+      deploy:
+        resources:
+          limits:
+            cpus: '2.0'
+            memory: '8g'
+      environment:
+        - NVIDIA_VISIBLE_DEVICES=all
+      runtime: nvidia
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -fs http://localhost:11434/api/models || exit 1" ]
+        interval: 10s
+        timeout: 5s
+        retries: 3
 
 
 

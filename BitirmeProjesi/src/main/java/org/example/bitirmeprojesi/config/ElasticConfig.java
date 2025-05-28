@@ -1,4 +1,4 @@
-package org.example.bitirmeprojesi.configuration;
+package org.example.bitirmeprojesi.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;

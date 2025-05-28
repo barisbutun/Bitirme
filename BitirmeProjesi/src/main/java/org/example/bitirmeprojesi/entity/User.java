@@ -90,6 +90,11 @@ public class User implements Serializable, UserDetails {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Refund> refunds;
+
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Cancellation> cancellation;
 
     @Column(name = "is_deleted")

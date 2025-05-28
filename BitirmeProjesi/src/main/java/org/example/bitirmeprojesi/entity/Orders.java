@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.bitirmeprojesi.enums.PaymentState;
-import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
