@@ -23,7 +23,7 @@ public class RateLimitService {
         }
 
         return cache.computeIfAbsent(userId.toString(), key -> {
-            Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1)));
+            Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofSeconds(1)));
             return Bucket4j.builder()
                     .addLimit(limit)
                     .build();
@@ -34,7 +34,7 @@ public class RateLimitService {
 
     public Bucket resolveIpBucket(String ip) {
         return ipCache.computeIfAbsent(ip, key -> {
-            Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1)));
+            Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofSeconds(1)));
             return Bucket4j.builder().addLimit(limit).build();
         });
     }
