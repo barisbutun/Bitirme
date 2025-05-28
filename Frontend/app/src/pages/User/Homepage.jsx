@@ -23,8 +23,10 @@ const Homepage = ({ setLoading }) => {
     if (pageSize !== size) {
       setPage(1); // Yeni boyut seçildiğinde sayfa 1'e sıfırlanır
       setSize(pageSize);
+      console.log("Sayfa boyutu değişti:", pageSize);
     } else {
       setPage(pageNumber);
+      console.log("Sayfa değişti:", pageNumber);
     }
   };
   // İlk aşamada sadece ürün verisi (resimsiz) çekilir
@@ -33,16 +35,19 @@ const Homepage = ({ setLoading }) => {
       setLoading(true);
       try {
         const productsData = await fetchProducts(page - 1, size);
-        const productList = productsData.content;
+        console.log("API'den gelen data:", productsData);
 
+        const productList = productsData.content;
         if (!Array.isArray(productList)) {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList); // ilk yükleme, resim henüz yok
-        setTotal(
-          productsData.page?.totalElements || productsData.totalElements
-        );
+        setProducts(productList);
+
+        const totalElements =
+          productsData.page?.totalElements ?? productsData.totalElements;
+        console.log("totalElements:", totalElements);
+        setTotal(totalElements);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
@@ -54,6 +59,9 @@ const Homepage = ({ setLoading }) => {
     fetchAllProducts();
   }, [page, size]);
 
+  useEffect(() => {
+    console.log("Güncel total değeri:", total);
+  }, [total]);
   useEffect(() => {
     const loadImages = async () => {
       const updated = await Promise.all(
@@ -157,13 +165,11 @@ const Homepage = ({ setLoading }) => {
             style={{ marginLeft: collapsed ? 0 : 180 }}
           >
             <Pagination
+              key={`${page}-${size}-${total}`}
               current={page}
               pageSize={size}
               total={total}
-              onChange={(pageNumber, pageSize) => {
-                setPage(pageNumber);
-                setSize(pageSize);
-              }}
+              onChange={handlePageChange}
               showSizeChanger
               pageSizeOptions={["5", "10", "20", "50"]}
             />

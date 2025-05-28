@@ -54,7 +54,8 @@ export const fetchProducts = async (page = 0, size = 10) => {
 
     return {
       content: formattedProducts,
-      totalElements:totalElements, 
+      totalElements:totalElements,
+      page:data.page, 
     };
   } catch (error) {
     console.error("fetchProducts Error:", error);

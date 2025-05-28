@@ -27,20 +27,24 @@ const Products = ({ setLoading }) => {
     setSize(pageSize);
   };
 
-  // Ürünleri getir (resimsiz)
   useEffect(() => {
     const fetchAllProducts = async () => {
       setLoading(true);
       try {
         const productsData = await fetchProducts(page - 1, size);
-        const productList = productsData.content;
+        console.log("API'den gelen data:", productsData);
 
+        const productList = productsData.content;
         if (!Array.isArray(productList)) {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
         setProducts(productList);
-        setTotal(productsData.totalElements);
+
+        const totalElements =
+          productsData.page?.totalElements ?? productsData.totalElements;
+        console.log("totalElements:", totalElements);
+        setTotal(totalElements);
       } catch (error) {
         setError(error.message);
         console.error("Ürünler yüklenirken hata oluştu:", error.message);
