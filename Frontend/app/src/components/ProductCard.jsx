@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   Button,
@@ -20,7 +20,7 @@ import {
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
 import { isAuthenticated, getToken } from "../utils/auth";
-import { getReviewCount } from "../services/ProductService/ReviewService";
+import { getUserReview } from "../services/ProductService/ReviewService";
 
 function ProductCard({
   id,
@@ -34,6 +34,8 @@ function ProductCard({
   categoryId,
   favorite_id,
   favorite = [],
+  averageRating = 0,
+  reviewCount = 0,
   onFavoriteChange,
 }) {
   const navigate = useNavigate();
@@ -41,25 +43,46 @@ function ProductCard({
     return favorite.some((fav) => fav.product_id === id);
   });
 
-  const [reviewCount, setReviewCount] = useState(0);
-  const [averageRating, setAverageRating] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [userRating, setUserRating] = useState(0);
+  const imageRef = useRef();
+  const [isImageVisible, setIsImageVisible] = useState(false);
+  const [currentAverageRating, setCurrentAverageRating] =
+    useState(averageRating);
+  const [currentReviewCount, setCurrentReviewCount] = useState(reviewCount);
 
   useEffect(() => {
     const fetchReviewData = async () => {
       try {
-        const reviewCountData = await getReviewCount(id);
-        setReviewCount(reviewCountData);
-
-        const averageRatingData = 4.2; // örnek değer
-        setAverageRating(averageRatingData);
-      } catch (error) {
-        console.error("Review verisi alınamadı:", error);
+        const res = await getUserReview(id);
+        if (res) {
+          setCurrentAverageRating(res.averageRating);
+          setCurrentReviewCount(res.reviewCount);
+        }
+      } catch (err) {
+        console.error("Yorum verileri alınamadı", err);
       }
     };
 
     fetchReviewData();
   }, [id]);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsImageVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (imageRef.current) {
+      observer.observe(imageRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
   const availableSizes = React.useMemo(() => {
     if (typeof quantity === "object" && quantity !== null) {
       return Object.entries(quantity).filter(([size, count]) => count > 0);
@@ -188,14 +211,22 @@ function ProductCard({
         {name}
       </CardTitle>
 
-      <div className="image-container" onClick={(e) => e.stopPropagation()}>
-        {image ? (
-          <Image
-            className="image"
-            src={image}
-            placeholder={<Spin />}
-            preview={true}
-          />
+      <div
+        className="image-container"
+        ref={imageRef}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {isImageVisible ? (
+          image ? (
+            <Image
+              className="image"
+              src={image}
+              placeholder={<Spin />}
+              preview={true}
+            />
+          ) : (
+            <Skeleton.Image active style={{ width: "100%", height: "200px" }} />
+          )
         ) : (
           <Skeleton.Image active style={{ width: "100%", height: "200px" }} />
         )}
@@ -210,12 +241,15 @@ function ProductCard({
         {isAvailable ? "Stokta Var" : "Stokta Yok"}
       </CardText>
 
-      <div style={{ marginTop: "10px" }}>
-        <Tooltip title={`${reviewCount} yorum`}>
-          <Rate allowHalf disabled defaultValue={averageRating} />
-        </Tooltip>
-        <p>{reviewCount} yorum</p>
-      </div>
+      <Tooltip title={`${currentReviewCount} yorum`}>
+        <Rate allowHalf disabled defaultValue={currentAverageRating} />
+        <p>
+          {Number.isFinite(currentAverageRating)
+            ? currentAverageRating.toFixed(1)
+            : "0.0"}{" "}
+          ⭐ ({currentReviewCount || 0} yorum)
+        </p>
+      </Tooltip>
 
       {isAvailable && (
         <>

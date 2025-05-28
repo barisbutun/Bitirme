@@ -13,34 +13,61 @@ import {
 } from "antd";
 import { CardText, CardTitle } from "reactstrap";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
 import "../css/ProductDetailsCard.css";
 import { addToCart } from "../services/ProductService/ShoppingCardService";
 import {
   addFavorite,
   removeFavorite,
 } from "../services/ProductService/FavoriteService";
-import { getReviewCount } from "../services/ProductService/ReviewService";
+import {
+  getUserReview,
+  getReviewCount,
+  submitReview,
+  getProductReviewSummary,
+} from "../services/ProductService/ReviewService";
 
+import { fetchProductById } from "../services/ProductService/ProductService";
 const { Panel } = Collapse;
 
 const ProductDetailsCard = ({ product, images }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [reviewCount, setReviewCount] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [userRating, setUserRating] = useState(null);
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
+  const { id } = useParams();
 
   useEffect(() => {
     if (product) {
       setIsFavorite(
         product.favorite?.some((fav) => fav.product_id === product.id)
       );
-    }
 
-    if (product?.id) {
-      getReviewCount(product.id)
-        .then(setReviewCount)
-        .catch((err) =>
-          console.error("Yorum sayısı alınırken hata oluştu:", err)
-        );
+      const productId = product.id;
+
+      // Yorum sayısı ve ortalama puanı doğrudan üründen al
+      setAverageRating(product.averageRating || 0);
+      setReviewCount(product.reviewCount || 0);
+
+      // LocalStorage'dan kullanıcı puanını çek
+      const storedRating = localStorage.getItem(`userRating_${productId}`);
+      if (storedRating !== null) {
+        setUserRating(Number(storedRating));
+        setHasSubmittedReview(true);
+      }
+
+      // Kullanıcının kendi değerlendirmesini al
+      getUserReview(productId)
+        .then((data) => {
+          if (data && data.rating !== undefined) {
+            setUserRating(data.rating);
+          } else if (storedRating === null) {
+            setUserRating(0);
+          }
+        })
+        .catch((err) => console.error("Kullanıcı yorumu alınamadı", err));
     }
   }, [product]);
 
@@ -119,6 +146,7 @@ const ProductDetailsCard = ({ product, images }) => {
       });
     }
   };
+
   const availableSizes = React.useMemo(() => {
     if (typeof product?.quantity === "object" && product.quantity !== null) {
       const sizes = Object.entries(product.quantity)
@@ -132,6 +160,33 @@ const ProductDetailsCard = ({ product, images }) => {
     }
     return [];
   }, [product]);
+
+  // Örnek: Kullanıcı puanını gönderme fonksiyonu
+  const submitUserRating = async (value) => {
+    try {
+      await submitReview({
+        product_id: id,
+        rating: value,
+      });
+
+      // LocalStorage'a kullanıcı değerlendirmesini kaydet
+      localStorage.setItem(`userRating_${id}`, value);
+      setUserRating(value);
+      setHasSubmittedReview(true);
+
+      notification.success({
+        message: "Değerlendirme Başarılı",
+        description: "Puanınız kaydedildi.",
+        placement: "topRight",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Hata",
+        description: "Puan kaydedilirken bir hata oluştu.",
+        placement: "topRight",
+      });
+    }
+  };
 
   return (
     <Card className="product-details-card">
@@ -159,13 +214,17 @@ const ProductDetailsCard = ({ product, images }) => {
         </Col>
         <Col span={14}>
           <h2 className="product-details-title">{product.name}</h2>
+          <Tooltip title={`${product.reviewCount} `}>
+            <>
+              <Rate
+                allowHalf
+                disabled
+                defaultValue={product.averageRating || 0}
+              />
+              <p> {averageRating.toFixed(1)} ⭐</p>
+            </>
 
-          <Tooltip title={`${reviewCount} yorum`}>
-            <Rate
-              allowHalf
-              disabled
-              defaultValue={product.averageRating || 0}
-            />
+            {/* <p>Toplam Yorum Sayısı: {reviewCount}</p> */}
           </Tooltip>
           <CardText className="product-info">
             Açıklama:
@@ -180,8 +239,57 @@ const ProductDetailsCard = ({ product, images }) => {
                 ))}
             </ul>
           </CardText>
+          <div style={{ marginTop: "16px" }}>
+            <h4>Bu ürünü değerlendirin:</h4>
+            <Rate
+              allowClear={false}
+              tooltips={["çok kötü", "kötü", "orta", "iyi", "çok iyi"]}
+              value={userRating}
+              onChange={async (value) => {
+                setUserRating(value);
 
-          <p style={{ marginTop: 4 }}>{reviewCount} yorum</p>
+                const token = localStorage.getItem("token");
+                if (!token) {
+                  notification.warning({
+                    message: "Giriş Yapın",
+                    description:
+                      "Değerlendirme yapabilmek için giriş yapmalısınız.",
+                    placement: "topRight",
+                  });
+                  return;
+                }
+
+                try {
+                  // Değerlendirmeyi gönder
+                  await submitReview({
+                    product_id: id, // product.id yerine doğrudan id kullanılıyor
+                    rating: value,
+                  });
+
+                  // Değerlendirme sonrası ürünü tekrar API'den çek
+                  const updatedProduct = await fetchProductById(id); // Bu fonksiyon API'den ürünü getiriyor olmalı
+                  setAverageRating(updatedProduct.averageRating || 0);
+                  setReviewCount(updatedProduct.reviewCount || 0);
+
+                  setHasSubmittedReview(true);
+                  notification.success({
+                    message: "Teşekkürler!",
+                    description: "Değerlendirmeniz kaydedildi.",
+                    placement: "topRight",
+                  });
+                } catch (error) {
+                  console.error("Değerlendirme gönderilirken hata:", error);
+                  notification.error({
+                    message: "Hata",
+                    description: "Değerlendirme gönderilemedi.",
+                    placement: "topRight",
+                  });
+                }
+              }}
+            />
+
+            {hasSubmittedReview && <p>Değerlendirmeniz için teşekkürler!</p>}
+          </div>
 
           <p className="product-details-price">{product.price} TL</p>
 

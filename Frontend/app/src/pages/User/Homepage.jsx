@@ -21,7 +21,7 @@ const Homepage = ({ setLoading }) => {
 
   const handlePageChange = (pageNumber, pageSize) => {
     if (pageSize !== size) {
-      setPage(1); // Yeni boyut seçildiğinde sayfa 1'e sıfırlanır
+      setPage(1);
       setSize(pageSize);
       console.log("Sayfa boyutu değişti:", pageSize);
     } else {
@@ -42,7 +42,23 @@ const Homepage = ({ setLoading }) => {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList);
+        // Her ürün için resimleri al
+        const productListWithImages = await Promise.all(
+          productList.map(async (product) => {
+            try {
+              const images = await fetchProductImages(product.id);
+              return { ...product, images };
+            } catch (error) {
+              console.error(
+                `Ürün resmi alınırken hata (ID: ${product.id}):`,
+                error
+              );
+              return product; // Resim alınamadıysa yine de döndür
+            }
+          })
+        );
+
+        setProducts(productListWithImages);
 
         const totalElements =
           productsData.page?.totalElements ?? productsData.totalElements;
@@ -58,36 +74,6 @@ const Homepage = ({ setLoading }) => {
 
     fetchAllProducts();
   }, [page, size]);
-
-  useEffect(() => {
-    console.log("Güncel total değeri:", total);
-  }, [total]);
-  useEffect(() => {
-    const loadImages = async () => {
-      const updated = await Promise.all(
-        products.map(async (product) => {
-          if (product.images) return product; // image varsa tekrar çekme
-
-          try {
-            const images = await fetchProductImages(product.id);
-            return { ...product, images };
-          } catch (error) {
-            console.error(
-              "Ürün resmi alınırken hata (ID: ${product.id}):",
-              error
-            );
-            return product; // resim alınamasa da ürünü geri döndür
-          }
-        })
-      );
-
-      setProducts(updated); // burada yeni state set edilir, döngü oluşmaz
-    };
-
-    if (products.length > 0 && !products.every((p) => p.images)) {
-      loadImages();
-    }
-  }, [products]);
 
   const handleApplyFilter = async (filters) => {
     console.log("filtreleme kriterleri:", filters);

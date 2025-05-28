@@ -17,16 +17,15 @@ const Products = ({ setLoading }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
-
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-
   const handlePageChange = (pageNumber, pageSize) => {
     setPage(pageNumber);
     setSize(pageSize);
   };
 
+  // İlk aşamada sadece ürün verisi (resimsiz) çekilir
   useEffect(() => {
     const fetchAllProducts = async () => {
       setLoading(true);
@@ -39,7 +38,23 @@ const Products = ({ setLoading }) => {
           throw new Error("Ürün verisi dizisi bekleniyor.");
         }
 
-        setProducts(productList);
+        // Her ürün için resimleri al
+        const productListWithImages = await Promise.all(
+          productList.map(async (product) => {
+            try {
+              const images = await fetchProductImages(product.id);
+              return { ...product, images };
+            } catch (error) {
+              console.error(
+                `Ürün resmi alınırken hata (ID: ${product.id}):`,
+                error
+              );
+              return product; // Resim alınamadıysa yine de döndür
+            }
+          })
+        );
+
+        setProducts(productListWithImages);
 
         const totalElements =
           productsData.page?.totalElements ?? productsData.totalElements;
@@ -55,29 +70,6 @@ const Products = ({ setLoading }) => {
 
     fetchAllProducts();
   }, [page, size]);
-
-  useEffect(() => {
-    const loadImages = async () => {
-      for (const product of products) {
-        try {
-          const images = await fetchProductImages(product.id);
-          setProducts((prev) =>
-            prev.map((p) => (p.id === product.id ? { ...p, images } : p))
-          );
-        } catch (error) {
-          console.error(
-            `Ürün resmi alınırken hata (ID: ${product.id}):`,
-            error
-          );
-        }
-      }
-    };
-
-    if (products.length > 0) {
-      loadImages();
-    }
-  }, [products]);
-
   // Filtreleme
   const handleApplyFilter = async (filters) => {
     console.log("filtreleme kriterleri:", filters);
