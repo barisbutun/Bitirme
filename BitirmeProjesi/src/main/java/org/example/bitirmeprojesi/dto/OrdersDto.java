@@ -47,11 +47,11 @@ public class OrdersDto implements Serializable {
     @JsonProperty("address")
     String address;
 
+    @JsonProperty(value="user", access = JsonProperty.Access.READ_ONLY)
+    private UserProfileDto user;
+
     @JsonProperty("is_same_address")
     boolean isSameAddress;
-
-    @JsonIgnore
-    private UUID userId;
 
     @JsonProperty(value = "delivery",access = JsonProperty.Access.READ_ONLY)
     private DeliveryDto delivery;

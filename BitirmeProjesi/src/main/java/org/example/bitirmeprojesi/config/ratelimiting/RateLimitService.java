@@ -19,7 +19,7 @@ public class RateLimitService {
 
     public Bucket resolveBucket(UUID userId, Collection<String> roles) {
         if (roles.contains("ROLE_ADMIN")) {
-            return null; // admin sınırsız
+            return null;
         }
 
         return cache.computeIfAbsent(userId.toString(), key -> {

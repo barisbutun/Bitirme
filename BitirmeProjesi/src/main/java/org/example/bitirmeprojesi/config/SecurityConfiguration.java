@@ -152,7 +152,8 @@ public class SecurityConfiguration {
                 "http://localhost:3000",
                 "http://localhost:5055/webhook",
                 "http://localhost:5005/webhooks/rest/webhook",
-                "http://192.168.194.16:3000"
+                "http://192.168.194.16:3000",
+                "http://192.168.30.16:3000"
         ));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH"));
