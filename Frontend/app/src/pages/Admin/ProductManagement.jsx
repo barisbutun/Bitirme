@@ -25,6 +25,7 @@ import {
   ShoppingOutlined,
   UploadOutlined,
   HomeOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import {
@@ -49,7 +50,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
+import ProductListModal from "../../AdminComponents/ProductListModal";
 const { Title } = Typography;
 
 const cardStyle = {
@@ -80,7 +81,11 @@ const AdminDashboard = () => {
   const [stockModalOpen, setStockModalOpen] = useState(false);
   const [productDataOverTimes, setProductDataOverTime] = useState();
   const [categoryDistribution, setCategoryDistribution] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const openProductModal = () => {
+    setIsModalOpen(true);
+  };
   const productDataOverTime = [
     {
       productName: "İnce uzun desenli bluz",
@@ -321,6 +326,13 @@ const AdminDashboard = () => {
       title: "Stok Durumu",
       icon: <ShoppingOutlined style={{ ...iconStyle, color: "#faad14" }} />,
       onClick: () => setStockModalOpen(true),
+    },
+    {
+      title: "Ürünler",
+      icon: (
+        <UnorderedListOutlined style={{ ...iconStyle, color: "#13c2c2" }} />
+      ),
+      onClick: openProductModal,
     },
   ];
 
@@ -662,6 +674,12 @@ const AdminDashboard = () => {
           size="middle"
         />
       </Modal>
+      <ProductListModal
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        products={allProducts}
+      />
     </div>
   );
 };
