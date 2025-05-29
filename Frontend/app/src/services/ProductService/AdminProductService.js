@@ -3,20 +3,35 @@ import { getAuthHeaders } from "../../utils/auth";
 const API_URL = "http://localhost:8082/api/admin/v1";
 
 export const getAllProducts = async () => {
-  const response = await fetch(`http://localhost:8082/api/product/v1/home`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) {
-    throw new Error("Ürün bilgilerini çekilirken bir hata oluştu.");
-  }
-  const data = await response.json();
-  return data.content.map(product => ({
+  let allProducts = [];
+  let page = 0;
+  let size = 50; // API'niz maksimum kaç veri dönüyorsa ona göre artırabilirsin
+  let totalPages = 1;
+
+  do {
+    const response = await fetch(
+      `http://localhost:8082/api/product/v1/home?page=${page}&size=${size}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Ürün bilgilerini çekilirken bir hata oluştu.");
+    }
+
+    const data = await response.json();
+    allProducts = [...allProducts, ...data.content];
+    totalPages = data.totalPages;
+    page++;
+  } while (page < totalPages);
+
+  return allProducts.map((product) => ({
     ...product,
-    category: product.category || { name: "Kategori Yok" } 
+    category: product.category || { name: "Kategori Yok" },
   }));
 };
-
 
 
 

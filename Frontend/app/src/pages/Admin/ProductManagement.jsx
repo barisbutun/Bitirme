@@ -17,6 +17,7 @@ import {
   Table,
   Tag,
   InputNumber,
+  AutoComplete,
 } from "antd";
 import {
   PlusOutlined,
@@ -74,7 +75,6 @@ const AdminDashboard = () => {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [fileList, setFileList] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -82,10 +82,45 @@ const AdminDashboard = () => {
   const [productDataOverTimes, setProductDataOverTime] = useState();
   const [categoryDistribution, setCategoryDistribution] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [productOptions, setProductOptions] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  //ürün listeleme modalını açmak için
   const openProductModal = () => {
     setIsModalOpen(true);
   };
+  //ürün aramak için
+  const handleSearch = async (value) => {
+    const response = await fetch(
+      "http://localhost:8082/api/productElastic/v1/autocomplete",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: value }),
+      }
+    );
+    const data = await response.json();
+
+    // gelen veri dizi mi kontrol et
+    if (Array.isArray(data)) {
+      setProductOptions(data);
+    } else {
+      setProductOptions([]); // boş array ata, map hatasını engelle
+      console.error("API'den beklenmeyen veri geldi:", data);
+    }
+  };
+
+  const handleSelect = (selectedProduct) => {
+    setSelectedProduct(selectedProduct); // Güncellenen ürünü seç
+    form.setFieldsValue({
+      productName: selectedProduct.name,
+      description: selectedProduct.description,
+      price: selectedProduct.price,
+      quantity: selectedProduct.quantity,
+      category: selectedProduct.category?.id,
+      // Diğer alanlar varsa ekle
+    });
+  };
+
   const productDataOverTime = [
     {
       productName: "İnce uzun desenli bluz",
@@ -451,18 +486,21 @@ const AdminDashboard = () => {
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
           {drawerType === "edit" && (
             <Form.Item label="Güncellenecek Ürün">
-              <Select
-                placeholder="Bir ürün seçin"
-                onChange={handleProductSelect}
-                value={selectedProduct?.id || undefined}
-                style={{ width: "100%" }} // Daha estetik bir görünüm için width:100% ekledim.
-              >
-                {allProducts.map((product) => (
-                  <Select.Option key={product.id} value={product.id}>
-                    {product.name}
-                  </Select.Option>
-                ))}
-              </Select>
+              <AutoComplete
+                style={{ width: "100%" }}
+                placeholder="Ürün adı yazın..."
+                onSearch={handleSearch}
+                onSelect={(value, option) => handleSelect(option.product)}
+                options={
+                  Array.isArray(productOptions)
+                    ? productOptions.map((product) => ({
+                        value: product.name,
+                        label: product.name,
+                        product,
+                      }))
+                    : []
+                }
+              />
             </Form.Item>
           )}
 
@@ -471,7 +509,7 @@ const AdminDashboard = () => {
             label="Ürün Adı"
             rules={[{ required: true, message: "Ürün adı giriniz" }]}
           >
-            <Input placeholder="Örn: Laptop" />
+            <Input placeholder="Örn: bluz" />
           </Form.Item>
 
           <Form.Item
