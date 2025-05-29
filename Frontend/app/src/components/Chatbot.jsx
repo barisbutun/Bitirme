@@ -164,7 +164,9 @@ const Chatbot = () => {
                       borderRadius: 16,
                       maxWidth: "80%",
                       display: "inline-block",
-                      wordBreak: "normal",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                      whiteSpace: "pre-wrap",
                       userSelect: "text",
                     }}
                   >
@@ -180,11 +182,20 @@ const Chatbot = () => {
                       borderRadius: 16,
                       maxWidth: "80%",
                       display: "inline-block",
-                      wordBreak: "normal",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                      whiteSpace: "pre-wrap",
                       userSelect: "text",
                     }}
                   >
-                    <div dangerouslySetInnerHTML={{ __html: item.text }} />
+                    <div
+                      style={{
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        whiteSpace: "pre-wrap",
+                      }}
+                      dangerouslySetInnerHTML={{ __html: item.text }}
+                    />
                     {item.image && (
                       <img
                         src={item.image}

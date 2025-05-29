@@ -165,3 +165,20 @@ export const Categories = async () => {
   }
   return response.json();
 };
+
+//kategori güncelleme
+
+
+export const updateCategory = async (id, updatedData) => {
+  const response = await fetch(`http://localhost:8082/api/admin/v1/category/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(updatedData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Kategori güncellenemedi.");
+  }
+
+  return response.json();
+};

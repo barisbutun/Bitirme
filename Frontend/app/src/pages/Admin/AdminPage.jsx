@@ -61,8 +61,6 @@ const AdminDashboard = () => {
   const [categoryCount, setCategoryCount] = useState(0);
   const [orderList, setOrderList] = useState([]);
   const [userCount, setUserCount] = useState(0);
-  const [favouriteCount, setFavouriteCount] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [categoryProduct, setCategoryProduct] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -77,35 +75,25 @@ const AdminDashboard = () => {
       },
     };
     try {
-      const [
-        products,
-        categories,
-        users,
-        favourites,
-        reviews,
-        categoryProductRes,
-      ] = await Promise.all([
-        axios.get("http://localhost:8082/api/admin/v1/product/count", config),
-        axios.get("http://localhost:8082/api/admin/v1/category/count", config),
-        // axios.get("/api/admin/v1/orders?page=0&size=5", config),
-        axios.get("http://localhost:8082/api/admin/v1/user/count", config),
-        axios.get(
-          "http://localhost:8082/api/admin/v1/favourites/findAll",
-          config
-        ),
-        axios.get("http://localhost:8082/api/admin/v1/reviews/findall", config),
-        axios.get(
-          "http://localhost:8082/api/admin/v1/category/count-product",
-          config
-        ),
-      ]);
+      const [products, categories, users, categoryProductRes] =
+        await Promise.all([
+          axios.get("http://localhost:8082/api/admin/v1/product/count", config),
+          axios.get(
+            "http://localhost:8082/api/admin/v1/category/count",
+            config
+          ),
+          axios.get("http://localhost:8082/api/admin/v1/user/count", config),
+          axios.get(
+            "http://localhost:8082/api/admin/v1/category/count-product",
+            config
+          ),
+          // axios.get("http://localhost:8082/api/admin/v1/order/list", config),
+        ]);
 
       setProductCount(products.data);
       setCategoryCount(categories.data);
       // setOrderList(orders.data.content);
       setUserCount(users.data);
-      setFavouriteCount(favourites.data.content.length);
-      setReviewCount(reviews.data.length);
       setCategoryProduct(categoryProduct.data);
       const categoryData = Object.entries(categoryProductRes.data).map(
         ([key, value]) => ({
@@ -148,25 +136,15 @@ const AdminDashboard = () => {
       count: categoryCount,
       icon: <AppstoreOutlined style={{ ...iconStyle, color: "#52c41a" }} />,
     },
-    {
-      title: "Toplam Sipariş",
-      count: orderList.length,
-      icon: <FileTextOutlined style={{ ...iconStyle, color: "#fa8c16" }} />,
-    },
+    // {
+    //   title: "Toplam Sipariş",
+    //   count: orderList.length,
+    //   icon: <FileTextOutlined style={{ ...iconStyle, color: "#fa8c16" }} />,
+    // },
     {
       title: "Kullanıcı Sayısı",
       count: userCount,
       icon: <UserOutlined style={{ ...iconStyle, color: "#722ed1" }} />,
-    },
-    {
-      title: "Favoriler",
-      count: favouriteCount,
-      icon: <HeartFilled style={{ ...iconStyle, color: "#eb2f96" }} />,
-    },
-    {
-      title: "Yorumlar",
-      count: reviewCount,
-      icon: <StarFilled style={{ ...iconStyle, color: "#fadb14" }} />,
     },
   ];
 
@@ -191,7 +169,7 @@ const AdminDashboard = () => {
 
       <Row gutter={[16, 16]}>
         {statCards.map((item, index) => (
-          <Col xs={24} sm={12} md={8} key={index}>
+          <Col xs={24} sm={12} md={8} lg={6} key={index}>
             <Card
               hoverable
               style={cardStyle}
@@ -207,9 +185,9 @@ const AdminDashboard = () => {
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-        <Col xs={24} md={12}>
+        <Col xs={24} lg={12}>
           <Card title="📊 Kategorik Ürün Dağılımı" style={cardStyle}>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
                   data={chartData}
@@ -217,7 +195,7 @@ const AdminDashboard = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={60}
+                  outerRadius={140}
                   label
                 >
                   {chartData.map((entry, index) => (
@@ -240,9 +218,9 @@ const AdminDashboard = () => {
             </ResponsiveContainer>
           </Card>
         </Col>
-        <Col xs={24} md={12}>
-          <Card title="📈 Genel İstatistikler" style={cardStyle}>
-            <ResponsiveContainer width="100%" height={200}>
+        <Col xs={24} lg={12}>
+          <Card title="📈 Kategorilere Göre Ürün Sayısı" style={cardStyle}>
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -255,31 +233,7 @@ const AdminDashboard = () => {
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
-        {/* <Col xs={24} md={12}>
-          <Card
-            title="📦 Son 5 Sipariş"
-            style={cardStyle}
-            extra={<FileTextOutlined />}
-          >
-            <List
-              itemLayout="horizontal"
-              dataSource={orderList}
-              renderItem={(order) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={
-                      <Tooltip title={order.createdDate}>
-                        <Tag color="blue">#{order.id}</Tag>
-                      </Tooltip>
-                    }
-                    description={order.createdDate || "Tarih Yok"}
-                  />
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col> */}
-        <Col xs={24} md={12}>
+        <Col xs={24} md={12} lg={8}>
           <Card title="⚡ Hızlı İşlemler" style={cardStyle}>
             <Button
               type="primary"
@@ -308,24 +262,7 @@ const AdminDashboard = () => {
             >
               Kullanıcı İşlemleri
             </Button>
-            <Button
-              type="dashed"
-              icon={<HeartFilled />}
-              block
-              style={{ marginBottom: 12 }}
-              onClick={() => navigate("/admin/FavoriteManagement")}
-            >
-              Favori İşlemleri
-            </Button>
-            <Button
-              type="dashed"
-              icon={<StarFilled />}
-              block
-              style={{ marginBottom: 12 }}
-              onClick={() => navigate("/admin/ReviewManagement")}
-            >
-              Yorum İşlemleri
-            </Button>
+
             <Button
               type="dashed"
               icon={<FileTextOutlined />}
