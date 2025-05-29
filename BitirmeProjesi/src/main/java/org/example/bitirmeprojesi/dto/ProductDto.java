@@ -11,6 +11,7 @@ import org.example.bitirmeprojesi.enums.Size;
 import org.example.bitirmeprojesi.enums.StockState;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -37,6 +38,12 @@ public class ProductDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
+
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double averageRating;
@@ -58,7 +65,6 @@ public class ProductDto implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int sameCount;
-
 
     @JsonProperty("quantity")
     private Map<Size, @Positive(message = "Stock count must be positive") Integer> quantity;

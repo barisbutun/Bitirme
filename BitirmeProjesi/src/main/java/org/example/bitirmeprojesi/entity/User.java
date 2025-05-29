@@ -42,7 +42,7 @@ public class User implements Serializable, UserDetails {
     private String password;
 
     @Column(name = "user_name", nullable = false,unique = true,updatable = true)
-    private String userName="user"+id;
+    private String userName;
 
     @Column(name = "email", unique = true)
     private String email;

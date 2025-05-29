@@ -124,8 +124,8 @@ public class AdminController {
     @PutMapping("/v1/category/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
 
-        CategoryDto updatedCategory = adminService.updateCategory(categoryDto, id);
-        return ResponseEntity.ok(updatedCategory);
+
+        return ResponseEntity.ok(adminService.updateCategory(categoryDto, id));
     }
 
     @DeleteMapping("/v1/category/{id}")

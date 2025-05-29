@@ -26,7 +26,7 @@ public class CategoryService {
          categoryRepository.save(category);
         return categoryMapper.toDto(category);
     }
-    public CategoryDto findById(long id) {
+    public CategoryDto findById(Long id) {
         Category category=categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
         return categoryMapper.toDto(category);
     }
@@ -48,7 +48,7 @@ public class CategoryService {
     }
 
     @CacheEvict(value = "categories", allEntries = true)
-    public CategoryDto update(CategoryDto categoryDto, long id) {
+    public CategoryDto update(CategoryDto categoryDto, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
         categoryMapper.update(categoryDto, category);
         categoryRepository.save(category);
@@ -56,7 +56,7 @@ public class CategoryService {
 
     }
     @CacheEvict(value = "categories", allEntries = true)
-    public void delete(long id) {
+    public void delete(Long id) {
         categoryRepository.deleteById(id);
     }
 

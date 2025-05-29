@@ -103,7 +103,7 @@ public class ProductService {
         log.info("Product Page: {}", dtoPage);
         return dtoPage;
     }
-    @Cacheable(value = "products_list", key = "'all'")
+    @Cacheable(value = "products_list", key = "'all_product_list'")
     public List<ProductDto> findAll() {
         List<Product> products = productRepository.findAll();
         return productMapper.toDtoList(products);

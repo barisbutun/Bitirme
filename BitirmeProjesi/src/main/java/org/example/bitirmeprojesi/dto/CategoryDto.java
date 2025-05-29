@@ -18,7 +18,7 @@ import java.io.Serializable;
 @NoArgsConstructor(force = true)
 public class CategoryDto implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long id;
+    private Long id;
     @JsonProperty("name")
     private String name;
 }
