@@ -245,7 +245,7 @@ const ProductDetailsCard = ({ product, images }) => {
                 {Number.isFinite(product.averageRating)
                   ? product.averageRating.toFixed(1)
                   : "0.0"}{" "}
-                ⭐ ({product.reviewCount || 0} yorum)
+                ⭐ ({product.reviewCount || 0} değerlendirme)
               </p>
             </>
           </Tooltip>

@@ -229,7 +229,7 @@ function ProductCard({
           <Rate allowHalf disabled defaultValue={averageRating || 0} />
           <p>
             {Number.isFinite(averageRating) ? averageRating.toFixed(1) : "0.0"}{" "}
-            ⭐ ({reviewCount || 0} yorum)
+            ⭐ ({reviewCount || 0} değerlendirme)
           </p>
         </>
       </Tooltip>

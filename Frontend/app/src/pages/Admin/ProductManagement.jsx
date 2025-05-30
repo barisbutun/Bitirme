@@ -81,7 +81,78 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stockModalOpen, setStockModalOpen] = useState(false);
-  const [productDataOverTimes, setProductDataOverTime] = useState();
+  const [productDataOverTimes, setProductDataOverTime] = useState([
+    {
+      name: "İnce Uzun Desenli Bluz",
+      favori: 245,
+      satış: 180,
+      değerlendirme: 95,
+      toplam: 520,
+    },
+    {
+      name: "Kısa Kollu Tişört",
+      favori: 210,
+      satış: 165,
+      değerlendirme: 85,
+      toplam: 460,
+    },
+    {
+      name: "Yüksek Bel Jean",
+      favori: 195,
+      satış: 150,
+      değerlendirme: 75,
+      toplam: 420,
+    },
+    {
+      name: "Oversize Sweatshirt",
+      favori: 180,
+      satış: 140,
+      değerlendirme: 70,
+      toplam: 390,
+    },
+    {
+      name: "Mini Etek",
+      favori: 170,
+      satış: 130,
+      değerlendirme: 65,
+      toplam: 365,
+    },
+    {
+      name: "Crop Blazer",
+      favori: 160,
+      satış: 120,
+      değerlendirme: 60,
+      toplam: 340,
+    },
+    {
+      name: "Yüksek Bel Pantolon",
+      favori: 150,
+      satış: 110,
+      değerlendirme: 55,
+      toplam: 315,
+    },
+    {
+      name: "Oversize Gömlek",
+      favori: 140,
+      satış: 100,
+      değerlendirme: 50,
+      toplam: 290,
+    },
+    {
+      name: "Mini Elbise",
+      favori: 130,
+      satış: 90,
+      değerlendirme: 45,
+      toplam: 265,
+    },
+    {
+      name: "Crop Tişört",
+      favori: 120,
+      satış: 80,
+      değerlendirme: 40,
+      toplam: 240,
+    },
+  ]);
   const [categoryDistribution, setCategoryDistribution] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productOptions, setProductOptions] = useState([]);
@@ -123,61 +194,6 @@ const AdminDashboard = () => {
     });
   };
 
-  const productDataOverTime = [
-    {
-      productName: "İnce uzun desenli bluz",
-      stockHistory: [
-        { date: "2024-12", stock: 50 },
-        { date: "2025-01", stock: 70 },
-        { date: "2025-02", stock: 90 },
-        { date: "2025-03", stock: 100 },
-        { date: "2025-03", stock: 0 },
-      ],
-    },
-    {
-      productName: "Kısa kollu tişört",
-      stockHistory: [
-        { date: "2024-12", stock: 200 },
-        { date: "2025-01", stock: 180 },
-        { date: "2025-02", stock: 160 },
-        { date: "2025-03", stock: 150 },
-        { date: "2025-04", stock: 60 },
-      ],
-    },
-  ];
-
-  // Stok durumu için tablo
-  const columns = [
-    {
-      title: "Ürün Adı",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Stok",
-      dataIndex: "quantity",
-      key: "quantity",
-      render: (quantity) => {
-        if (!quantity) return "Bilinmiyor";
-
-        return Object.entries(quantity).map(([size, count]) => (
-          <Tag
-            color={count < 20 ? "red" : count < 100 ? "orange" : "green"}
-            key={size}
-          >
-            {size}: {count}
-          </Tag>
-        ));
-      },
-    },
-    {
-      title: "Kategori",
-      dataIndex: "category",
-      key: "category",
-      render: (category) => category?.name || "Kategori Yok",
-    },
-  ];
-
   const fetchAllProducts = async () => {
     try {
       const response = await axios.get(
@@ -198,27 +214,6 @@ const AdminDashboard = () => {
           name: "Kategori Yok",
         },
       }));
-
-      // Ürün performans verilerini oluştur
-      const productPerformanceData = productsWithCategory
-        .sort(
-          (a, b) =>
-            b.favouriteCount +
-            b.saleCount +
-            b.reviewCount -
-            (a.favouriteCount + a.saleCount + a.reviewCount)
-        )
-        .slice(0, 10) // En iyi performans gösteren 10 ürün
-        .map((product) => ({
-          name: product.name,
-          favori: product.favouriteCount,
-          satış: product.saleCount,
-          değerlendirme: product.reviewCount,
-          toplam:
-            product.favouriteCount + product.saleCount + product.reviewCount,
-        }));
-
-      setProductDataOverTime(productPerformanceData);
 
       const categoryCount = {};
       productsWithCategory.forEach((product) => {
@@ -370,37 +365,84 @@ const AdminDashboard = () => {
   const actionCards = [
     {
       title: "Ürün Ekle",
-      icon: <PlusOutlined style={{ ...iconStyle, color: "#52c41a" }} />,
+      icon: (
+        <PlusOutlined style={{ ...iconStyle, color: "#52c41a", width: 280 }} />
+      ),
       onClick: () => openDrawer("add"),
     },
     {
       title: "Ürün Güncelle",
-      icon: <EditOutlined style={{ ...iconStyle, color: "#1890ff" }} />,
+      icon: (
+        <EditOutlined style={{ ...iconStyle, color: "#1890ff", width: 280 }} />
+      ),
       onClick: () => openDrawer("edit"),
     },
     {
       title: "Ürün Sil",
-      icon: <DeleteOutlined style={{ ...iconStyle, color: "#ff4d4f" }} />,
+      icon: (
+        <DeleteOutlined
+          style={{ ...iconStyle, color: "#ff4d4f", width: 280 }}
+        />
+      ),
       onClick: () => setDeleteModalOpen(true),
     },
     {
       title: "Stok Durumu",
-      icon: <ShoppingOutlined style={{ ...iconStyle, color: "#faad14" }} />,
+      icon: (
+        <ShoppingOutlined
+          style={{ ...iconStyle, color: "#faad14", width: 280 }}
+        />
+      ),
       onClick: () => setStockModalOpen(true),
     },
     {
       title: "Ürünler",
       icon: (
-        <UnorderedListOutlined style={{ ...iconStyle, color: "#13c2c2" }} />
+        <UnorderedListOutlined
+          style={{ ...iconStyle, color: "#13c2c2", width: 280 }}
+        />
       ),
       onClick: openProductModal,
+    },
+  ];
+
+  // Stok durumu için tablo
+  const columns = [
+    {
+      title: "Ürün Adı",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Stok",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (quantity) => {
+        if (!quantity) return "Bilinmiyor";
+
+        return Object.entries(quantity).map(([size, count]) => (
+          <Tag
+            color={count < 20 ? "red" : count < 100 ? "orange" : "green"}
+            key={size}
+          >
+            {size}: {count}
+          </Tag>
+        ));
+      },
+    },
+    {
+      title: "Kategori",
+      dataIndex: "category",
+      key: "category",
+      render: (category) => category?.name || "Kategori Yok",
     },
   ];
 
   return (
     <div
       style={{
-        padding: "30px",
+        padding: "50px",
+        marginLeft: "48px",
       }}
     >
       <Title level={3}>🏷️ Ürün Yönetimi</Title>
@@ -427,20 +469,22 @@ const AdminDashboard = () => {
         <Col xs={24} md={12}>
           <Card
             title="En Popüler 10 Ürün Performansı"
-            style={{ borderRadius: "16px" }}
+            style={{ borderRadius: "16px", height: 400 }}
           >
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={productDataOverTime}>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={productDataOverTimes} margin={{ bottom: 100 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
                   tick={{ fontSize: 12 }}
-                  angle={-45}
+                  angle={-60}
                   textAnchor="end"
+                  height={100}
+                  interval={0}
                 />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Legend />
+                <Legend verticalAlign="top" height={36} />
                 <Bar
                   dataKey="favori"
                   name="Favori Sayısı"
@@ -466,9 +510,9 @@ const AdminDashboard = () => {
         <Col xs={24} md={10}>
           <Card
             title="Kategori Dağılımı (Pie Chart)"
-            style={{ borderRadius: "16px" }}
+            style={{ borderRadius: "16px", marginLeft: 55 }}
           >
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={categoryDistribution}
@@ -476,7 +520,7 @@ const AdminDashboard = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={60}
+                  outerRadius={80}
                   label
                 >
                   {categoryDistribution.map((entry, index) => (
@@ -499,7 +543,7 @@ const AdminDashboard = () => {
       </Row>
       <Row gutter={[24, 24]} style={{ paddingTop: "20px" }}>
         {actionCards.map((card, index) => (
-          <Col key={index} xs={24} sm={12} md={6}>
+          <Col key={index} span={6.9}>
             <Card hoverable style={cardStyle} onClick={card.onClick}>
               {card.icon}
               <Title level={4}>{card.title}</Title>

@@ -5,8 +5,6 @@ import { sendMessageToBot } from "../services/chatbotService";
 import Draggable from "react-draggable";
 import "../css/chatbot.css";
 
-const CHAT_HISTORY_KEY = "chatbot_messages";
-
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -18,22 +16,11 @@ const Chatbot = () => {
     setIsOpen(!isOpen);
   };
 
-  const loadHistory = () => {
-    const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
-  };
-
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = { sender: "user", text: input };
-    setMessages((prev) => {
-      const updated = [...prev, userMessage];
-      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
-      return updated;
-    });
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
     try {
@@ -43,27 +30,15 @@ const Chatbot = () => {
         text: botResponse.reply,
         image: botResponse.image || null,
       };
-      setMessages((prev) => {
-        const updated = [...prev, botMessage];
-        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
-        return updated;
-      });
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       const errorMessage = {
         sender: "bot",
         text: "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
       };
-      setMessages((prev) => {
-        const updated = [...prev, errorMessage];
-        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updated));
-        return updated;
-      });
+      setMessages((prev) => [...prev, errorMessage]);
     }
   };
-
-  useEffect(() => {
-    if (isOpen) loadHistory();
-  }, [isOpen]);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });

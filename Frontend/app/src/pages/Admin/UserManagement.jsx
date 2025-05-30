@@ -172,6 +172,7 @@ const UserListWithDashboard = () => {
   const activeUsers = users.filter((user) => !user.isDeleted).length;
   const passiveUsers = users.filter((user) => user.isDeleted).length;
   const adminCount = users.filter((user) => user.role === "ADMIN").length;
+  const [searchText, setSearchText] = useState("");
 
   const columns = [
     {
@@ -182,7 +183,9 @@ const UserListWithDashboard = () => {
         let icon;
         let bgColor;
 
-        switch (record.gender) {
+        console.log("User gender:", record.gender); // Debug için log ekleyelim
+
+        switch (record.gender?.toUpperCase()) {
           case "FEMALE":
             icon = <WomanOutlined />;
             bgColor = "#e91e63";
@@ -270,6 +273,61 @@ const UserListWithDashboard = () => {
     },
   ];
 
+  const handleSearch = async () => {
+    if (!searchText.trim()) {
+      // Boşsa normal kullanıcıları tekrar yükle
+      setLoading(true);
+      setCurrentPage(1);
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.get(
+          `http://localhost:8082/api/admin/v1/users?page=0&size=${pageSize}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUsers(response.data.content);
+        setFilteredUsers(response.data.content);
+        setTotalElements(response.data.totalElements);
+      } catch (error) {
+        console.error("Kullanıcılar yeniden yüklenemedi:", error);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:8082/api/admin/v1/user/search",
+        {
+          query: searchText,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUsers(response.data);
+      setFilteredUsers(response.data);
+      setTotalElements(response.data.length); // Elasticsearch için total
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Arama sırasında hata:", error);
+      api.error({
+        message: "Hata",
+        description: "Arama yapılırken bir hata oluştu.",
+        placement: "topRight",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div style={{ padding: 24, position: "relative" }}>
       {contextHolder}
@@ -333,11 +391,20 @@ const UserListWithDashboard = () => {
       >
         <div
           style={{
-            marginBottom: 16,
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 16,
           }}
         >
+          <Input.Search
+            placeholder="Ad, telefon veya email ile ara"
+            enterButton="Ara"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onSearch={handleSearch}
+            style={{ width: 300 }}
+          />
+
           <Select
             value={filterStatus}
             onChange={(value) => setFilterStatus(value)}
