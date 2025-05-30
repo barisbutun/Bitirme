@@ -85,6 +85,7 @@ public class AuthenticationService {
     public UserDto register(RegisterDto registerDto) {
         String encodedPassword = passwordEncoder.encode(registerDto.getPassword());
         User user = userMapper.toEntity(registerDto);
+        System.out.println(registerDto.getUserName());
         user.setUserName(registerDto.getUserName());
         user.setRole(Role.USER);
         user.setPassword(encodedPassword);

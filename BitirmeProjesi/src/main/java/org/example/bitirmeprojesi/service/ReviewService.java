@@ -10,7 +10,6 @@ import org.example.bitirmeprojesi.entity.Product;
 import org.example.bitirmeprojesi.entity.Review;
 import org.example.bitirmeprojesi.exception.ErrorMesage;
 import org.example.bitirmeprojesi.exception.error.AccountNotFoundException;
-import org.example.bitirmeprojesi.exception.error.DuplicateReviewException;
 import org.example.bitirmeprojesi.exception.error.ProductNotFoundException;
 import org.example.bitirmeprojesi.exception.error.ReviewNotFoundException;
 import org.example.bitirmeprojesi.mapper.ReviewMapper;

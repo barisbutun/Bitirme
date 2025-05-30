@@ -22,7 +22,7 @@ import java.io.Serializable;
         private Long id;
 
         @JsonProperty("product_id")
-        private long productId;
+        private Long productId;
 
         @JsonProperty("cancel_quantity")
         private Integer cancelQuantity;

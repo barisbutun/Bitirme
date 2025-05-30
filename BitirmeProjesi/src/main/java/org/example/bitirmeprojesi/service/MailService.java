@@ -51,7 +51,7 @@ public class MailService {
     }
 
     public void sendEmailVerification(TemporaryUserDto dto) throws MessagingException {
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        if (userRepository.existsByEmailAndIsDeletedFalse(dto.getEmail())) {
             throw new ExistByEmailException(ErrorMesage.EMAIL_ALREADY_EXISTS_ERROR);
         }
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.bitirmeprojesi.enums.Gender;
 import org.example.bitirmeprojesi.enums.Role;
 
 import java.io.Serializable;
@@ -42,6 +43,9 @@ public class UserDto implements Serializable {
 
     @JsonProperty(access=JsonProperty.Access.READ_ONLY)
     private Role role;
+
+    @JsonProperty(access=JsonProperty.Access.READ_ONLY)
+    private Gender gender;
 
     @JsonProperty(access=JsonProperty.Access.READ_ONLY)
     private boolean isDeleted;

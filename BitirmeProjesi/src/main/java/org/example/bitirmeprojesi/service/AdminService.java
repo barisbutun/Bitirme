@@ -25,6 +25,7 @@ public class AdminService {
     private final CancellationService cancellationService;
     private final CommentService commentService;
     private final RefundService refundService;
+    private final UserElasticService userElasticService;
 
     public Page<PaymentDto> findAllPayment(int page, int size) {
         return paymentService.findAll(page, size);
@@ -112,6 +113,10 @@ public class AdminService {
         return userService.findAll(page,size);
     }
 
+    public List<UserElasticDto> searchUser(QueryRequest request) {
+        return userElasticService.searchByQuery(request);
+    }
+
     public void deleteUser(UUID id) {
         userService.deleteById(id);
     }
@@ -131,6 +136,7 @@ public class AdminService {
     public RefundDto updateRefund(RefundDto refundDto, UUID id,UUID userId) {
         return refundService.update(refundDto, id,userId);
     }
+
 
     public FavouriteDto updateFavourite(FavouriteDto favouriteDto, Long id) {
         return favouriteService.update(favouriteDto, id);

@@ -20,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class OrderItemDto implements Serializable {
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     @JsonProperty("product_id")
     private long productId;

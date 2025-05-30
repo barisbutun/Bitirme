@@ -37,7 +37,6 @@ public class CancellationService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final BalanceService balanceService;
-    private final OrderValidator orderValidator;
 
 
     @Transactional

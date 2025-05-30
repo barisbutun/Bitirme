@@ -171,6 +171,13 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PostMapping("/v1/user/search")
+    public ResponseEntity<List<UserElasticDto>> searchUser(@RequestBody QueryRequest request) {
+
+        List<UserElasticDto> users = adminService.searchUser(request);
+        return ResponseEntity.ok(users);
+    }
+
     @DeleteMapping("/v1/user/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
 

@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RequestMapping("/api/productElastic")
 @RestController
@@ -21,15 +20,6 @@ public class ProductElasticController {
     @PostMapping("/v1/autocomplete")
     public ResponseEntity<List<ProductDto>> searchByQuery(@RequestBody QueryRequest query) {
         List<ProductDto> products = productElasticService.searchByQuery(query);
-        return ResponseEntity.ok(products);
-    }
-    @PostMapping("/v1/searchByNameOrDescription")
-    public ResponseEntity<List<ProductDto>> searchByNameOrDescription(@RequestBody Map<String, String> searchQuery) {
-
-       String name=searchQuery.get("name");
-       String description=searchQuery.get("description");
-
-        List<ProductDto> products = productElasticService.findByNameOrDescription(name,description);
         return ResponseEntity.ok(products);
     }
     @GetMapping("v1/filter")
