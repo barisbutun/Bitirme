@@ -77,6 +77,9 @@ public class AdminService {
         return categoryService.getCategoryCountMap();
     }
 
+    public List<OrdersDto> getAllOrders() {
+        return orderService.findAll();
+    }
 
     public Page<OrdersDto> getAllOrders(int page, int size) {
         return orderService.findAll(page , size);

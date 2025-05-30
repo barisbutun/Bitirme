@@ -34,6 +34,10 @@ public class Delivery {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Orders order;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(name = "delivery_state")
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryState;

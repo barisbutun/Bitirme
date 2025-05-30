@@ -128,6 +128,10 @@ public class OrderService {
         orderRepository.save(orders);
         return orderMapper.toDto(orders);
     }
+    public List<OrdersDto> findAll(){
+        List<Orders> ordersList = orderRepository.findAll();
+        return orderMapper.toDtoList(ordersList);
+    }
 
     public Page<OrdersDto> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

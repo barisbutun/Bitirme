@@ -142,6 +142,13 @@ public class AdminController {
         Page<OrdersDto> orders = adminService.getAllOrders(page, size);
         return ResponseEntity.ok(orders);
     }
+    @GetMapping("/v1/orders/list")
+    public ResponseEntity<List<OrdersDto>> getAllOrdersList() {
+
+        List<OrdersDto> orders = adminService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
 
     @DeleteMapping("/v1/orders/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {

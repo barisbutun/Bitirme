@@ -82,6 +82,10 @@ public class User implements Serializable, UserDetails {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Delivery> deliveries;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @JsonManagedReference

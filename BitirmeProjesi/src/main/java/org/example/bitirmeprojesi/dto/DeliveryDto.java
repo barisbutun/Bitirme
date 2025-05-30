@@ -30,6 +30,8 @@ public class DeliveryDto implements Serializable {
     private DeliveryStatus deliveryState;
     @JsonProperty("delivery_date")
     private LocalDateTime deliveryDate;
+    @JsonProperty("user")
+    private UserDto userDto;
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 }
