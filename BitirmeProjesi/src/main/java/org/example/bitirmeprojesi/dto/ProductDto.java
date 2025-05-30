@@ -38,8 +38,9 @@ public class ProductDto implements Serializable {
     @JsonProperty("stock_state")
     StockState stockState;
 
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    @JsonProperty("created_date")
+    private LocalDateTime createdDate;
+
 
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
