@@ -203,24 +203,36 @@ const ShoppingCard = () => {
       title: "Ürün Resmi",
       dataIndex: ["product", "images"],
       key: "image",
-      render: (images) => (
-        <img
-          className="image"
-          src={images && images.length > 0 ? images[0] : ""}
-          alt="Ürün Resmi"
-          onError={(e) => {
-            console.log("Resim yüklenemedi");
-            e.target.style.display = "none";
-          }}
-        />
+      render: (images, record) => (
+        <div
+          onClick={() => navigate(`/user/ProductDetails/${record.product.id}`)}
+          style={{ cursor: "pointer" }}
+        >
+          <img
+            className="image"
+            src={images && images.length > 0 ? images[0] : ""}
+            alt="Ürün Resmi"
+            onError={(e) => {
+              console.log("Resim yüklenemedi");
+              e.target.style.display = "none";
+            }}
+          />
+        </div>
       ),
     },
     {
       title: "Ürün Adı",
       dataIndex: ["product", "name"],
       key: "name",
+      render: (name, record) => (
+        <div
+          onClick={() => navigate(`/user/ProductDetails/${record.product.id}`)}
+          style={{ cursor: "pointer" }}
+        >
+          {name}
+        </div>
+      ),
     },
-
     {
       title: "Miktar",
       dataIndex: "quantity",

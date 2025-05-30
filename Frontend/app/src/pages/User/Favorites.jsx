@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Image, Button, Layout, Table } from "antd";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -14,6 +15,7 @@ const Favorites = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const loadFavorites = async () => {
     try {
@@ -67,23 +69,40 @@ const Favorites = () => {
     }
   };
 
+  const handleProductClick = (productId) => {
+    navigate(`/user/ProductDetails/${productId}`);
+  };
+
   const columns = [
     {
       title: "Resim",
       dataIndex: "image1",
       key: "image",
-      render: (image1) =>
-        image1 ? (
-          <Image width={50} src={image1} alt="Product" />
-        ) : (
-          <div>Resim Yok</div>
-        ),
+      render: (image1, record) => (
+        <div
+          onClick={() => handleProductClick(record.product_id)}
+          style={{ cursor: "pointer" }}
+        >
+          {image1 ? (
+            <Image width={50} src={image1} alt="Product" />
+          ) : (
+            <div>Resim Yok</div>
+          )}
+        </div>
+      ),
     },
     {
       title: "Ürün Adı",
       dataIndex: "name",
       key: "name",
-      render: (name) => name || "Ürün Adı Yok",
+      render: (name, record) => (
+        <div
+          onClick={() => handleProductClick(record.product_id)}
+          style={{ cursor: "pointer" }}
+        >
+          {name || "Ürün Adı Yok"}
+        </div>
+      ),
     },
     {
       title: "Fiyat",
