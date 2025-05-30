@@ -152,6 +152,19 @@ const Payment = () => {
 
       const data = await response.json();
 
+      // Sipariş durumunu PENDING olarak güncelle
+      await fetch(`http://localhost:8082/api/delivery/v1/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          delivery_state: "PENDING",
+          updated_at: new Date().toISOString(),
+        }),
+      });
+
       notification.success({
         message: "Ödeme Başarılı",
         description: "Ödemeniz alındı. Siparişiniz hazırlanıyor.",
@@ -159,10 +172,14 @@ const Payment = () => {
 
       setWalletBalance(walletBalance - totalPrice);
 
-      // [Yeni eklendi] - payment_state frontend'de güncelleniyor
+      // payment_state frontend'de güncelleniyor
       setOrder((prevOrder) => ({
         ...prevOrder,
-        payment_state: true,
+        payment_state: "SUCCESS",
+        delivery: {
+          ...prevOrder.delivery,
+          delivery_state: "PENDING",
+        },
       }));
 
       localStorage.removeItem("orderData");
@@ -264,7 +281,7 @@ const Payment = () => {
                   <br />
                   <Text>Cüzdan Bakiyesi: {userData.balance} TL</Text>
                   <br />
-                  {order.payment_state && (
+                  {order.payment_state === "SUCCESS" && (
                     <Text type="success">
                       Ödeme durumu: Ödeme tamamlandı ✅
                     </Text>

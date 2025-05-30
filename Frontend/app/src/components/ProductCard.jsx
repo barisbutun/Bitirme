@@ -47,25 +47,7 @@ function ProductCard({
   const [userRating, setUserRating] = useState(0);
   const imageRef = useRef();
   const [isImageVisible, setIsImageVisible] = useState(false);
-  const [currentAverageRating, setCurrentAverageRating] =
-    useState(averageRating);
-  const [currentReviewCount, setCurrentReviewCount] = useState(reviewCount);
 
-  useEffect(() => {
-    const fetchReviewData = async () => {
-      try {
-        const res = await getUserReview(id);
-        if (res) {
-          setCurrentAverageRating(res.averageRating);
-          setCurrentReviewCount(res.reviewCount);
-        }
-      } catch (err) {
-        console.error("Yorum verileri alınamadı", err);
-      }
-    };
-
-    fetchReviewData();
-  }, [id]);
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -83,6 +65,7 @@ function ProductCard({
 
     return () => observer.disconnect();
   }, []);
+
   const availableSizes = React.useMemo(() => {
     if (typeof quantity === "object" && quantity !== null) {
       return Object.entries(quantity).filter(([size, count]) => count > 0);
@@ -241,14 +224,14 @@ function ProductCard({
         {isAvailable ? "Stokta Var" : "Stokta Yok"}
       </CardText>
 
-      <Tooltip title={`${currentReviewCount} yorum`}>
-        <Rate allowHalf disabled defaultValue={currentAverageRating} />
-        <p>
-          {Number.isFinite(currentAverageRating)
-            ? currentAverageRating.toFixed(1)
-            : "0.0"}{" "}
-          ⭐ ({currentReviewCount || 0} yorum)
-        </p>
+      <Tooltip title={`${reviewCount || 0} yorum`}>
+        <>
+          <Rate allowHalf disabled defaultValue={averageRating || 0} />
+          <p>
+            {Number.isFinite(averageRating) ? averageRating.toFixed(1) : "0.0"}{" "}
+            ⭐ ({reviewCount || 0} yorum)
+          </p>
+        </>
       </Tooltip>
 
       {isAvailable && (

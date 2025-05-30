@@ -11,6 +11,7 @@ import {
   Statistic,
   message,
   Spin,
+  App,
 } from "antd";
 import {
   DeliveredProcedureOutlined,
@@ -26,6 +27,7 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const DeliveryDashboard = () => {
+  const { message: messageApi } = App.useApp();
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusUpdates, setStatusUpdates] = useState({});
@@ -34,34 +36,46 @@ const DeliveryDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [deliveryRes, productRes] = await Promise.all([
-        axios.get("http://localhost:8082/api/delivery/v1"),
-        axios.get("http://localhost:8082/api/product/v1/all"),
-      ]);
+      // Admin sipariş bilgilerini al
+      const orderResponse = await axios.get(
+        "http://localhost:8082/api/admin/v1/orders?page=0&size=100",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-      const deliveriesWithExtras = deliveryRes.data.map((delivery) => {
-        const product = productRes.data.find(
-          (p) => p.id === delivery.productId || p.id === delivery.product_id
-        );
+      console.log("Admin Sipariş Verisi:", orderResponse.data);
 
-        return {
-          ...delivery,
-          userName:
-            delivery.user?.name || delivery.user_name || "Bilinmeyen Kullanıcı",
-          address: delivery.address || "",
-          status:
-            delivery.delivery_state === "PENDING"
-              ? "preparing"
-              : delivery.delivery_state === "SHIPPED"
-              ? "shipping"
-              : "delivered",
-          productName: product?.name || "Ürün Bilgisi Yok",
-        };
-      });
+      // Sipariş verilerini işle
+      const processedOrders = orderResponse.data.content.map((order) => ({
+        id: order.delivery?.id || order.id,
+        userName: order.user?.name || "Bilinmeyen Kullanıcı",
+        status:
+          order.delivery?.delivery_state === "PENDING"
+            ? "preparing"
+            : order.delivery?.delivery_state === "SHIPPED"
+            ? "shipping"
+            : order.delivery?.delivery_state === "DELIVERED"
+            ? "delivered"
+            : "cancelled",
+        delivery_state: order.delivery?.delivery_state,
+        delivery_date: order.delivery?.delivery_date,
+        updated_at: order.delivery?.updated_at,
+        company_name: order.delivery?.company_name,
+        order_id: order.id,
+        payment_state: order.payment_state,
+        sum_price: order.sum_price,
+        sale_date: order.sale_date,
+        address: order.address,
+      }));
 
-      setDeliveries(deliveriesWithExtras);
+      console.log("İşlenmiş Veriler:", processedOrders);
+      setDeliveries(processedOrders);
     } catch (error) {
-      message.error("Veriler alınamadı.");
+      console.error("Veri alma hatası:", error);
+      messageApi.error("Veriler alınamadı.");
     } finally {
       setLoading(false);
     }
@@ -79,7 +93,7 @@ const DeliveryDashboard = () => {
     console.log("Gönderilen ID:", id);
     const updatedStatus = statusUpdates[id];
     if (!updatedStatus) {
-      message.warning("Lütfen bir durum seçin.");
+      messageApi.warning("Lütfen bir durum seçin.");
       return;
     }
 
@@ -93,19 +107,26 @@ const DeliveryDashboard = () => {
           ? "PROCESSING"
           : updatedStatus === "shipping"
           ? "SHIPPED"
-          : "DELIVERED",
+          : updatedStatus === "delivered"
+          ? "DELIVERED"
+          : "CANCELLED",
       updated_at: new Date().toISOString(),
     };
 
     try {
       await axios.put(
         `http://localhost:8082/api/delivery/v1/${id}`,
-        updatedDelivery
+        updatedDelivery,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
-      message.success("Sipariş durumu güncellendi.");
+      messageApi.success("Sipariş durumu güncellendi.");
       fetchData();
     } catch (error) {
-      message.error("Güncelleme başarısız.");
+      messageApi.error("Güncelleme başarısız.");
     }
   };
 
@@ -127,19 +148,9 @@ const DeliveryDashboard = () => {
       key: "id",
     },
     {
-      title: "Ürün",
-      dataIndex: "productName",
-      key: "productName",
-    },
-    {
-      title: "Kullanıcı",
+      title: "Kullanıcı Adı",
       dataIndex: "userName",
       key: "userName",
-    },
-    {
-      title: "Adres",
-      dataIndex: "address",
-      key: "address",
     },
     {
       title: "Durum",
@@ -193,7 +204,6 @@ const DeliveryDashboard = () => {
         </div>
       ),
     },
-
     {
       title: "Güncelle",
       key: "update",
@@ -273,4 +283,10 @@ const DeliveryDashboard = () => {
   );
 };
 
-export default DeliveryDashboard;
+const DeliveryDashboardWithApp = () => (
+  <App>
+    <DeliveryDashboard />
+  </App>
+);
+
+export default DeliveryDashboardWithApp;

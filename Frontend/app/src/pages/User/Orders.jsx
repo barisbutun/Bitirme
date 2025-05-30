@@ -94,7 +94,7 @@ const Orders = () => {
         description: "sipariş",
         sumPrice: dataSource.reduce((sum, item) => sum + item.total, 0),
         saleDate: new Date().toISOString(),
-        stockState: "Hazırlanıyor",
+        // stockState: "Hazırlanıyor",
         products: dataSource.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,

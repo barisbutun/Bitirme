@@ -13,13 +13,16 @@ export const fetchProducts = async (page = 0, size = 10) => {
     });
 
     if (!response.ok) {
-      // throw new Error("Ürün bilgileri alınamadı");
+      throw new Error("Ürün bilgileri alınamadı");
     }
 
     const data = await response.json();
+    
+    if (!data || !data.content) {
+      throw new Error("Geçersiz veri formatı: content alanı bulunamadı");
+    }
 
-  
-    const totalElements = data.totalElements||data.content.length; 
+    const totalElements = data.totalElements || data.content.length; 
     const formattedProducts = data.content.map(product => ({
       ...product,
       category_id: product.category_id,

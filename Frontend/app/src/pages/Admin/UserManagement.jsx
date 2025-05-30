@@ -17,12 +17,15 @@ import {
   notification,
 } from "antd";
 import {
-  UserOutlined,
   TeamOutlined,
   CheckCircleOutlined,
   StopOutlined,
   SafetyOutlined,
   HomeOutlined,
+  UserOutlined,
+  ManOutlined,
+  WomanOutlined,
+  MehOutlined,
 } from "@ant-design/icons";
 import {
   deleteUser,
@@ -175,12 +178,30 @@ const UserListWithDashboard = () => {
       title: "Avatar",
       dataIndex: "avatar",
       key: "avatar",
-      render: () => (
-        <Avatar
-          style={{ backgroundColor: "#1890ff" }}
-          icon={<UserOutlined />}
-        />
-      ),
+      render: (text, record) => {
+        let icon;
+        let bgColor;
+
+        switch (record.gender) {
+          case "FEMALE":
+            icon = <WomanOutlined />;
+            bgColor = "#e91e63";
+            break;
+          case "MALE":
+            icon = <ManOutlined />;
+            bgColor = "#1890ff";
+            break;
+          case "OTHER":
+            icon = <MehOutlined />;
+            bgColor = "#9e9e9e";
+            break;
+          default:
+            icon = <UserOutlined />;
+            bgColor = "#bdbdbd";
+        }
+
+        return <Avatar style={{ backgroundColor: bgColor }}>{icon}</Avatar>;
+      },
     },
     {
       title: "Ad Soyad",

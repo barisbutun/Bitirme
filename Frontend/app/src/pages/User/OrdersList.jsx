@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Table, Typography, notification, Button, Select } from "antd";
+import { Layout, Table, Typography, Button, Select, Tag, App } from "antd";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -8,23 +8,26 @@ import { fetchProductImages } from "../../services/ProductService/ProductService
 import ImageCollage from "../../components/ImageCollage";
 import { useNavigate } from "react-router-dom";
 import "../User/UserCss/Orders.css";
+
 import {
   cancelOrder,
   cancelOrderItem,
 } from "../../services/ProductService/OrdersService";
-// ... diğer importlar ...
+
 const { Text } = Typography;
 const { Option } = Select;
 
 const OrderList = () => {
+  const { notification } = App.useApp();
   const [collapsed, setCollapsed] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [updateTrigger, setUpdateTrigger] = useState(false);
   const [categorizedOrders, setCategorizedOrders] = useState({
     pending: [],
     preparing: [],
     shipping: [],
     delivered: [],
-    cancelled: [], // ✅ Yeni kategori
+    cancelled: [],
   });
   const [selectedCategory, setSelectedCategory] = useState("pending");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
@@ -62,7 +65,7 @@ const OrderList = () => {
 
     setLoading(true);
     fetchAllOrdersCompletely().finally(() => setLoading(false));
-  }, []);
+  }, [updateTrigger]); // updateTrigger değişince tekrar fetch et
 
   useEffect(() => {
     const categorizeOrders = () => {
@@ -70,27 +73,32 @@ const OrderList = () => {
       const preparing = [];
       const shipping = [];
       const delivered = [];
-      const cancelled = []; // ✅
+      const cancelled = [];
 
       orders.forEach((order) => {
         const paymentState = order.payment_state;
-        const deliveryState = order.delivery?.delivery_state;
+        const deliveryState = order.delivery?.delivery_state?.toUpperCase();
 
-        if (paymentState === "CANCELLED" || deliveryState === "İptal Edildi") {
-          cancelled.push(order); // ✅
-        } else if (
-          paymentState === null ||
-          paymentState === "FAILED" ||
-          paymentState === "REFUNDED"
-        ) {
+        if (paymentState === "CANCELLED" || deliveryState === "CANCELLED") {
+          cancelled.push(order);
+        } else if (paymentState === null) {
           pending.push(order);
         } else if (paymentState === "SUCCESS") {
-          if (deliveryState === "pending" || deliveryState === "Hazırlanıyor") {
+          if (deliveryState === "PROCESSING") {
             preparing.push(order);
-          } else if (deliveryState === "Teslimatta") {
+          } else if (
+            deliveryState === "SHIPPED" ||
+            deliveryState === "IN_TRANSIT" ||
+            deliveryState === "OUT_FOR_DELIVERY"
+          ) {
             shipping.push(order);
-          } else if (deliveryState === "Teslim Edildi") {
+          } else if (deliveryState === "DELIVERED") {
             delivered.push(order);
+          } else if (
+            deliveryState === "FAILED_DELIVERY" ||
+            deliveryState === "RETURNED"
+          ) {
+            cancelled.push(order);
           } else {
             preparing.push(order);
           }
@@ -105,7 +113,7 @@ const OrderList = () => {
         shipping,
         delivered,
         cancelled,
-      }); // ✅
+      });
       setPagination({ current: 1, pageSize: 5 });
     };
 
@@ -156,46 +164,99 @@ const OrderList = () => {
     setSelectedItemsMap((prev) => ({ ...prev, [orderId]: selectedRowKeys }));
   };
 
-  const handleCancelOrder = async (order) => {
-    try {
-      const order_items = order.orderItems.map((item) => ({
-        id: item.id,
-        product_id: item.product_id,
-        cancel_quantity: item.quantity,
-      }));
-
-      await cancelOrder({
-        order_id: order.id,
-        description: order.description,
-        order_items: order_items,
-      });
-
-      notification.success({ message: "Sipariş iptal edildi" });
-      setOrders((prev) => prev.filter((o) => o.id !== order.id));
-    } catch (error) {
-      notification.error({ message: "Sipariş iptal edilemedi" });
-      console.error(error);
-    }
-  };
-
   const handleCancelSelectedItems = async (orderId) => {
     const selectedKeys = selectedItemsMap[orderId] || [];
     const productIds = selectedKeys.map((key) => key.split(`${orderId}-`)[1]);
 
     try {
-      await cancelOrderItem(orderId, productIds);
+      // Önce mevcut siparişi bul
+      const currentOrder = orders.find((order) => order.id === orderId);
+      if (!currentOrder) {
+        throw new Error("Sipariş bulunamadı");
+      }
+
+      // İptal edilecek ürünleri filtrele
+      const itemsToCancel = currentOrder.orderItems.filter((item) =>
+        productIds.includes(item.product_id.toString())
+      );
+
+      if (itemsToCancel.length === 0) {
+        throw new Error("İptal edilecek ürün bulunamadı");
+      }
+
+      console.log("Items to cancel:", itemsToCancel);
+
+      // İptal edilecek ürünlerin detaylarını hazırla
+      const orderItems = itemsToCancel.map((item) => {
+        const orderItem = currentOrder.orderItems.find(
+          (oi) => oi.product_id === item.product_id
+        );
+        if (!orderItem) {
+          throw new Error(
+            `Ürün ID ${item.product_id} için order item bulunamadı`
+          );
+        }
+
+        return {
+          id: orderItem.id,
+          product_id: item.product_id,
+          cancel_quantity: item.quantity,
+          quantity: item.quantity,
+        };
+      });
+
+      console.log("Order items for payload:", orderItems);
+
+      const payload = {
+        order_id: orderId,
+        order_items: orderItems,
+      };
+
+      console.log("Cancellation payload:", payload);
+
+      const response = await cancelOrderItem(orderId, productIds, payload);
+
       notification.success({
         message: "Seçili ürünler iptal edildi",
       });
 
-      // Frontend'te siparişten çıkar
+      // Frontend'te siparişi güncelle
       setOrders((prevOrders) =>
         prevOrders.map((order) => {
           if (order.id === orderId) {
+            // İptal edilen ürünleri siparişten çıkar
             const updatedItems = order.orderItems.filter(
               (item) => !productIds.includes(item.product_id.toString())
             );
-            return { ...order, orderItems: updatedItems };
+
+            // Toplam tutarı güncelle
+            const newSumPrice = updatedItems.reduce((sum, item) => {
+              return sum + (item.product?.price || 0) * item.quantity;
+            }, 0);
+
+            // Eğer tüm ürünler iptal edildiyse veya kalan ürünlerin miktarları 0 ise
+            if (
+              updatedItems.length === 0 ||
+              updatedItems.every((item) => item.quantity === 0)
+            ) {
+              return {
+                ...order,
+                orderItems: [], // Tüm ürünleri temizle
+                sum_price: 0, // Toplam tutarı sıfırla
+                delivery: {
+                  ...order.delivery,
+                  delivery_state: "CANCELLED",
+                },
+                payment_state: "CANCELLED", // Ödeme durumunu da güncelle
+              };
+            }
+
+            return {
+              ...order,
+              orderItems: updatedItems,
+              sum_price: newSumPrice,
+              payment_state: "UPDATED", // Kısmi iptal durumunda ödeme durumunu güncelle
+            };
           }
           return order;
         })
@@ -203,8 +264,83 @@ const OrderList = () => {
 
       // Seçimi temizle
       setSelectedItemsMap((prev) => ({ ...prev, [orderId]: [] }));
+
+      // Kategorileri yeniden hesapla
+      setUpdateTrigger((prev) => !prev);
     } catch (error) {
-      notification.error({ message: "Ürünler iptal edilemedi" });
+      console.error("İptal hatası:", error);
+      notification.error({
+        message: "Ürünler iptal edilemedi",
+        description: error.message || "Bir hata oluştu. Lütfen tekrar deneyin.",
+      });
+    }
+  };
+
+  const handleCancelOrder = async (order) => {
+    try {
+      // Sadece iptal edilmemiş ürünleri filtrele
+      const activeOrderItems = order.orderItems.filter(
+        (item) => !item.cancelled
+      );
+
+      if (activeOrderItems.length === 0) {
+        notification.warning({
+          message: "Uyarı",
+          description: "Bu siparişte iptal edilecek ürün kalmadı.",
+        });
+        return;
+      }
+
+      // Tüm ürünlerin toplam tutarını hesapla
+      const cancelAmount = activeOrderItems.reduce((sum, item) => {
+        return sum + (item.product?.price || 0) * item.quantity;
+      }, 0);
+
+      const order_items = activeOrderItems.map((item) => ({
+        id: item.id,
+        product_id: item.product_id,
+        cancel_quantity: item.quantity,
+        quantity: item.quantity, // Orijinal miktarı da gönder
+      }));
+
+      const payload = {
+        order_id: order.id,
+        description: "Siparişi iptal etmek istiyorum",
+        order_items: order_items,
+        cancel_amount: cancelAmount,
+      };
+
+      await cancelOrder(payload);
+
+      notification.success({ message: "Sipariş iptal edildi" });
+
+      // Siparişi cancelled kategorisine taşı ve orderItems'ı temizle
+      setOrders((prev) =>
+        prev.map((o) => {
+          if (o.id === order.id) {
+            return {
+              ...o,
+              orderItems: [], // Tüm ürünleri temizle
+              sum_price: 0, // Toplam tutarı sıfırla
+              delivery: {
+                ...o.delivery,
+                delivery_state: "CANCELLED",
+              },
+              payment_state: "CANCELLED", // Ödeme durumunu da güncelle
+            };
+          }
+          return o;
+        })
+      );
+
+      // Kategorileri yeniden hesapla
+      setUpdateTrigger((prev) => !prev);
+    } catch (error) {
+      console.error("Sipariş iptal hatası:", error);
+      notification.error({
+        message: "Sipariş iptal edilemedi",
+        description: error.message || "Bir hata oluştu. Lütfen tekrar deneyin.",
+      });
     }
   };
 
@@ -346,22 +482,44 @@ const OrderList = () => {
         key: "size",
         width: 80,
       },
+      {
+        title: "Durum",
+        key: "status",
+        width: 100,
+        render: (_, record) => {
+          const isCancelled = record.cancelled || false;
+          return isCancelled ? (
+            <Tag color="red">İptal Edildi</Tag>
+          ) : (
+            <Tag color="green">Aktif</Tag>
+          );
+        },
+      },
     ];
+
+    // Sadece iptal edilmemiş ürünleri göster
+    const activeOrderItems = order.orderItems.filter((item) => !item.cancelled);
 
     const rowSelection = {
       selectedRowKeys: selectedItemsMap[order.id] || [],
       onChange: (selectedRowKeys) =>
         handleItemSelection(order.id, selectedRowKeys),
+      // İptal edilmiş ürünleri seçilemez yap
+      getCheckboxProps: (record) => ({
+        disabled: record.cancelled,
+      }),
     };
 
     return (
       <Table
         columns={itemColumns}
-        dataSource={order.orderItems.map((item) => ({
+        dataSource={activeOrderItems.map((item) => ({
           ...item,
           key: `${order.id}-${item.product_id}`,
         }))}
         pagination={false}
+        rowKey={(record) => `${order.id}-${record.product_id}`}
+        locale={{ emptyText: "Sipariş ürünü bulunamadı" }}
         size="small"
         rowSelection={{
           type: "checkbox",
@@ -389,6 +547,7 @@ const OrderList = () => {
     });
   };
 
+  // Tek tabloda seçilen kategoriye göre veriyi getiriyoruz
   const currentData = categorizedOrders[selectedCategory] || [];
 
   return (
@@ -410,11 +569,11 @@ const OrderList = () => {
               style={{ width: "100%" }}
               placeholder="Kategori Seçiniz"
             >
-              <Option value="pending">🕒 Ödeme Bekleyen Siparişler</Option>
+              <Option value="pending">🕒 Bekleyen Siparişler</Option>
               <Option value="preparing">🛠 Hazırlanıyor</Option>
               <Option value="shipping">🚚 Teslimatta</Option>
               <Option value="delivered">📦 Teslim Edildi</Option>
-              <Option value="cancelled">❌ İptal Edilen Siparişler</Option>
+              <Option value="cancelled">❌ İptal/İade Edilen Siparişler</Option>
             </Select>
           </div>
 
@@ -439,7 +598,7 @@ const OrderList = () => {
         <Footer>
           <div
             className="pagination-inside-footer"
-            style={{ marginTop: 470, marginLeft: collapsed ? 80 : 180 }}
+            style={{ marginTop: 370, marginLeft: collapsed ? 80 : 180 }}
           >
             <p className="footer-text">@Fashion Design</p>
           </div>
@@ -449,4 +608,11 @@ const OrderList = () => {
   );
 };
 
-export default OrderList;
+// Wrap the component with App provider
+const OrderListWithApp = () => (
+  <App>
+    <OrderList />
+  </App>
+);
+
+export default OrderListWithApp;

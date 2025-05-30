@@ -97,6 +97,8 @@ const SearchResults = () => {
                   quantity={item.quantity}
                   stock_state={item.stock_state}
                   category_id={item.category_id}
+                  averageRating={item.averageRating}
+                  reviewCount={item.reviewCount}
                 />
               </div>
             ))
