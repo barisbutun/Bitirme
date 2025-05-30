@@ -50,6 +50,8 @@ import {
   Cell,
   Legend,
   ResponsiveContainer,
+  BarChart,
+  Bar,
 } from "recharts";
 import ProductListModal from "../../AdminComponents/ProductListModal";
 const { Title } = Typography;
@@ -178,7 +180,16 @@ const AdminDashboard = () => {
 
   const fetchAllProducts = async () => {
     try {
-      const products = await getAllProducts();
+      const response = await axios.get(
+        "http://localhost:8082/api/product/v1/all",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const products = response.data;
       const categories = await Categories();
 
       const productsWithCategory = products.map((product) => ({
@@ -188,11 +199,26 @@ const AdminDashboard = () => {
         },
       }));
 
-      const timeData = productsWithCategory.map((product, index) => ({
-        name: `Ürün ${index + 1}`,
-        ürünler: index + 1,
-      }));
-      setProductDataOverTime(timeData);
+      // Ürün performans verilerini oluştur
+      const productPerformanceData = productsWithCategory
+        .sort(
+          (a, b) =>
+            b.favouriteCount +
+            b.saleCount +
+            b.reviewCount -
+            (a.favouriteCount + a.saleCount + a.reviewCount)
+        )
+        .slice(0, 10) // En iyi performans gösteren 10 ürün
+        .map((product) => ({
+          name: product.name,
+          favori: product.favouriteCount,
+          satış: product.saleCount,
+          değerlendirme: product.reviewCount,
+          toplam:
+            product.favouriteCount + product.saleCount + product.reviewCount,
+        }));
+
+      setProductDataOverTime(productPerformanceData);
 
       const categoryCount = {};
       productsWithCategory.forEach((product) => {
@@ -400,27 +426,40 @@ const AdminDashboard = () => {
       <Row gutter={[24, 24]} style={{ marginTop: "48px" }}>
         <Col xs={24} md={12}>
           <Card
-            title="Zamana Göre Ürün Stok Değişimi"
+            title="En Popüler 10 Ürün Performansı"
             style={{ borderRadius: "16px" }}
           >
             <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={productDataOverTime[0].stockHistory}>
+              <BarChart data={productDataOverTime}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-
-                {productDataOverTime.map((product, index) => (
-                  <Line
-                    key={index}
-                    type="monotone"
-                    dataKey="stock"
-                    data={product.stockHistory}
-                    stroke={index % 2 === 0 ? "#8884d8" : "#82ca9d"}
-                    name={product.productName}
-                  />
-                ))}
-              </LineChart>
+                <Legend />
+                <Bar
+                  dataKey="favori"
+                  name="Favori Sayısı"
+                  fill="#8884d8"
+                  stackId="a"
+                />
+                <Bar
+                  dataKey="satış"
+                  name="Satış Sayısı"
+                  fill="#82ca9d"
+                  stackId="a"
+                />
+                <Bar
+                  dataKey="değerlendirme"
+                  name="Değerlendirme Sayısı"
+                  fill="#ffc658"
+                  stackId="a"
+                />
+              </BarChart>
             </ResponsiveContainer>
           </Card>
         </Col>

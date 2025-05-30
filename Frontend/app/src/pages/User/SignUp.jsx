@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Button, Checkbox, Form, Input, Select, Spin, message } from "antd";
+import React, { useState } from "react";
+import { Button, Form, Input, Select, Spin, message } from "antd";
 import "../User/UserCss/SignUp.css";
 import { useNavigate } from "react-router-dom";
-import {
-  Register,
-  VerifyRegister,
-} from "../../services/UserService/AuthService";
+import { VerifyRegister } from "../../services/UserService/AuthService";
 import AgreementCheckbox from "../../components/AgreementCheckbox";
 const { Option } = Select;
 
@@ -30,77 +27,12 @@ const tailFormItemLayout = {
 const SignUp = ({ setLoading }) => {
   const [form] = Form.useForm();
   const [name, setName] = useState("");
-  const [email, setUseremail] = useState("");
   const [password, setUserpassword] = useState("");
   const [address, setUseraddress] = useState("");
   const [phone, setUserphone] = useState("");
-  const [errormessage, setErrorMessage] = useState("");
-  const [remainingTime, setRemainingTime] = useState(6 * 60);
-
   const navigate = useNavigate();
 
-  const getColor = () => {
-    if (remainingTime > 240) return "#52c41a"; // yeşil
-    if (remainingTime > 120) return "#faad14"; // turuncu
-    return "#f5222d"; // kırmızı
-  };
-
-  useEffect(() => {
-    const countdown = setInterval(() => {
-      setRemainingTime((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(countdown);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-
-    const timeout = setTimeout(() => {
-      message.warning(
-        "Doğrulama kodunun süresi doldu. Lütfen yeniden e-posta doğrulaması yapın."
-      );
-      navigate("/user/EmailVerification");
-    }, 6 * 60 * 1000);
-
-    return () => {
-      clearInterval(countdown);
-      clearTimeout(timeout);
-    };
-  }, []);
-
-  // const registerUser = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await Register(
-  //       name,
-  //       email,
-  //       password,
-  //       address,
-  //       phone,
-  //       navigate
-  //     );
-  //     if (response) {
-  //       setMessage(" Kayıt başarılı:");
-  //       navigate("/user/Login");
-  //     } else {
-  //       setMessage("Kayıt başarısız: {$data.message}");
-  //     }
-  //   } catch (error) {
-  //     setMessage("Kayıt sırasında hata oluştu:");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleRegister = async () => {
-    if (remainingTime <= 0) {
-      message.warning(
-        "Doğrulama süresi doldu. Lütfen tekrar e-posta doğrulaması yapın."
-      );
-      navigate("/user/EmailVerification");
-      return;
-    }
-
     if (!name || !address || !phone || !password) {
       message.error("Tüm alanları doldurduğunuzdan emin olun.");
       return;
@@ -187,21 +119,6 @@ const SignUp = ({ setLoading }) => {
               onChange={(e) => setName(e.target.value)}
             />
           </Form.Item>
-
-          {/* <Form.Item
-            name="email"
-            label="E-posta"
-            rules={[
-              { type: "email", message: "Geçerli bir e-posta değil!" },
-              { required: true, message: "Lütfen e-posta adresinizi giriniz!" },
-            ]}
-          >
-            <Input
-              className="form-input"
-              value={email}
-              onChange={(e) => setUseremail(e.target.value)}
-            />
-          </Form.Item> */}
 
           <Form.Item
             name="password"
@@ -296,38 +213,6 @@ const SignUp = ({ setLoading }) => {
             </Button>
           </Form.Item>
         </Form>
-        {/* Sayaç ve progress bar */}
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div
-            style={{
-              fontSize: "18px",
-              fontWeight: "bold",
-              color: getColor(),
-            }}
-          >
-            Kalan Süre: {Math.floor(remainingTime / 60)}:
-            {String(remainingTime % 60).padStart(2, "0")}
-          </div>
-          <div style={{ marginTop: "8px", width: "30%", marginInline: "auto" }}>
-            <div
-              style={{
-                height: "8px",
-                background: "#f0f0f0",
-                borderRadius: "4px",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  height: "80%",
-                  width: `${(remainingTime / (6 * 60)) * 100}%`,
-                  background: getColor(),
-                  transition: "width 1s linear",
-                }}
-              />
-            </div>
-          </div>
-        </div>
       </Spin>
     </div>
   );

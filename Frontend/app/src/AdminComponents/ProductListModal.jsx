@@ -100,6 +100,9 @@ const ProductListModal = ({ isOpen, setIsOpen }) => {
                 <p>
                   <strong>Değerlendirme Sayısı:</strong> {product.reviewCount}
                 </p>
+                <p>
+                  <strong>Satış Sayısı:</strong> {product.saleCount}
+                </p>
               </div>
             }
           >
