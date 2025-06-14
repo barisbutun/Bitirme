@@ -53,6 +53,8 @@ Development spanned 9 months and included extensive documentation and testing. O
 | **Container**       | Docker, Docker Compose                                             |
 
 ---
+## 📦 Rasa repo
+https://github.com/barisbutun/rasa-ecommerce-bot
 
 ## 📂 Proje Yapısı / Project Structure
 
