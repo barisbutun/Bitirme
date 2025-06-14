@@ -1,2 +1,5 @@
 /Frontend/app/node_modules
 /chatbot/chatbot_ecommeerce
+/BitirmeProjesi/src/main/resources/keystore.p12
+/BitirmeProjesi/src/main/resources/application.yml
+/BitirmeProjesi/src/main/resources/.env
