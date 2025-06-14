@@ -78,9 +78,9 @@ spring:
       uris: https://localhost:9200
       ssl:
         enabled: true
-        key-store: C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/keystore.p12
+        key-store: ./Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/keystore.p12
         key-store-password: 123456B
-        trust-store:  C:/Users/Baris/OneDrive - ktun.edu.tr/Masaustu/SpringBoot/Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/truststore.jks
+        trust-store:  ./Bitirme Projesi/Bitirme/BitirmeProjesi/src/main/resources/truststore.jks
         trust-store-password: 123456B
         key-store-type: PKCS12
         key-alias: es01
@@ -89,13 +89,13 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379  # Eğer Redis şifreliyse buraya ekleyebilirsin, aksi halde boş bırakabilirsin
-      timeout: 60000 # (ms cinsinden) Redis bağlantısı zaman aşımı süresi
+      port: 6379
+      timeout: 60000
       lettuce:
         pool:
-          max-active: 10  # Maksimum aktif bağlantı sayısı
-          max-idle: 5      # Maksimum boşta bekleyen bağlantı sayısı
-          min-idle: 1      # Minimum boşta bekleyen bağlantı sayısı
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
           max-wait: 5000
 
 

@@ -24,19 +24,19 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // Kullanıcı kimliği ve rollerini al
+
         UUID userId = JwtUtil.getUserIdFromToken();
         Collection<String> roles = Collections.singleton(JwtUtil.getRoleFromToken());
 
         Bucket bucket = rateLimitService.resolveBucket(userId, roles);
 
-        // Admin ise sınırsız
+
         if (bucket == null) {
             return true;
         }
 
         if (bucket.tryConsume(1)) {
-            return true; // izin ver
+            return true;
         } else {
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.getWriter().write("Too many requests - try again later.");
