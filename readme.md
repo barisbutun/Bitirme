@@ -26,16 +26,16 @@ Geliştirme süreci 9 ay, kapsamlı bir dokümantasyon ve test süreci içerir. 
 
 ## 🏗️ Mimari ve Teknoloji Yığını
 
-| Katman           | Teknolojiler                            |
-|------------------|-----------------------------------------|
-| **Backend**       | Java, Spring Boot, Spring Security, JWT |
-| **Öneri Motoru**  | Python, scikit-learn, numpy             |
-| **Cache & Queue** | Redis                                   |
-| **Rate Limiting** | Bucket4j                                |
-| **Chatbot**       | Rasa                                    |
-| **Veri Tabanı**   | PostgreSQL,Elasticsearch,Redis          |
-| **Frontend**      | React (TypeScript), Rechart, Antdesign  |
-| **Container**     | Docker, Docker Compose                  |
+| Katman           | Teknolojiler                                                 |
+|------------------|--------------------------------------------------------------|
+| **Backend**       | Java, Spring Boot, Spring Security, JWT, Spring Data JPA ... |
+| **Öneri Motoru**  | Python, scikit-learn, numpy                                  |
+| **Cache & Queue** | Redis                                                        |
+| **Rate Limiting** | Bucket4j                                                     |
+| **Chatbot**       | Rasa                                                         |
+| **Veri Tabanı**   | PostgreSQL,Elasticsearch,Redis                               |
+| **Frontend**      | React (TypeScript), Rechart, Antdesign                       |
+| **Container**     | Docker, Docker Compose                                       |
 
 ---
 ## 📂 Proje Yapısı - Backend
