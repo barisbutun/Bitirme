@@ -32,6 +32,9 @@ Development spanned 9 months and included extensive documentation and testing. O
   Chatbot integration using Rasa
 - 🚦 **Rate Limiting**: Redis + Bucket4j tabanlı istek sınırlandırma  
   Redis and Bucket4j for API rate limiting
+  ⚡ **Hızlı Arama & Otomatik Tamamlama / Fast Search & Autocomplete**:
+Elasticsearch ve QueryDSL kullanılarak ürün isimlerinde N-gram analizör tabanlı hızlı arama ve otomatik tamamlama özelliği
+Fast product name search and autocomplete using Elasticsearch, QueryDSL, and N-gram analyzer
 - 🔐 **Güvenlik / Security**: CORS, CSRF, rol tabanlı yetkilendirme  
   CORS, CSRF, and role-based authorization
 - 🐳 **Docker Desteği / Docker Support**: Hem backend hem frontend için container desteği  
